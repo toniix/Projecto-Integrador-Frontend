@@ -1,0 +1,21 @@
+.custom-button {
+    background: var(--color3);
+    color: #d9c6b0;
+    border: 2px solid #6d6665 !important;
+    transition: all 0.3s ease;
+    transform: scale(1);
+}
+
+.custom-button:hover {
+    background: var(--color4);
+    color: #e0cfbc;
+    font-weight: bold;
+    transform: scale(1.05) ease;
+} 
+
+.custom-button:active,
+.custom-button:active:focus-visible {
+    background-color: #a83221 !important;
+    color: #e0cfbc !important;
+    outline: none !important;
+}

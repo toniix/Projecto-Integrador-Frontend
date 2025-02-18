@@ -7,7 +7,7 @@ export const RegisterInstrumentButton = () => {
 
     return (
         <div className="text-center mt-5">
-            <Button variant="success" onClick={() => setIsModalOpen(true)}>
+            <Button className="custom-button" onClick={() => setIsModalOpen(true)}>
                 Agregar Instrumento
             </Button>
             <InstrumentForm
