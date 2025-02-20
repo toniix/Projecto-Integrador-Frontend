@@ -1,0 +1,71 @@
+:root {
+    --color1: #A68F72;
+    --color2: #D9C6B0;
+    --color3: #8C3A27;
+    --color4: #D95A4E;
+    --color5: #0D0D0D;
+}
+.modal-overlay .modal-header {
+    background-color: var(--color3);
+    color: var(--color2);
+    border-bottom: none;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-overlay .modal-body {
+    background-color: var(--color2);
+    border-radius: 0 0 5px 5px;
+}
+
+.modal-overlay .form-label {
+    color: var(--color5);
+}
+
+.modal-overlay .form-control {
+    background-color: var(--color1);
+    color: var(--color5);
+    border: 1px solid var(--color3)
+}
+
+.modal-overlay .form-control:focus {
+    box-shadow: none;
+    border-color: var(--color4);
+}
+
+.modal-overlay .form-check-label {
+    color: var(--color5);
+}
+
+/* Personalización del checkbox */
+.custom-checkbox .form-check-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color3);  /* Color del borde */
+    background-color: transparent;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.custom-checkbox .form-check-input:checked {
+    background-color: var(--color3); /* Color cuando está seleccionado */
+    border-color: var(--color3);
+}
+
+.custom-checkbox .form-check-input:focus {
+    box-shadow: none;
+    border-color: var(--color3);
+}
+
+.custom-checkbox .form-check-label {
+    color: #0D0D0D;
+    padding-left: 8px;
+}
+
+
+
+
+
+

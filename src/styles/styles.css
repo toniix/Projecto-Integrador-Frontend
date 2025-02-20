@@ -78,6 +78,7 @@ nav a {
 
 main {
   padding-top: 80px;
+  background-color: #c63a27;
 }
 
 /* Sección Hero */
@@ -284,8 +285,8 @@ main {
 }
 
 /* ======================================================
-         Media Queries para Responsividad
-         ====================================================== */
+      Media Queries para Responsividad
+      ====================================================== */
 
 /* Para dispositivos con ancho máximo de 768px (tablets y móviles en horizontal) */
 @media (max-width: 768px) {
