@@ -1,7 +1,10 @@
-.custom-button {
+.add-button {
     position: absolute;
     top: 10rem;
     left: 5rem;
+}
+
+.custom-button {
     background: var(--color3);
     color: #d9c6b0;
     border: 2px solid #6d6665 !important;

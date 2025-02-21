@@ -4,10 +4,16 @@ import { InstrumentContext } from '../../context/InstrumentContext';
 import instrumentService from '../../services/instrumentService';
 import cloudinaryService from '../../services/images/cloudinaryService';
 import { Modal, Button, Form } from 'react-bootstrap';
+import  ErrorToast  from "../common/ToastError";
+import  SuccessToast  from "../common/SuccessToast";
 import '../../styles/Modal.css';
 
 export const InstrumentForm = ({ isOpen, onClose }) => {
   const { addInstrument } = useContext(InstrumentContext);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,15 +29,15 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   });
 
   const [categories, setCategories] = useState([]);
-  const [error, setError] = useState('');
+ // const [ setError] = useState('');
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const data = await instrumentService.getCategories();
-  
-        // Acceder correctamente al array dentro del objeto response
+
+        // Acceder al array dentro del objeto response
         if (data?.response?.categories && Array.isArray(data.response.categories)) {
           setCategories(data.response.categories);
         } else {
@@ -40,18 +46,18 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         }
       } catch (error) {
         console.error("Error al obtener categorías:", error);
-        setError('Error al cargar categorías');
+        setToastMessage('Error al cargar categorías');
         setCategories([]); // Asegura que `categories` siempre sea un array
       }
     };
-  
+
     fetchCategories();
   }, []);
-  
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : name === 'idCategory' ? Number(value) : value
@@ -63,7 +69,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
     if (!files.length) return;
 
     setUploading(true);
-    setError('');
+    //setError('');
 
     try {
       const urls = await Promise.all(
@@ -74,7 +80,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         imageUrls: [...prev.imageUrls, ...urls] // Agrega las nuevas imágenes
       }));
     } catch {
-      setError('Error al subir imágenes');
+      setToastMessage('Error al subir imágenes');
     } finally {
       setUploading(false);
     }
@@ -93,30 +99,43 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
       idCategory: '',
       imageUrls: []
     });
-    setError('');
+    setToastMessage('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-  
+   // setError('');
+
     try {
-      // Asegurar que se envíe un ID válido
       if (!formData.idCategory) {
-        setError('Debes seleccionar una categoría.');
+        setToastMessage('Debes seleccionar una categoría.');
         return;
       }
-  
+
       const newInstrument = await instrumentService.createInstrument(formData);
       addInstrument(newInstrument);
       resetForm();
-      onClose();
+
+      setSuccessMessage("Instrumento agregado con éxito.");
+      setShowSuccessToast(true); 
+      //onClose();
     } catch (error) {
-      setError(error.message || 'Error al crear el instrumento');
+      if (error.response?.status === 409) {
+        console.log("Error detectado:", error);
+        setToastMessage("El instrumento ya existe. Intenta con otro nombre.");
+      }
+      else if (error.response?.status === 400) {
+        setToastMessage("Datos inválidos. Revisa el formulario.");
+      } else if (error.response?.status === 500) {
+        setToastMessage("Error en el servidor. Inténtalo más tarde.");
+      } else {
+        setToastMessage(error.message || "Error al crear el instrumento.");
+      }
+      setShowToast(true); 
     }
   };
-  
-  
+
+
 
   return (
     <Modal show={isOpen} onHide={onClose} className="modal-overlay">
@@ -124,12 +143,8 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         <Modal.Title>Registrar Instrumento</Modal.Title>
       </Modal.Header>
       <Modal.Body className="modal-body">
-        {error && (
-          <div className="alert alert-danger">
-            {error}
-          </div>
-        )}
-        <Form onSubmit={handleSubmit} className="form">
+      
+          <Form onSubmit={handleSubmit} className="form">
           <Form.Group controlId="formNombre" className="mb-3">
             <Form.Label className='form-label'>Nombre</Form.Label>
             <Form.Control
@@ -149,6 +164,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               name="brand"
               value={formData.brand}
               onChange={handleInputChange}
+              required
               className="form-control"
             />
           </Form.Group>
@@ -160,6 +176,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               name="model"
               value={formData.model}
               onChange={handleInputChange}
+              required
               className="form-control"
             />
           </Form.Group>
@@ -171,6 +188,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               name="year"
               value={formData.year}
               onChange={handleInputChange}
+              required
               className="form-control"
             />
           </Form.Group>
@@ -228,6 +246,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
+              required
               className="form-control"
             />
           </Form.Group>
@@ -239,6 +258,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               name="available"
               checked={formData.available}
               onChange={handleInputChange}
+              required
             />
           </Form.Group>
 
@@ -267,6 +287,22 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             Registrar
           </Button>
         </Form>
+
+        {/* El Toast aparece cuando hay un exito */}
+
+        <SuccessToast 
+        show={showSuccessToast} 
+        handleClose={() => setShowSuccessToast(false)} 
+        message={successMessage} 
+        />
+
+
+         {/* El Toast aparece cuando hay un error */}
+        <ErrorToast 
+        show={showToast} 
+        handleClose={() => setShowToast(false)} 
+        message={toastMessage} 
+      />
       </Modal.Body>
     </Modal>
   );
