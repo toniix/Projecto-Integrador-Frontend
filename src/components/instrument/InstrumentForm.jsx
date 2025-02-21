@@ -2,165 +2,222 @@ import PropTypes from 'prop-types';
 import { useState, useEffect, useContext } from 'react';
 import { InstrumentContext } from '../../context/InstrumentContext';
 import instrumentService from '../../services/instrumentService';
+import cloudinaryService from '../../services/images/cloudinaryService';
 import { Modal, Button, Form } from 'react-bootstrap';
-import '../../styles/Modal.css'
+import '../../styles/Modal.css';
 
 export const InstrumentForm = ({ isOpen, onClose }) => {
   const { addInstrument } = useContext(InstrumentContext);
 
-  // Estados para el formulario
-  const [name, setName] = useState('');
-  const [model, setModel] = useState('');
-  const [brand, setBrand] = useState('');
-  const [idType, setIdType] = useState('');
-  const [price, setPrice] = useState('');
-  const [available, setAvailable] = useState(false);
-  const [stock, setStock] = useState('');
-  const [description, setDescription] = useState('');
-  const [anio, setAnio] = useState('');
-  const [images, setImages] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    brand: '',
+    model: '',
+    year: '',
+    stock: '',
+    description: '',
+    price: '',
+    available: false,
+    idCategory: '',
+    imageUrls: [] // Guardará las URLs de las imágenes subidas
+  });
 
-  // Cargar categorías al cargar el componente
+  const [categories, setCategories] = useState([]);
+  const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const data = await instrumentService.getCategories();
-        setCategories(data);
+  
+        // Acceder correctamente al array dentro del objeto response
+        if (data?.response?.categories && Array.isArray(data.response.categories)) {
+          setCategories(data.response.categories);
+        } else {
+          console.error("La API no devolvió un array:", data);
+          setCategories([]); // Evita que el valor sea null o undefined
+        }
       } catch (error) {
-        console.error('Error al cargar categorías:', error);
+        console.error("Error al obtener categorías:", error);
+        setError('Error al cargar categorías');
+        setCategories([]); // Asegura que `categories` siempre sea un array
       }
     };
+  
     fetchCategories();
   }, []);
+  
 
-  // Manejo cambio de imágenes
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    setImages((prevImages) => [...prevImages, ...files]);  // Acumula las imágenes seleccionadas
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : name === 'idCategory' ? Number(value) : value
+    }));
   };
 
-  // Envío del formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleImageUpload = async (e) => {
+    const files = e.target.files;
+    if (!files.length) return;
 
-    const formData = new FormData();
-    formData.append('instrumentoDtoJson', JSON.stringify({ 
-      name, model, brand, id_tipo: idType, price: Number (price), available, stock: Number(stock), description, anio: Number (anio) 
-    }));
-
-    images.forEach((image) => {
-      formData.append('file', image);
-    });
+    setUploading(true);
+    setError('');
 
     try {
-      const newInstrument = await instrumentService.createInstrument(formData);
-      addInstrument(newInstrument);
-      onClose();
-      setName('');
-      setModel('');
-      setBrand('');
-      setIdType('');
-      setPrice('');
-      setAvailable(false);
-      setStock('');
-      setDescription('');
-      setAnio('');
-      setImages([]); 
-    } catch (error) {
-      console.error('Error al crear el instrumento:', error);
+      const urls = await Promise.all(
+        Array.from(files).map(file => cloudinaryService.uploadImage(file))
+      );
+      setFormData(prev => ({
+        ...prev,
+        imageUrls: [...prev.imageUrls, ...urls] // Agrega las nuevas imágenes
+      }));
+    } catch {
+      setError('Error al subir imágenes');
+    } finally {
+      setUploading(false);
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      brand: '',
+      model: '',
+      year: '',
+      stock: '',
+      description: '',
+      price: '',
+      available: false,
+      idCategory: '',
+      imageUrls: []
+    });
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+  
+    try {
+      // Asegurar que se envíe un ID válido
+      if (!formData.idCategory) {
+        setError('Debes seleccionar una categoría.');
+        return;
+      }
+  
+      const newInstrument = await instrumentService.createInstrument(formData);
+      addInstrument(newInstrument);
+      resetForm();
+      onClose();
+    } catch (error) {
+      setError(error.message || 'Error al crear el instrumento');
+    }
+  };
+  
+  
+
   return (
-    <Modal show={isOpen} onHide={onClose} className='modal-overlay'>
-      <Modal.Header closeButton className='modal-header'>
+    <Modal show={isOpen} onHide={onClose} className="modal-overlay">
+      <Modal.Header closeButton className="modal-header">
         <Modal.Title>Registrar Instrumento</Modal.Title>
       </Modal.Header>
-      <Modal.Body className='modal-body'>
-        <Form onSubmit={handleSubmit} className='form'>
+      <Modal.Body className="modal-body">
+        {error && (
+          <div className="alert alert-danger">
+            {error}
+          </div>
+        )}
+        <Form onSubmit={handleSubmit} className="form">
           <Form.Group controlId="formNombre" className="mb-3">
             <Form.Label className='form-label'>Nombre</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Nombre"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
               required
-              className='form-control'
-            />
-          </Form.Group>
-
-          <Form.Group controlId="formModelo" className="mb-3">
-            <Form.Label className="form-label">Modelo</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Modelo"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              className='form-control'
+              className="form-control"
             />
           </Form.Group>
 
           <Form.Group controlId="formMarca" className="mb-3">
-            <Form.Label className="form-label">Marca</Form.Label>
+            <Form.Label className="form-label" >Marca</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Marca"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              className='form-control'
+              name="brand"
+              value={formData.brand}
+              onChange={handleInputChange}
+              className="form-control"
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formModelo" className="mb-3">
+            <Form.Label className='form-label'>Modelo</Form.Label>
+            <Form.Control
+              type="text"
+              name="model"
+              value={formData.model}
+              onChange={handleInputChange}
+              className="form-control"
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formYear" className="mb-3">
+            <Form.Label className="form-label">Año</Form.Label>
+            <Form.Control
+              type="number"
+              name="year"
+              value={formData.year}
+              onChange={handleInputChange}
+              className="form-control"
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formNStock" className="mb-3">
+            <Form.Label className="form-label">Stock</Form.Label>
+            <Form.Control
+              type="number"
+              name="stock"
+              value={formData.stock}
+              onChange={handleInputChange}
+              required
+              className="form-control"
             />
           </Form.Group>
 
           <Form.Group controlId="formTipo" className="mb-3">
             <Form.Label className="form-label">Categoría</Form.Label>
-            <Form.Control
-              as="select"
-              value={idType}
-              onChange={(e) => setIdType(e.target.value)} 
+            <Form.Select
+              name="idCategory"
+              value={formData.idCategory}
+              onChange={handleInputChange}
               required
-              className='form-control'
+              className="form-control"
             >
               <option value="">Seleccionar Categoría</option>
-              {categories.map((category) => (
-                <option key={category.id_tipo} value={category.id_tipo}>
-                  {category.name}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-
-          <Form.Group controlId="formAnio" className="mb-3">
-            <Form.Label className="form-label">Año</Form.Label>
-            <Form.Control
-              type="number"
-              placeholder="Año"
-              value={anio}
-              onChange={(e) => setAnio(e.target.value)}
-              class name="form-control"
-            />
+              {Array.isArray(categories) && categories.length > 0 ? (
+                categories.map((category, index) => (
+                  <option key={category.idCategory || index} value={category.idCategory}>
+                    {category.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>Cargando categorías...</option>
+              )}
+            </Form.Select>
           </Form.Group>
 
           <Form.Group controlId="formPrecio" className="mb-3">
             <Form.Label className="form-label">Precio</Form.Label>
             <Form.Control
               type="number"
-              placeholder="Precio"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className='form-control'
-            />
-          </Form.Group>
-
-          <Form.Group controlId="formStock" className="mb-3">
-            <Form.Label className="form-label">Stock</Form.Label>
-            <Form.Control
-              type="number"
-              placeholder="Stock"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              className='form-control'
+              name="price"
+              value={formData.price}
+              onChange={handleInputChange}
+              required
+              className="form-control"
             />
           </Form.Group>
 
@@ -168,35 +225,45 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             <Form.Label className="form-label">Descripción</Form.Label>
             <Form.Control
               as="textarea"
-              placeholder="Descripción"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className='form-control'
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              className="form-control"
             />
           </Form.Group>
 
-          <Form.Group controlId="formDisponible" className="mb-3 custom-checkbox">
+          <Form.Group controlId='formDisponible' className="mb-3 custom-checkbox">
             <Form.Check
-              type="checkbox" 
+              type="checkbox"
               label="Disponible"
-              checked={available}
-              onChange={(e) => setAvailable(e.target.checked)}
-          
+              name="available"
+              checked={formData.available}
+              onChange={handleInputChange}
             />
           </Form.Group>
 
-          <Form.Group controlId="formImages" className="mb-3">
-            <Form.Label className="form-label">Imágenes</Form.Label>
+          <Form.Group controlId="formImageUpload" className="mb-3">
+            <Form.Label>Imágenes</Form.Label>
             <Form.Control
               type="file"
-              onChange={handleImageChange}
-              accept="image/*"
+              onChange={handleImageUpload}
+              //accept="image/*"
               multiple
-              className='form-control'
+              required
+              className="form-control"
             />
           </Form.Group>
+          {uploading && <p>Subiendo imágenes...</p>}
+          <Form.Group controlId="formImagePreview">
+            <Form.Label>Imágenes Cargadas</Form.Label>
+            <div>
+              {formData.imageUrls.map((url, index) => (
+                <img key={index} src={url} alt={`Imagen ${index + 1}`} width="100" />
+              ))}
+            </div>
+          </Form.Group>
 
-          <Button className="custom-button" type="submit">
+          <Button type="submit" className="custom-button">
             Registrar
           </Button>
         </Form>
