@@ -33,6 +33,7 @@
 .modal-overlay .form-control:focus, 
 .modal-overlay .form-control:active {
     background-color: var(--color1) !important;
+
     box-shadow: none;
     border-color: var(--color4);
 }
@@ -46,6 +47,7 @@
     width: 20px;
     height: 20px;
     border: 2px solid var(--color3);  
+
     background-color: transparent;
     border-radius: 4px;
     transition: all 0.3s;
@@ -72,22 +74,23 @@
     z-index: 1050; /* Asegura que el Toast esté sobre otros elementos */
     position:absolute;
     
-  }
-  
-  .custom-toast {
+}
+
+.custom-toast {
     background-color: #f8d7da !important; /* Fondo rojo claro */
     color: #721c24 !important; /* Texto rojo oscuro */
     border-left: 5px solid #dc3545; /* Borde izquierdo */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .toast-header {
+}
+
+.toast-header {
     font-weight: bold;
-  }
-  
-  .toast-close {
+}
+
+.toast-close {
     cursor: pointer;
-  }
+}
+
 
 
 
