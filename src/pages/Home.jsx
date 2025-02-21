@@ -1,80 +1,7 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const allProducts = [
-  {
-    id: 1,
-    nombre: "producto 1",
-    descripcion: "es el producto 1",
-    imagen: "/img/guitarra-electrica-1.jpg",
-  },
-  {
-    id: 2,
-    nombre: "producto 2",
-    descripcion: "es el producto 2",
-    imagen: "/img/guitarra-electrica-2.jpg",
-  },
-  {
-    id: 3,
-    nombre: "producto 3",
-    descripcion: "es el producto 3",
-    imagen: "/img/violin-cervini-1.jpg",
-  },
-  {
-    id: 4,
-    nombre: "producto 4",
-    descripcion: "es el producto 4",
-    imagen: "/img/violin-cervini-2.jpg",
-  },
-  {
-    id: 5,
-    nombre: "producto 5",
-    descripcion: "es el producto 5",
-    imagen: "/img/set-bateria1.jpg",
-  },
-  {
-    id: 6,
-    nombre: "producto 6",
-    descripcion: "es el producto 6",
-    imagen: "/img/set-bateria2.jpg",
-  },
-  {
-    id: 7,
-    nombre: "producto 7",
-    descripcion: "es el producto 7",
-    imagen: "/img/saxo1.jpg",
-  },
-  {
-    id: 8,
-    nombre: "producto 8",
-    descripcion: "es el producto 8",
-    imagen: "/img/saxo2.jpg",
-  },
-  {
-    id: 9,
-    nombre: "producto 9",
-    descripcion: "es el producto 9",
-    imagen: "/img/acordeon1.jpg",
-  },
-  {
-    id: 10,
-    nombre: "producto 10",
-    descripcion: "es el producto 10",
-    imagen: "/img/acordeon2.jpg",
-  },
-  {
-    id: 11,
-    nombre: "producto 11",
-    descripcion: "es el producto 11",
-    imagen: "/img/guitarra-clasica1.jpg",
-  },
-  {
-    id: 12,
-    nombre: "producto 12",
-    descripcion: "es el producto 12",
-    imagen: "/img/guitarra-clasica2.jpg",
-  },
-];
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -86,18 +13,35 @@ function shuffleArray(array) {
 
 function Home() {
   const [randomProducts, setRandomProducts] = useState([]);
-
+  const [allProducts,setAllProducts] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     // Mezclamos el array y tomamos 10 productos
-    const shuffled = shuffleArray([...allProducts]);
-    setRandomProducts(shuffled.slice(0, 10));
+    fetch(`https://clavecompas-production.up.railway.app/clavecompas/products?page=0&pageSize=10`)
+      .then((response) => response.json())
+      .then((data) => setAllProducts(data.response.content))
+      .catch((error) =>
+        console.error("Error al obtener productos:", error)
+      );
   }, []);
+
+  useEffect(() => {
+    if (allProducts.length > 0) {
+      const shuffled = shuffleArray([...allProducts]);
+      setRandomProducts(shuffled.slice(0, 10));
+    }
+  }, [allProducts]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     const query = e.target.elements.search.value;
     console.log("Buscar:", query);
     // Aquí podrías implementar la lógica de búsqueda real
+  };
+
+  const handleViewDetail = (productId) => {
+    // Por ejemplo, navega a la ruta completa de galería
+    navigate(`/product/${productId}`);
   };
 
   return (
@@ -140,10 +84,10 @@ function Home() {
         <h2>Productos Recomendados</h2>
         <div className="random-products-grid">
           {randomProducts.map((prod) => (
-            <div className="product-card" key={prod.id}>
-              <img src={prod.imagen} alt={prod.nombre} />
-              <h3>{prod.nombre}</h3>
-              <p>{prod.descripcion}</p>
+            <div className="product-card" key={prod.idProduct} onClick={()=>handleViewDetail(prod.idProduct)}>
+              <img src={prod.imageUrls[0]} alt={prod.name}  />
+              <h3>{prod.name}</h3>
+              <p>{prod.description}</p>
             </div>
           ))}
         </div>

@@ -1,0 +1,63 @@
+.gallery-preview-container {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+
+/* Mitad izquierda para la imagen principal */
+.main-image {
+  flex: 1;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Mitad derecha: grilla de 2 columnas y 2 filas */
+.grid-images {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+  position: relative;
+}
+
+.grid-image {
+  position: relative;
+}
+
+.grid-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* "Ver Más" en la esquina inferior derecha del último bloque */
+.ver-mas {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+/* Responsividad: en dispositivos móviles se apilan los bloques */
+@media (max-width: 768px) {
+  .gallery-preview-container {
+    flex-direction: column;
+  }
+  .grid-images {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+}
