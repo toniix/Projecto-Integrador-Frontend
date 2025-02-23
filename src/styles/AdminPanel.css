@@ -1,0 +1,53 @@
+.admin-panel {
+    display: flex;
+    height: 100vh;
+}
+
+.admin-menu {
+    width: 20%;
+    background-color: var(--color1);
+    color: var(--color5);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-button {
+    width:100%;
+}
+.admin-menu button {
+    background: var(--color3);
+    color: var(--color2);
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.admin-menu button:hover {
+    background: linear-gradient(45deg, var(--color4), var(--color3)) !important;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 20px;
+    background-color: var(--color2);
+    overflow-y: auto;
+    border-radius: 10px;
+}
+
+.home-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+.panel-logo {
+    width: 150px; /* Ajusta el tamaño según tu logo */
+    margin-bottom: 20px;
+}

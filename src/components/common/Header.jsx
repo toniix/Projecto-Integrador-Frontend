@@ -14,8 +14,8 @@ function Header() {
         </Link>
       </div>
       <div className="auth-buttons">
-        <button className="btn-crear custom-button">Crear Cuenta</button>
-        <button className="btn-iniciar custom-button">Iniciar Sesión</button>
+        <button className=" custom-button">Crear Cuenta</button>
+        <button className=" custom-button">Iniciar Sesión</button>
       </div>
     </header>
   );
