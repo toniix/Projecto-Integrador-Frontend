@@ -32,12 +32,10 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
  // const [ setError] = useState('');
   const [uploading, setUploading] = useState(false);
 
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const data = await instrumentService.getCategories();
-
 
         // Acceder al array dentro del objeto response
         if (data?.response?.categories && Array.isArray(data.response.categories)) {
@@ -147,12 +145,10 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
       <Modal.Body className="modal-body">
       
           <Form onSubmit={handleSubmit} className="form">
-
           <Form.Group controlId="formNombre" className="mb-3">
             <Form.Label className='form-label'>Nombre</Form.Label>
             <Form.Control
               type="text"
-
               name="name"
               value={formData.name}
               onChange={handleInputChange}
@@ -170,12 +166,10 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               onChange={handleInputChange}
               required
               className="form-control"
-
             />
           </Form.Group>
 
           <Form.Group controlId="formModelo" className="mb-3">
-
             <Form.Label className='form-label'>Modelo</Form.Label>
             <Form.Control
               type="text"
@@ -208,13 +202,11 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               onChange={handleInputChange}
               required
               className="form-control"
-
             />
           </Form.Group>
 
           <Form.Group controlId="formTipo" className="mb-3">
             <Form.Label className="form-label">Categoría</Form.Label>
-
             <Form.Select
               name="idCategory"
               value={formData.idCategory}
@@ -233,35 +225,17 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 <option disabled>Cargando categorías...</option>
               )}
             </Form.Select>
-
           </Form.Group>
 
           <Form.Group controlId="formPrecio" className="mb-3">
             <Form.Label className="form-label">Precio</Form.Label>
             <Form.Control
               type="number"
-
               name="price"
               value={formData.price}
               onChange={handleInputChange}
               required
               className="form-control"
-
-              placeholder="Precio"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className='form-control'
-            />
-          </Form.Group>
-
-          <Form.Group controlId="formStock" className="mb-3">
-            <Form.Label className="form-label">Stock</Form.Label>
-            <Form.Control
-              type="number"
-              placeholder="Stock"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              className='form-control'
             />
           </Form.Group>
 
@@ -269,7 +243,6 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             <Form.Label className="form-label">Descripción</Form.Label>
             <Form.Control
               as="textarea"
-
               name="description"
               value={formData.description}
               onChange={handleInputChange}
@@ -316,21 +289,20 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         </Form>
 
         {/* El Toast aparece cuando hay un exito */}
-
         <SuccessToast 
         show={showSuccessToast} 
         handleClose={() => setShowSuccessToast(false)} 
         message={successMessage} 
+        className="toast-header .custom-toastSuccess"
         />
 
-
-         {/* El Toast aparece cuando hay un error */}
+         {/*Toast: aparece cuando hay un error */}
         <ErrorToast 
         show={showToast} 
         handleClose={() => setShowToast(false)} 
         message={toastMessage} 
+        className="toast-header .custom-toastError"
       />
-
       </Modal.Body>
     </Modal>
   );
@@ -339,6 +311,4 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 InstrumentForm.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-
 };
-

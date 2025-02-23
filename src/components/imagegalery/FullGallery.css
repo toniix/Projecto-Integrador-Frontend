@@ -1,13 +1,15 @@
 .full-gallery-container {
+  margin-top: 9rem;
   padding: 20px;
 }
 
 .gallery-header {
+  top: 4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f5f5f5;
-  padding: 10px 20px;
+  background-color: var(--color2);
+  padding: 20px 20px;
   width: 100%;
   box-sizing: border-box;
 }

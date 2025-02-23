@@ -1,5 +1,5 @@
 // src/pages/Home.jsx
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -58,7 +58,7 @@ function Home() {
               className="search-input"
               placeholder="Buscar productos..."
             />
-            <button type="submit" className="search-btn">
+            <button type="submit" className="search-btn custom-button">
               Buscar
             </button>
           </form>
@@ -67,9 +67,9 @@ function Home() {
 
       {/* Sección de Categorías */}
       <section className="categories-section">
-        <h2>Categorías</h2>
+        {/* <h2>Categorías</h2> */}
         <div className="categories-container">
-          <button className="category-btn">Cuerdas</button>
+          <button className="category-btn">Cuerda</button>
           <button className="category-btn">Percusión</button>
           <button className="category-btn">Viento</button>
           <button className="category-btn">Audio Profesional</button>
@@ -81,7 +81,7 @@ function Home() {
 
       {/* Sección de Productos Recomendados */}
       <section className="random-products">
-        <h2>Productos Recomendados</h2>
+        <h2 className="popular-title">Productos Recomendados</h2>
         <div className="random-products-grid">
           {randomProducts.map((prod) => (
             <div className="product-card" key={prod.idProduct} onClick={()=>handleViewDetail(prod.idProduct)}>
@@ -95,7 +95,7 @@ function Home() {
 
       {/* Botón para volver arriba */}
       <button
-        className="btn-subir"
+        className="btn-subir custom-button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         ↑ Volver arriba
