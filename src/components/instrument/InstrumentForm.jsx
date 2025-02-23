@@ -289,19 +289,19 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         </Form>
 
         {/* El Toast aparece cuando hay un exito */}
-
         <SuccessToast 
         show={showSuccessToast} 
         handleClose={() => setShowSuccessToast(false)} 
         message={successMessage} 
+        className="toast-header .custom-toastSuccess"
         />
 
-
-         {/* El Toast aparece cuando hay un error */}
+         {/*Toast: aparece cuando hay un error */}
         <ErrorToast 
         show={showToast} 
         handleClose={() => setShowToast(false)} 
         message={toastMessage} 
+        className="toast-header .custom-toastError"
       />
       </Modal.Body>
     </Modal>

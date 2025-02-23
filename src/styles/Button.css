@@ -1,21 +1,24 @@
+
 .add-button {
     position: absolute;
-    top: 10rem;
-    left: 5rem;
+    top: 60px !important;
+    left: 40px !important;
 }
 
 .custom-button {
     background: var(--color3);
-    color: #d9c6b0;
-    border: 2px solid #6d6665 !important;
+    color: var(--color2);
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
     transition: all 0.3s ease;
     transform: scale(1);
+    font-family: "Alata", sans-serif;
 }
 
 .custom-button:hover {
-    background: var(--color4);
-    color: #e0cfbc;
-    font-weight: bold;
+    background: linear-gradient(45deg, var(--color4), var(--color3));
+    color: var(--color2);
     transform: scale(1.05) ease;
 } 
 
@@ -25,3 +28,16 @@
     color: #e0cfbc !important;
     outline: none !important;
 }
+
+/* Botón para volver arriba */
+.btn-subir {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 999;
+}
+
+

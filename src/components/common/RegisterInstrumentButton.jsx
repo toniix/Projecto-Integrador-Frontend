@@ -6,9 +6,9 @@ export const RegisterInstrumentButton = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
-        <div className="text-center mt-5 add-button">
+        <div className="mt-5 add-button">
             <Button className="custom-button" onClick={() => setIsModalOpen(true)}>
-                Agregar Instrumento
+                Agregar Producto
             </Button>
             <InstrumentForm
                 isOpen={isModalOpen}
@@ -17,4 +17,3 @@ export const RegisterInstrumentButton = () => {
         </div>
     );
 };
-
