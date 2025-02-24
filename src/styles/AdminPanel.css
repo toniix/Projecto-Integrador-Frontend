@@ -3,6 +3,12 @@
     height: 100vh;
 }
 
+.title-lista {
+    text-align: center;
+    color: var(--color3);
+    font-weight: bold;
+}
+
 .admin-menu {
     width: 20%;
     background-color: var(--color1);

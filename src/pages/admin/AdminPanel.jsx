@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { RegisterInstrumentButton } from "../components/common/RegisterInstrumentButton";
-import "../styles/AdminPanel.css";
+import { RegisterInstrumentButton } from "../../components/common/RegisterInstrumentButton";
+import { ListProduct } from "./ListProduct";
+import "../../styles/AdminPanel.css";
 
 export const AdminPanel = () => {
     const [view, setView] = useState("home"); // Vista inicial con el logo
@@ -27,10 +28,12 @@ export const AdminPanel = () => {
                         <img src="/img/logo.png" alt="Logo de la App" className="panel-logo" />
                         <h1>Bienvenido a AdminPanel</h1>
                     </div>
+                    
                 )}
                 {view === "list" && (
                     <div>
-                        <h3>Lista de Instrumentos</h3>
+                        <h3 className="title-lista">Lista de Instrumentos</h3> {/* Encabezado pregunta*/}
+                        <ListProduct />
                     </div>
                 )}
                 {view === "manage-reservations" && <h3>Gestión de Reservas</h3>}

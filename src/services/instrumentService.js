@@ -1,7 +1,5 @@
 import axios from 'axios';
-
 //const API_LOCAL = import.meta.env.VITE_API_URL_LOCAL;
-
 const API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -26,14 +24,30 @@ const instrumentService = {
       console.error('Error al crear el instrumento:', error.response?.data || error.message);
       throw error;
     }
-  },  async getInstrumenAll() {
+  },  
+  async getInstrumenAll(page = 0, pageSize = 10) { // Cambia page=0 para asegurarte que la API lo acepte
     try {
-      const response = await axios.get(`${API_URL}/products?page=0&pageSize=10`)
-      return response.data;
+        const response = await axios.get(`${API_URL}/products`, { 
+            params: { 
+                page,  // Verifica si la API usa `page` o `pageNumber`
+                pageSize 
+            } 
+        });
+
+        console.log("Respuesta completa del backend:", response.data); // Debugging
+
+        const data = response.data?.response || {}; 
+
+        return {
+            products: data.content || [], // Verifica si la API realmente usa `content`
+            totalPages: data.totalPages || 1, 
+        };
     } catch (error) {
-      console.error('Error al listar los instrumentos', error.response?.data || error.message)
+        console.error('Error al listar los productos:', error.response?.data || error.message);
+        return { products: [], totalPages: 1 };
     }
-  },
+},
+
 
   async updateInstrument(id, updatedData) {
     try {
