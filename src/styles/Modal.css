@@ -68,34 +68,7 @@
     padding-left: 8px;
 }
 
-/* Personalización Notificacion error/exito */
 
-.toast-container {
-    z-index: 1050; /* Asegura que el Toast esté sobre otros elementos */
-    position:absolute;
-    
-}
-
-.toast-header-success {
-    background: #16a403 !important; 
-    color: #111111 !important; 
-    border: 5px solid #0a4802; 
-}
-
-.toast-header-error{
-    background: #f0081b !important; 
-    color: #111111 !important; 
-    border: 1px solid #f0081b; 
-}
-
-.toast-body-error{
-    background:#d9cdc0  !important; 
-    color: #0b0b0b !important; 
-}
-
-.toast-header {
-    font-weight: bold; 
-}
 
 
 

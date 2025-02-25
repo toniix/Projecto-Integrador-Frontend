@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logoCandC from "/LogoC&C.png";
 
@@ -10,12 +11,14 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Name */}
+          <Link to={"/"}>
           <div className="flex items-center space-x-3">
             <img src={logoCandC} alt="Logo" className="w-10 h-10" />
             <span className="text-[#d9c6b0] text-xl font-bold hidden sm:block">
               Clave &amp; Compas
             </span>
           </div>
+          </Link>
 
           {/* Mobile Menu Button */}
           <div className="sm:hidden">

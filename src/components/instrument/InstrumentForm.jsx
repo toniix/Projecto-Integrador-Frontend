@@ -4,7 +4,6 @@ import { InstrumentContext } from "../../context/InstrumentContext";
 import instrumentService from "../../services/instrumentService";
 import cloudinaryService from "../../services/images/cloudinaryService";
 import { successToast, errorToast } from "../../utils/toastNotifications";
-
 import { X, Plus, Trash2 } from "lucide-react";
 
 export const InstrumentForm = ({ isOpen, onClose }) => {
@@ -25,6 +24,11 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 
   const [categories, setCategories] = useState([]);
 
+  // Estado para manejar imágenes
+  const [imageFiles, setImageFiles] = useState([]); // Para almacenar los archivos originales
+  const [imagePreviews, setImagePreviews] = useState([]);
+   // Para almacenar las URLs de vista previa
+
   // Función para obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
@@ -43,15 +47,40 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         }
       } catch (error) {
         console.error("Error al obtener categorías:", error);
-        setToastMessage("Error al cargar categorías");
-        setCategories([]); // Asegura que `categories` siempre sea un array
+        setCategories([]); // Asegura que categories siempre sea un array
       }
     };
 
     fetchCategories();
   }, []);
 
-  console.log(categories);
+  // Limpiar el formulario cuando se cierra y resetear cuando se abre de nuevo
+  useEffect(() => {
+    if (!isOpen) {
+      // Al cerrar el modal, limpiamos las URLs de objetos
+      imagePreviews.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    } else {
+      // Al abrir el modal, reseteamos completamente el formulario
+      resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  // Limpiar las URLs de objetos cuando el componente se desmonte
+  useEffect(() => {
+    return () => {
+      // Revocar todas las URLs de objetos al desmontar para evitar fugas de memoria
+      imagePreviews.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [imagePreviews]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -63,25 +92,69 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
           ? checked
           : name === "idCategory"
           ? Number(value)
+          : name === "available"
+          ? value === "true"
           : value,
     }));
   };
 
   // Manejo de imágenes
-  const [images, setImages] = useState([]);
-
   const handleImageUpload = (e) => {
-    const files = e.target.files;
-    if (files && images.length < 5) {
-      const newImages = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setImages((prev) => [...prev, ...newImages].slice(0, 5));
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length && imageFiles.length < 5) {
+      // Limitar a 5 imágenes en total
+      const newFiles = files.slice(0, 5 - imageFiles.length);
+      
+      // Crear URLs de vista previa para las nuevas imágenes
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      
+      // Actualizar los estados
+      setImageFiles(prev => [...prev, ...newFiles]);
+      setImagePreviews(prev => [...prev, ...newPreviews]);
     }
   };
 
   const removeImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    // Revocar la URL de objeto para evitar fugas de memoria
+    if (imagePreviews[index] && imagePreviews[index].startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreviews[index]);
+    }
+    
+    // Eliminar el archivo y la vista previa
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const resetForm = () => {
+    // Limpiar todas las URLs de objetos
+    imagePreviews.forEach(url => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    
+    setFormData({
+      name: "",
+      brand: "",
+      model: "",
+      year: "",
+      stock: "",
+      description: "",
+      price: "",
+      available: false,
+      idCategory: "",
+      imageUrls: [],
+    });
+    
+    setImageFiles([]);
+    setImagePreviews([]);
+  };
+
+  // Función personalizada para cerrar el modal y limpiar el formulario
+  const handleClose = () => {
+    resetForm();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -95,47 +168,39 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         return;
       }
 
+      // Verificar que hay imágenes para subir
+      if (imageFiles.length === 0) {
+        errorToast("Debes agregar al menos una imagen.");
+        return;
+      }
+
+      // Subir archivos de imagen a Cloudinary
       const urls = await Promise.all(
-        images.map((image) => cloudinaryService.uploadImage(image)) // Subir las imágenes al servidor
+        imageFiles.map(file => cloudinaryService.uploadImage(file))
       );
 
+      // Crear el instrumento con las URLs de las imágenes
       const newInstrument = await instrumentService.createInstrument({
         ...formData,
         imageUrls: urls,
       });
+      
       addInstrument(newInstrument);
-      resetForm();
       successToast("Instrumento agregado con éxito.");
-
-      onClose();
+      handleClose();
     } catch (error) {
+      console.error("Error completo:", error);
+      
       if (error.response?.status === 409) {
-        console.log("Error detectado:", error);
-
         errorToast("El instrumento ya existe. Intenta con otro nombre.");
       } else if (error.response?.status === 400) {
         errorToast("Datos inválidos. Revisa el formulario.");
       } else if (error.response?.status === 500) {
         errorToast("Error en el servidor. Inténtalo más tarde.");
       } else {
-        errorToast("Error al crear el instrumento.");
+        errorToast(error.message || "Error al crear el instrumento.");
       }
     }
-
-    const resetForm = () => {
-      setFormData({
-        name: "",
-        brand: "",
-        model: "",
-        year: "",
-        stock: "",
-        description: "",
-        price: "",
-        available: false,
-        idCategory: "",
-        imageUrls: [],
-      });
-    };
   };
 
   return (
@@ -146,7 +211,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             Registrar Instrumento
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-white hover:text-[#d9c6b0] transition-colors"
           >
             <X size={20} />
@@ -233,14 +298,15 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 Categoría
               </label>
               <select
-                name="category"
+                name="idCategory"
                 value={formData.idCategory}
                 onChange={handleInputChange}
                 required
                 className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
               >
+                <option value="">Selecciona una categoría</option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.idCategory || category.id} value={category.idCategory}>
                     {category.name}
                   </option>
                 ))}
@@ -269,7 +335,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               </label>
               <select
                 name="available"
-                value={formData.available}
+                value={formData.available.toString()}
                 onChange={handleInputChange}
                 required
                 className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
@@ -300,10 +366,10 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             </label>
             <div className="space-y-4">
               <div className="grid grid-cols-5 gap-4">
-                {images.map((image, index) => (
+                {imagePreviews.map((preview, index) => (
                   <div key={index} className="relative group aspect-square">
                     <img
-                      src={image}
+                      src={preview}
                       alt={`Preview ${index + 1}`}
                       className="w-full h-full object-cover rounded-lg"
                     />
@@ -316,7 +382,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                     </button>
                   </div>
                 ))}
-                {images.length < 5 && (
+                {imagePreviews.length < 5 && (
                   <label className="aspect-square flex items-center justify-center border-2 border-[#757575] border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
                     <div className="flex flex-col items-center justify-center">
                       <Plus className="text-[#b08562] mb-1" size={24} />
@@ -338,7 +404,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
           <div className="flex justify-center space-x-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-6 py-2 border border-[#757575] rounded-lg text-[#1e1e1e] hover:bg-gray-50"
             >
               Cancelar
@@ -358,5 +424,5 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 
 InstrumentForm.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired, 
 };
