@@ -43,6 +43,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         }
       } catch (error) {
         console.error("Error al obtener categorías:", error);
+        setToastMessage("Error al cargar categorías");
         setCategories([]); // Asegura que `categories` siempre sea un array
       }
     };
@@ -148,7 +149,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="text-white hover:text-[#d9c6b0] transition-colors"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 

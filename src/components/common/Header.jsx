@@ -29,14 +29,14 @@ function Header() {
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:space-x-4">
-            <button className="px-4 py-2 bg-[#730f06] text-white rounded-lg hover:bg-[#b08562] transition-colors">
+            {/* <button className="px-4 py-2 bg-[#730f06] text-white rounded-lg hover:bg-[#b08562] transition-colors">
               Iniciar Sesión
             </button>
             <button className="px-4 py-2 border-2 border-[#d9c6b0] text-[#d9c6b0] rounded-lg hover:bg-[#d9c6b0] hover:text-[#1e1e1e] transition-colors">
               Registrarse
-            </button>
-            {/* <button className=" custom-button">Crear Cuenta</button>
-            <button className=" custom-button">Iniciar Sesión</button> */}
+            </button> */}
+            <button className=" custom-button">Crear Cuenta</button>
+            <button className=" custom-button">Iniciar Sesión</button>
           </div>
         </div>
 

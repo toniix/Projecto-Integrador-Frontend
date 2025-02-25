@@ -7,9 +7,10 @@ import Home from "./pages/Home"; // Nueva página Home
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "./styles/styles.css"; // Ajusta la ruta si es necesario
-import "./styles/custom.css";
+
+// import "./styles/custom.css";
 import "./styles/Button.css";
+import "./App.css";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
