@@ -58,7 +58,7 @@ function Home() {
               className="search-input"
               placeholder="Buscar productos..."
             />
-            <button type="submit" className="search-btn custom-button">
+            <button type="submit" className="custom-button">
               Buscar
             </button>
           </form>
@@ -95,7 +95,7 @@ function Home() {
 
       {/* Botón para volver arriba */}
       <button
-        className="btn-subir custom-button"
+        className=" custom-button btn-subir "
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         ↑ Volver arriba

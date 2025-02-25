@@ -76,20 +76,25 @@
     
 }
 
-.custom-toastSuccess {
+.toast-header-success {
     background: #16a403 !important; 
     color: #111111 !important; 
     border: 5px solid #0a4802; 
 }
 
-.custom-toastError {
+.toast-header-error{
     background: #f0081b !important; 
     color: #111111 !important; 
-    border: 5px solid #830411; 
+    border: 1px solid #f0081b; 
+}
+
+.toast-body-error{
+    background:#d9cdc0  !important; 
+    color: #0b0b0b !important; 
 }
 
 .toast-header {
-    font-weight: bold;
+    font-weight: bold; 
 }
 
 
