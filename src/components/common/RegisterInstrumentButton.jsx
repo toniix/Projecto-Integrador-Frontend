@@ -1,19 +1,21 @@
-import { useState } from 'react';
-import { InstrumentForm } from '../instrument/InstrumentForm';
-import { Button } from 'react-bootstrap';
+import { useState } from "react";
+import { InstrumentForm } from "../instrument/InstrumentForm";
 
 export const RegisterInstrumentButton = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    return (
-        <div className="mt-5 add-button">
-            <Button className="custom-button" onClick={() => setIsModalOpen(true)}>
-                Agregar Producto
-            </Button>
-            <InstrumentForm
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
-        </div>
-    );
+  return (
+    <div className="flex items-center justify-center">
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="px-6 py-3 bg-[#730f06] text-white rounded-lg hover:bg-[#b08562] transition-colors"
+      >
+        Registrar Nuevo Instrumento
+      </button>
+      <InstrumentForm
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </div>
+  );
 };

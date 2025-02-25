@@ -1,30 +1,41 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { InstrumentProvider } from "./context/InstrumentContext";
 import { RegisterInstrumentButton } from "./components/common/RegisterInstrumentButton";
 import FullGallery from "./components/imagegalery/FullGallery";
-import ProductDetail from "./pages/ProductDetail"
+import ProductDetail from "./pages/ProductDetail";
 import Header from "./components/common/Header"; // Nuevo Header
 import Home from "./pages/Home"; // Nueva página Home
-import "./styles/styles.css"; // Ajusta la ruta si es necesario
-import "./styles/custom.css";
-
-import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import "./styles/custom.css";
 import "./styles/Button.css";
 
 export const App = () => {
   return (
     <Router>
       <InstrumentProvider>
-        <Header />  {/* El Header se muestra en todas las rutas */}
+        <Header /> {/* El Header se muestra en todas las rutas */}
         <Routes>
-          <Route path="/" element={<Home />} /> {/* Ruta principal para la Home */}
+          <Route path="/" element={<Home />} />{" "}
           {/* Ruta adicional para el botón de registro (si se requiere) */}
-          <Route path="/register" element={<RegisterInstrumentButton />} /> {/* Ruta adicional para el botón de registro (si se requiere) */}
+          <Route path="/register" element={<RegisterInstrumentButton />} />{" "}
+          {/* Ruta adicional para el botón de registro (si se requiere) */}
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/product/:id/galeria" element={<FullGallery />} />
         </Routes>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </InstrumentProvider>
     </Router>
   );

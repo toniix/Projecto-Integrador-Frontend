@@ -1,7 +1,6 @@
 // src/pages/Home.jsx
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -13,16 +12,16 @@ function shuffleArray(array) {
 
 function Home() {
   const [randomProducts, setRandomProducts] = useState([]);
-  const [allProducts,setAllProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     // Mezclamos el array y tomamos 10 productos
-    fetch(`https://clavecompas-production.up.railway.app/clavecompas/products?page=0&pageSize=10`)
+    fetch(
+      `https://clavecompas-production.up.railway.app/clavecompas/products?page=0&pageSize=10`
+    )
       .then((response) => response.json())
       .then((data) => setAllProducts(data.response.content))
-      .catch((error) =>
-        console.error("Error al obtener productos:", error)
-      );
+      .catch((error) => console.error("Error al obtener productos:", error));
   }, []);
 
   useEffect(() => {
@@ -51,14 +50,17 @@ function Home() {
         <div className="hero-content">
           <h1>Bienvenido a Clave &amp; Compas</h1>
           <p>Tu ritmo, nuestro sonido.</p>
-          <form className="search-form" onSubmit={handleSearch}>
+          <form className="flex justify-center" onSubmit={handleSearch}>
             <input
               type="text"
               name="search"
-              className="search-input"
+              className="search-input w-full max-w-xs p-2 border border-[#757575] rounded-l-lg focus:outline-none focus:border-[#b08562]"
               placeholder="Buscar productos..."
             />
-            <button type="submit" className="search-btn custom-button">
+            <button
+              type="submit"
+              className="search-btn bg-[#730f06] text-white p-2 rounded-r-lg hover:bg-[#b08562] transition-colors"
+            >
               Buscar
             </button>
           </form>
@@ -84,8 +86,12 @@ function Home() {
         <h2 className="popular-title">Productos Recomendados</h2>
         <div className="random-products-grid">
           {randomProducts.map((prod) => (
-            <div className="product-card" key={prod.idProduct} onClick={()=>handleViewDetail(prod.idProduct)}>
-              <img src={prod.imageUrls[0]} alt={prod.name}  />
+            <div
+              className="product-card"
+              key={prod.idProduct}
+              onClick={() => handleViewDetail(prod.idProduct)}
+            >
+              <img src={prod.imageUrls[0]} alt={prod.name} />
               <h3>{prod.name}</h3>
               <p>{prod.description}</p>
             </div>
