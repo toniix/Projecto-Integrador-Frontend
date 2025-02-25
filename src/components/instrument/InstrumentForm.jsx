@@ -125,7 +125,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         setToastMessage("El instrumento ya existe. Intenta con otro nombre.");
       }
       else if (error.response?.status === 400) {
-        setToastMessage("Datos inválidos. Revisa el formulario.");
+        setToastMessage("Datos inválidos. El valor destock debe ser mayor que o igual a 1.");
       } else if (error.response?.status === 500) {
         setToastMessage("Error en el servidor. Inténtalo más tarde.");
       } else {
