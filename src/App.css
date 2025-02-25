@@ -1,6 +1,133 @@
-/*#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ====================================================== 
+  Estilos Globales y de Componentes Existentes 
+   ====================================================== */
+
+:root {
+  --color1: #a68f72;
+  --color2: #d9c6b0;
+  --color3: #8c3a27;
+  --color4: #d95a4e;
+  --color5: #0d0d0d;
+}
+
+header a:hover {
+  color: var(--color1);
+  text-decoration: none;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+nav a {
+  color: #d9c6b0;
+  text-decoration: none;
+}
+
+.auth-buttons button + button {
+  margin-left: 10px;
+}
+
+main {
+  padding-top: 80px;
+  background-color: var(--color1);
+}
+
+/* Sección Hero */
+.hero {
+  background-color: var(--color1);
+  color: var(--color5);
+  padding: 40px 20px;
   text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+/* Sección Categorías */
+.categories-section {
+  padding: 20px;
+  text-align: center;
+  background-color: #d9c6b0;
+}
+
+.categories-section h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px;
+  justify-content: center;
+}
+
+.category-btn {
+  font-size: 1rem;
+  background: var(--color5);
+  color: var(--color1);
+  border: 1px solid var(--color1);
+  border-right: none;
+  padding: 16px 30px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.3s, color 0.3s;
+  border-radius: 0;
+  font-family: "Alata", sans-serif;
+}
+
+.category-btn:hover {
+  background: var(--color3);
+  color: #d9c6b0;
+  border: none;
+}
+
+.category-btn:first-of-type {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.category-btn:last-of-type {
+  border-right: 1px solid var(--color1);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.popular-title {
+  color: var(--color5);
+}
+
+/* Sección Productos Recomendados */
+.featured-products h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
