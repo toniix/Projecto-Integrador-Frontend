@@ -1,6 +1,7 @@
 // src/pages/Home.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PaginationComponent from "../components/common/PaginationComponent"; // Reutilizamos el componente
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -13,16 +14,47 @@ function shuffleArray(array) {
 function Home() {
   const [randomProducts, setRandomProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); // Página actual (UI base 1)
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
+  const [loading, setLoading] = useState(false); // Estado de carga
   const navigate = useNavigate();
+
+  const fetchProducts = async (page) => {
+    try {
+      setLoading(true);
+      // Convertir de UI (base 1) a API (base 0)
+      const apiPage = page - 1;
+      
+      const response = await fetch(
+        `https://clavecompas-production.up.railway.app/clavecompas/products?page=${apiPage}&pageSize=10`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Error de red: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Respuesta de la API:", data);
+      
+      // Actualizar estados con los datos recibidos
+      setAllProducts(data.response.content || []);
+      setTotalPages(data.response.totalPages || 1);
+      
+      // Opcional: verificar si la página actual coincide con la que devuelve la API
+      const apiReturnedPage = (data.response.number || 0) + 1; // Convertir de base 0 a base 1
+      if (apiReturnedPage !== page && apiReturnedPage > 0) {
+        setCurrentPage(apiReturnedPage);
+      }
+    } catch (error) {
+      console.error("Error al obtener productos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Mezclamos el array y tomamos 10 productos
-    fetch(
-      `https://clavecompas-production.up.railway.app/clavecompas/products?page=0&pageSize=10`
-    )
-      .then((response) => response.json())
-      .then((data) => setAllProducts(data.response.content))
-      .catch((error) => console.error("Error al obtener productos:", error));
-  }, []);
+    fetchProducts(currentPage);
+  }, [currentPage]); // Se ejecuta cuando cambia la página
 
   useEffect(() => {
     if (allProducts.length > 0) {
@@ -67,29 +99,27 @@ function Home() {
 
       {/* Sección de Categorías */}
       <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#f1eae7] ">
-      {["Cuerda", "Percusión", "Viento", "Audio Profesional", "Instrumentos Electrónicos"].map((category) => (
-          <button key={category} className="text-[#b08562] px-4 py-2 rounded-lg hover:bg-[#c6bcb049]">
+        {["Cuerda", "Percusión", "Viento", "Audio Profesional", "Instrumentos Electrónicos"].map((category) => (
+          <button 
+            key={category} 
+            className="text-[#b08562] px-4 py-2 rounded-lg hover:bg-[#c6bcb049]"
+          >
             {category}
           </button>
         ))}
         <div className="w-full border-t border-[#b08562] mx-auto"></div>
-        {/* <h2>Categorías</h2> */}
-        {/* <div className="categories-container">
-          <button className="category-btn">Cuerda</button>
-          <button className="category-btn">Percusión</button>
-          <button className="category-btn">Viento</button>
-          <button className="category-btn">Audio Profesional</button>
-          <button className="category-btn">Instrumentos Electrónicos</button>
-          <button className="category-btn">Marca</button>
-          <button className="category-btn">Ofertas</button>
-        </div> */}
-        
       </section>
       
+      {/* Indicador de carga */}
+      {loading && (
+        <div className="flex justify-center items-center py-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#730f06]"></div>
+        </div>
+      )}
 
       {/* Sección de Productos Recomendados */}
       <section className="p-2 bg-[#f1eae7]">
-        {/* <h2 className="text-2xl font-bold text-center text-[#3e0b05] mb-6">Productos Recomendados</h2> */}
+        {/* Mantenemos el diseño original sin título */}
         <div className="random-products-grid">
           {randomProducts.map((prod) => (
             <div
@@ -103,10 +133,21 @@ function Home() {
             </div>
           ))}
         </div>
+        
+        {/* Paginación solo en la parte inferior */}
+        {totalPages > 1 && (
+          <div className="flex justify-center my-4">
+            <PaginationComponent
+              currentPage={currentPage}
+              totalPages={totalPages}
+              setCurrentPage={setCurrentPage}
+            />
+          </div>
+        )}
       </section>
 
       {/* Botón para volver arriba */}
-      <div className=" bg-[#f1eae7] flex justify-center py-">
+      <div className="bg-[#f1eae7] flex justify-center py-4">
         <button
           className="bg-[#730f06] text-[#d9c6b0] px-4 py-2 rounded-lg hover:bg-[#3e0b05]"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

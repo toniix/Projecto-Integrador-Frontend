@@ -10,6 +10,7 @@
 .pagination .page-item .page-link:hover {
     background-color: #1e1e1e !important;
     color: #d9c6b0 !important;
+    border-radius: 5px !important;
 }
 
 /* Personaliza el elemento activo */
