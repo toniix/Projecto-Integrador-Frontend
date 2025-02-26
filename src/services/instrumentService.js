@@ -31,29 +31,31 @@ const instrumentService = {
     }
   },
   async getInstrumenAll(page = 0, pageSize = 10) {
-    // Cambia page=0 para asegurarte que la API lo acepte
     try {
+      // La API usa paginación base 0 (como es común en Spring Boot)
       const response = await axios.get(`${API_URL}/products`, {
         params: {
-          page, // Verifica si la API usa `page` o `pageNumber`
+          page, // Enviamos directamente el valor (que ya debe estar en base 0)
           pageSize,
         },
       });
-
-      console.log("Respuesta completa del backend:", response.data); // Debugging
-
+      
+      console.log("Respuesta completa del backend:", response.data);
+      
+      // Asegurándonos de acceder correctamente a la estructura de la respuesta
       const data = response.data?.response || {};
-
+      
       return {
-        products: data.content || [], // Verifica si la API realmente usa `content`
+        products: data.content || [],
         totalPages: data.totalPages || 1,
+        currentPageIndex: data.number || 0, // Página actual en base 0
       };
     } catch (error) {
       console.error(
         "Error al listar los productos:",
         error.response?.data || error.message
       );
-      return { products: [], totalPages: 1 };
+      return { products: [], totalPages: 1, currentPageIndex: 0 };
     }
   },
 
