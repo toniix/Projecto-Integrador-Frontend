@@ -4,14 +4,13 @@ import PaginationComponent from '../../components/common/PaginationComponent';
 import '../../styles/ListProduct.css';
 
 export const ListProduct = () => {
-    const [products, setAllProducts] = useState([]); // Almacena los productos
-    const [currentPage, setCurrentPage] = useState(1); // Página actual
-    const [totalPages] = useState(1); // Total de páginas
-    // Tamaño de página fijo
+    const [products, setAllProducts] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages] = useState(1);
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const data = await instrumentService.getInstrumenAll(0, 10); // Inicia en 0
+            const data = await instrumentService.getInstrumenAll(0, 10);
             console.log("Respuesta procesada:", data);
             setAllProducts(data.products);
         };
@@ -20,44 +19,48 @@ export const ListProduct = () => {
     }, []);
 
     return (
-        <div className="product-container">
-
-            <table className="custom-table">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Nombre</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody className='body-table'>
-                    {products.length > 0 ? (
-                        products.map((product) => (
-                            <tr key={product.idProduct} className='product-row'>
-                                <td>{product.idProduct}</td>
-                                <td>{product.name}</td>
-                                <td>{product.stock}</td>
-                                <td className="actions-column">
-                                    <button className="edit-btn">
-                                        <i className="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    <button className="delete-btn">
-                                        <i className="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
+        <div className="p-6 bg-[#e6d1bb] rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold text-[#5a0c04] mb-4 text-center">Lista de Instrumentos</h2>
+            
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border border-[#a37b63] rounded-lg shadow-md">
+                    <thead className="bg-[#730f06] text-[#e6d1bb] uppercase">
                         <tr>
-                            <td colSpan="4" className="text-center">No hay productos disponibles</td>
+                            <th className="p-3 border-b border-[#a37b63]">Id</th>
+                            <th className="p-3 border-b border-[#a37b63]">Nombre</th>
+                            <th className="p-3 border-b border-[#a37b63]">Stock</th>
+                            <th className="p-3 border-b border-[#a37b63] text-center">Acciones</th>
                         </tr>
-                    )}
-                </tbody>
+                    </thead>
+                    <tbody className="text-[#5a0c04] bg-[#f1eae7]">
+                        {products.length > 0 ? (
+                            products.map((product) => (
+                                <tr key={product.idProduct} className="border-b border-[#a37b63] hover:bg-[#c6bcb049] transition">
+                                    <td className="p-3">{product.idProduct}</td>
+                                    <td className="p-3">{product.name}</td>
+                                    <td className="p-3">{product.stock}</td>
+                                    <td className="p-3 text-center">
+                                        <button className="text-[#e6d1bb] bg-[#730f06] hover:bg-[#5a0c04] py-1 px-2 rounded mr-2 transition">
+                                            <i className="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button className="text-[#e6d1bb] bg-[#b08562] hover:bg-[#5a0c04] py-1 px-2 rounded transition">
+                                            <i className="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className="p-4 text-center text-[#5a0c04]">No hay productos disponibles</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
-
-            </table>
-            <PaginationComponent currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+            <div className="mt-4 d-flex justify-content-center">
+                <PaginationComponent currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage}/>
+            </div>
         </div>
     );
 };

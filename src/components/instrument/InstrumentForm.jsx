@@ -5,6 +5,7 @@ import instrumentService from "../../services/instrumentService";
 import cloudinaryService from "../../services/images/cloudinaryService";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 import { X, Plus, Trash2 } from "lucide-react";
+import "../../styles/Modal.css";
 
 export const InstrumentForm = ({ isOpen, onClose }) => {
   const { addInstrument } = useContext(InstrumentContext);
@@ -206,22 +207,22 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-[#1e1e1e]/75 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-[#1e1e1e] p-4 rounded-t-lg flex justify-between items-center">
-          <h2 className="text-white text-xl font-semibold">
+        <div className="sticky top-0 bg-[#b08562] p-4 rounded-t-lg flex justify-between items-center">
+          <h2 className="text-[#730f06] text-xl font-semibold">
             Registrar Instrumento
           </h2>
           <button
             onClick={handleClose}
-            className="text-white hover:text-[#d9c6b0] transition-colors"
+            className="text-[#730f06] hover:text-[#d9c6b0] transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
-        <form className="p-6 space-y-6" onSubmit={handleSubmit}>
+        <form className="p-6 space-y-6 verflow-y-auto max-h-[500px] scrollbar-form" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Nombre
               </label>
               <input
@@ -230,12 +231,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               />
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Marca
               </label>
               <input
@@ -244,12 +245,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 value={formData.brand}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               />
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Modelo
               </label>
               <input
@@ -258,12 +259,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 value={formData.model}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               />
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Año
               </label>
               <input
@@ -274,12 +275,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 min="1900"
                 max={new Date().getFullYear()}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               />
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Stock
               </label>
               <input
@@ -289,12 +290,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 value={formData.stock}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               />
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Categoría
               </label>
               <select
@@ -302,7 +303,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 value={formData.idCategory}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className=" select-category "
               >
                 <option value="">Selecciona una categoría</option>
                 {categories.map((category) => (
@@ -314,7 +315,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Precio
               </label>
               <input
@@ -325,12 +326,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 min="0"
                 step="0.01"
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               />
             </div>
 
             <div>
-              <label className="block text-[#1e1e1e] font-medium mb-2">
+              <label className="block text-[#730f06] font-medium mb-2">
                 Disponible
               </label>
               <select
@@ -338,7 +339,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
                 value={formData.available.toString()}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+                className="select-category"
               >
                 <option value="true">Sí</option>
                 <option value="false">No</option>
@@ -347,7 +348,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-[#1e1e1e] font-medium mb-2">
+            <label className="block text-[#730f06] font-medium mb-2">
               Descripción
             </label>
             <textarea
@@ -356,12 +357,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               onChange={handleInputChange}
               required
               rows={4}
-              className="w-full px-4 py-2 border border-[#757575] rounded-lg focus:outline-none focus:border-[#b08562]"
+              className="select-category"
             ></textarea>
           </div>
 
           <div>
-            <label className="block text-[#1e1e1e] font-medium mb-2">
+            <label className="block text-[#3e0b05] font-medium mb-2">
               Imágenes (máximo 5)
             </label>
             <div className="space-y-4">
@@ -405,13 +406,13 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2 border border-[#757575] rounded-lg text-[#1e1e1e] hover:bg-gray-50"
+              className="px-6 py-2 border-2 border-[#730f06] text-[#730f06] rounded-lg text-[#1e1e1e] hover:text-[#d9c6b0] hover:bg-[#730f06]"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#730f06] text-white rounded-lg hover:bg-[#b08562] transition-colors"
+              className="px-6 py-2 bg-[#730f06] text-[#d9c6b0] rounded-lg hover:bg-[#b08562] transition-colors"
             >
               Registrar
             </button>
