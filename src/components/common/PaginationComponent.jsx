@@ -1,5 +1,6 @@
 import Pagination from 'react-bootstrap/Pagination';
 import PropTypes from 'prop-types';
+import "../../styles/ListProduct.css"
 
 const PaginationComponent = ({ currentPage, totalPages, setCurrentPage }) => {
     const handlePageChange = (page) => {
@@ -18,6 +19,7 @@ const PaginationComponent = ({ currentPage, totalPages, setCurrentPage }) => {
                     key={index + 1} 
                     active={index + 1 === currentPage} 
                     onClick={() => handlePageChange(index + 1)}
+                    className='custom-pagination-item'
                 >
                     {index + 1}
                 </Pagination.Item>
