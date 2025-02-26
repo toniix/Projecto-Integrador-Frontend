@@ -27,7 +27,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   // Estado para manejar imágenes
   const [imageFiles, setImageFiles] = useState([]); // Para almacenar los archivos originales
   const [imagePreviews, setImagePreviews] = useState([]);
-   // Para almacenar las URLs de vista previa
+  // Para almacenar las URLs de vista previa
 
   // Función para obtener las categorías
   useEffect(() => {
@@ -58,8 +58,8 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (!isOpen) {
       // Al cerrar el modal, limpiamos las URLs de objetos
-      imagePreviews.forEach(url => {
-        if (url.startsWith('blob:')) {
+      imagePreviews.forEach((url) => {
+        if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
         }
       });
@@ -71,16 +71,16 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   // Limpiar las URLs de objetos cuando el componente se desmonte
-  useEffect(() => {
-    return () => {
-      // Revocar todas las URLs de objetos al desmontar para evitar fugas de memoria
-      imagePreviews.forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, [imagePreviews]);
+  // useEffect(() => {
+  //   return () => {
+  //     // Revocar todas las URLs de objetos al desmontar para evitar fugas de memoria
+  //     imagePreviews.forEach((url) => {
+  //       if (url.startsWith("blob:")) {
+  //         URL.revokeObjectURL(url);
+  //       }
+  //     });
+  //   };
+  // }, [imagePreviews]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -101,39 +101,39 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   // Manejo de imágenes
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files || []);
-    
+
     if (files.length && imageFiles.length < 5) {
       // Limitar a 5 imágenes en total
       const newFiles = files.slice(0, 5 - imageFiles.length);
-      
+
       // Crear URLs de vista previa para las nuevas imágenes
-      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
-      
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+
       // Actualizar los estados
-      setImageFiles(prev => [...prev, ...newFiles]);
-      setImagePreviews(prev => [...prev, ...newPreviews]);
+      setImageFiles((prev) => [...prev, ...newFiles]);
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
 
   const removeImage = (index) => {
     // Revocar la URL de objeto para evitar fugas de memoria
-    if (imagePreviews[index] && imagePreviews[index].startsWith('blob:')) {
+    if (imagePreviews[index] && imagePreviews[index].startsWith("blob:")) {
       URL.revokeObjectURL(imagePreviews[index]);
     }
-    
+
     // Eliminar el archivo y la vista previa
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const resetForm = () => {
     // Limpiar todas las URLs de objetos
-    imagePreviews.forEach(url => {
-      if (url.startsWith('blob:')) {
+    imagePreviews.forEach((url) => {
+      if (url.startsWith("blob:")) {
         URL.revokeObjectURL(url);
       }
     });
-    
+
     setFormData({
       name: "",
       brand: "",
@@ -146,7 +146,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
       idCategory: "",
       imageUrls: [],
     });
-    
+
     setImageFiles([]);
     setImagePreviews([]);
   };
@@ -176,7 +176,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 
       // Subir archivos de imagen a Cloudinary
       const urls = await Promise.all(
-        imageFiles.map(file => cloudinaryService.uploadImage(file))
+        imageFiles.map((file) => cloudinaryService.uploadImage(file))
       );
 
       // Crear el instrumento con las URLs de las imágenes
@@ -184,13 +184,13 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         ...formData,
         imageUrls: urls,
       });
-      
+
       addInstrument(newInstrument);
       successToast("Instrumento agregado con éxito.");
       handleClose();
     } catch (error) {
       console.error("Error completo:", error);
-      
+
       if (error.response?.status === 409) {
         errorToast("El instrumento ya existe. Intenta con otro nombre.");
       } else if (error.response?.status === 400) {
@@ -306,7 +306,10 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               >
                 <option value="">Selecciona una categoría</option>
                 {categories.map((category) => (
-                  <option key={category.idCategory || category.id} value={category.idCategory}>
+                  <option
+                    key={category.idCategory || category.id}
+                    value={category.idCategory}
+                  >
                     {category.name}
                   </option>
                 ))}
@@ -424,5 +427,5 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 
 InstrumentForm.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired, 
+  onClose: PropTypes.func.isRequired,
 };

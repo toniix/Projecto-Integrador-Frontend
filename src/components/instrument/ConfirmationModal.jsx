@@ -2,11 +2,7 @@
 import { X, AlertTriangle } from "lucide-react";
 import PropTypes from "prop-types";
 
-const ConfirmationModal = ({
-  isOpen,
-  onClose,
-  onConfirm, //FUNCION DE LA LOGICA DE ELIMINACION
-}) => {
+const ConfirmationModal = ({ isOpen, onClose, onDelete, id }) => {
   if (!isOpen) return null;
 
   return (
@@ -26,10 +22,15 @@ const ConfirmationModal = ({
             <div className="bg-[#730f06]/10 p-2 rounded-full">
               <AlertTriangle size={24} className="text-[#730f06]" />
             </div>
-            <h2 className="text-[#1e1e1e] text-xl font-semibold">Confirmar eliminación de instrumento</h2>
+            <h2 className="text-[#1e1e1e] text-xl font-semibold">
+              Confirmar eliminación de instrumento
+            </h2>
           </div>
 
-          <p className="text-[#757575] mb-6">¿Estás seguro que deseas eliminar este instrumento? Esta acción no se puede deshacer.</p>
+          <p className="text-[#757575] mb-6">
+            ¿Estás seguro que deseas eliminar este instrumento? Esta acción no
+            se puede deshacer.
+          </p>
 
           {/* Action buttons */}
           <div className="flex gap-3 justify-end">
@@ -41,7 +42,7 @@ const ConfirmationModal = ({
             </button>
             <button
               onClick={() => {
-                onConfirm();
+                onDelete(id);
                 onClose();
               }}
               className="px-4 py-2 rounded-md bg-[#730f06] text-white hover:bg-[#b08562] transition-colors"
