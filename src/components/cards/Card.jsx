@@ -3,7 +3,7 @@ import React from "react";
 const Card = ({ product, onViewDetail }) => {
   return (
     <div
-      className="cursor-pointer bg-white  w-full sm:w-1/2 max-w-md"
+      className="bg-white shadow-lg rounded-2xl p-6"
       onClick={() => onViewDetail(product.idProduct)}
     >
       <img
@@ -11,7 +11,7 @@ const Card = ({ product, onViewDetail }) => {
         alt={product.name}
         className="w-full h-96 object-fill rounded-md "
       />
-      <h3 className="mt-2 text-lg font-semibold text-[#730f06]">{product.name}</h3>
+      <h3 className="mt-2 text-lg font-semibold text-[#1E1E1E]">{product.name}</h3>
       <p className="text-sm text-[#757575]">{product.description}</p>
     </div>
   );

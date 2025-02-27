@@ -78,7 +78,7 @@ function Home() {
   };
 
   return (
-    <main className="bg-[#d9c6b0] min-h-screen text-[#1e1e1e]">
+    <main className="bg-[#F9F7F4] min-h-screen text-[#1e1e1e]">
       {/* Sección Hero */}
       <section className="bg-[#d9c6b0] text-center p-10 text-white">
         <div className="hero-content">
@@ -88,7 +88,7 @@ function Home() {
             <input
               type="text"
               name="search"
-              className="w-full max-w-xs p-2 border border-[#757575] bg-[#f1eae7] rounded-lg focus:outline-none focus:border-[#730f06]"
+              className="w-full max-w-xs p-2 border border-[#757575] bg-[#F9F7F4] rounded-lg focus:outline-none focus:border-[#730f06]"
               placeholder="Buscar productos..."
             />
 
@@ -100,7 +100,7 @@ function Home() {
       </section>
 
       {/* Sección de Categorías */}
-      <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#f1eae7] outline outline-1 outline-[#b08562] ">
+      <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#F9F7F4] outline outline-1 outline-[#b08562] ">
         {["Cuerda", "Percusión", "Viento", "Audio Profesional", "Instrumentos Electrónicos"].map((category) => (
           <button 
             key={category} 
