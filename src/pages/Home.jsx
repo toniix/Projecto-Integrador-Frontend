@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../components/common/PaginationComponent"; // Reutilizamos el componente
+import Button from "../components/common/Button";
+import CardsContainer from "../components/containers/CardsContainer";
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -90,15 +92,15 @@ function Home() {
               placeholder="Buscar productos..."
             />
 
-            <button type="submit" className="bg-[#730f06] text-[#b08562] px-4 py-2 rounded-r-lg hover:bg-[#3e0b05] custom-button">
+            <Button variant="accent">
               Buscar
-            </button>
+            </Button>
           </form>
         </div>
       </section>
 
       {/* Sección de Categorías */}
-      <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#f1eae7] ">
+      <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#f1eae7] outline outline-1 outline-[#b08562] ">
         {["Cuerda", "Percusión", "Viento", "Audio Profesional", "Instrumentos Electrónicos"].map((category) => (
           <button 
             key={category} 
@@ -107,7 +109,7 @@ function Home() {
             {category}
           </button>
         ))}
-        <div className="w-full border-t border-[#b08562] mx-auto"></div>
+        
       </section>
       
       {/* Indicador de carga */}
@@ -117,22 +119,10 @@ function Home() {
         </div>
       )}
 
-      {/* Sección de Productos Recomendados */}
-      <section className="p-2 bg-[#f1eae7]">
-        {/* Mantenemos el diseño original sin título */}
-        <div className="random-products-grid">
-          {randomProducts.map((prod) => (
-            <div
-              className="product-card"
-              key={prod.idProduct}
-              onClick={() => handleViewDetail(prod.idProduct)}
-            >
-              <img src={prod.imageUrls[0]} alt={prod.name} />
-              <h3>{prod.name}</h3>
-              <p>{prod.description}</p>
-            </div>
-          ))}
-        </div>
+      
+
+        <CardsContainer products={randomProducts} handleViewDetail={handleViewDetail} />
+          
         
         {/* Paginación solo en la parte inferior */}
         {totalPages > 1 && (
@@ -144,7 +134,8 @@ function Home() {
             />
           </div>
         )}
-      </section>
+        
+      
 
       {/* Botón para volver arriba */}
       <div className="bg-[#f1eae7] flex justify-center py-4">

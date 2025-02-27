@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo1 from "/img/logo1.svg";
+import Button from "./Button";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,12 +33,12 @@ function Header() {
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:space-x-6">
-            <button className="px-4 py-2 bg-[#b08562] text-[#d9c6b0] rounded-lg hover:bg-[#730f06] transition-colors">
+            <Button variant="primary">
               Iniciar Sesión
-            </button>
-            <button className="px-4 py-2 border-2 border-[#d9c6b0] text-[#d9c6b0] rounded-lg hover:bg-[#d9c6b0] hover:text-[#730f06] transition-colors">
+            </Button>
+            <Button variant="outline">
               Registrarse
-            </button>
+            </Button>
             {/* <button className=" custom-button">Crear Cuenta</button>
             <button className=" custom-button">Iniciar Sesión</button> */}
           </div>
@@ -49,12 +50,12 @@ function Header() {
             isMenuOpen ? "block" : "hidden"
           } sm:hidden border-t border-[#757575] py-4 space-y-3`}
         >
-          <button className="w-full px-4 py-2 bg-[#730f06] text-white rounded-lg hover:bg-[#b08562] transition-colors">
+          <Button variant="primary">
             Iniciar Sesión
-          </button>
-          <button className="w-full px-4 py-2 border-2 border-[#d9c6b0] text-[#d9c6b0] rounded-lg hover:bg-[#d9c6b0] hover:text-[#730f06] transition-colors">
+          </Button>
+          <Button variant="outline" >
             Registrarse
-          </button>
+          </Button>
         </div>
       </div>
     </header>
