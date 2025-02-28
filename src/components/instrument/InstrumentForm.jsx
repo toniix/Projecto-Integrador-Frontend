@@ -61,7 +61,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
   useEffect(() => {
     if (isEditMode && instrumentToEdit) {
       setFormData({
-        id: instrumentToEdit.id || instrumentToEdit.idInstrument,
+        id: instrumentToEdit.id || instrumentToEdit.idProduct,
         name: instrumentToEdit.name || "",
         brand: instrumentToEdit.brand || "",
         model: instrumentToEdit.model || "",
@@ -101,6 +101,11 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
+    // En modo edición, solo permitimos cambiar la categoría
+    if (isEditMode && name !== "idCategory") {
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]:
@@ -116,6 +121,9 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
 
   // Manejo de imágenes
   const handleImageUpload = (e) => {
+    // Si estamos en modo edición, no permitimos cambiar imágenes
+    if (isEditMode) return;
+
     const files = Array.from(e.target.files || []);
     const totalImages = imageFiles.length + existingImages.length;
 
@@ -133,6 +141,9 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
   };
 
   const removeImage = (index) => {
+    // Si estamos en modo edición, no permitimos eliminar imágenes
+    if (isEditMode) return;
+
     // Determinar si la imagen es existente o nueva
     const isExistingImage = index < existingImages.length;
     
@@ -198,39 +209,45 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
         return;
       }
 
-      // Verificar que hay imágenes para subir (nuevas o existentes)
-      if (imageFiles.length === 0 && existingImages.length === 0) {
-        errorToast("Debes agregar al menos una imagen.");
-        return;
-      }
+      if (isEditMode) {
+        // En modo edición, solo enviamos el ID y la categoría
+        const categoryUpdateData = {
+          id: formData.id,
+          idCategory: formData.idCategory
+        };
 
-      // Subir nuevos archivos de imagen a Cloudinary (si hay)
-      let allImageUrls = [...existingImages];
-      
-      if (imageFiles.length > 0) {
-        const newUrls = await Promise.all(
+        console.log("Actualizando categoría del instrumento:", categoryUpdateData);
+        
+        // Actualizar solo la categoría del instrumento
+        const updatedInstrument = await instrumentService.updateInstrument(categoryUpdateData);
+        
+        if (updateInstrument) {
+          updateInstrument(updatedInstrument);
+        }
+        
+        successToast("Categoría del instrumento actualizada con éxito.");
+      } else {
+        // Verificar que hay imágenes para subir en modo creación
+        if (imageFiles.length === 0) {
+          errorToast("Debes agregar al menos una imagen.");
+          return;
+        }
+
+        // Subir archivos de imagen a Cloudinary
+        const imageUrls = await Promise.all(
           imageFiles.map((file) => cloudinaryService.uploadImage(file))
         );
-        allImageUrls = [...allImageUrls, ...newUrls];
-      }
 
-      if (isEditMode) {
-        // Actualizar el instrumento
-        const updatedInstrument = await instrumentService.updateInstrument({
-          ...formData,
-          imageUrls: allImageUrls,
-        });
-
-        updateInstrument(updatedInstrument);
-        successToast("Instrumento actualizado con éxito.");
-      } else {
         // Crear el instrumento con las URLs de las imágenes
         const newInstrument = await instrumentService.createInstrument({
           ...formData,
-          imageUrls: allImageUrls,
+          imageUrls,
         });
 
-        addInstrument(newInstrument);
+        if (addInstrument) {
+          addInstrument(newInstrument);
+        }
+        
         successToast("Instrumento agregado con éxito.");
       }
       
@@ -245,7 +262,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
       } else if (error.response?.status === 500) {
         errorToast("Error en el servidor. Inténtalo más tarde.");
       } else {
-        errorToast(error.message || `Error al ${isEditMode ? 'actualizar' : 'crear'} el instrumento.`);
+        errorToast(error.message || `Error al ${isEditMode ? 'actualizar la categoría' : 'crear'} el instrumento.`);
       }
     }
   };
@@ -255,7 +272,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
       <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-[#b08562] p-4 rounded-t-lg flex justify-between items-center">
           <h2 className="text-[#730f06] text-xl font-semibold">
-            {isEditMode ? "Editar Instrumento" : "Registrar Instrumento"}
+            {isEditMode ? "Editar Categoría del Instrumento" : "Registrar Instrumento"}
           </h2>
           <button
             onClick={handleClose}
@@ -277,7 +294,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
 
@@ -291,7 +309,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 value={formData.brand}
                 onChange={handleInputChange}
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
 
@@ -305,7 +324,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 value={formData.model}
                 onChange={handleInputChange}
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
 
@@ -321,7 +341,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 min="1900"
                 max={new Date().getFullYear()}
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
 
@@ -336,7 +357,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 value={formData.stock}
                 onChange={handleInputChange}
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
 
@@ -349,7 +371,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 value={formData.idCategory}
                 onChange={handleInputChange}
                 required
-                className=" select-category "
+                className="select-category"
               >
                 <option value="">Selecciona una categoría</option>
                 {categories.map((category) => (
@@ -361,6 +383,11 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                   </option>
                 ))}
               </select>
+              {isEditMode && (
+                <p className="mt-1 text-sm text-[#730f06]">
+                  Solo puedes editar la categoría del instrumento.
+                </p>
+              )}
             </div>
 
             <div>
@@ -375,7 +402,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 min="0"
                 step="0.01"
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </div>
 
@@ -388,7 +416,8 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
                 value={formData.available.toString()}
                 onChange={handleInputChange}
                 required
-                className="select-category"
+                disabled={isEditMode}
+                className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               >
                 <option value="true">Sí</option>
                 <option value="false">No</option>
@@ -406,50 +435,74 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
               onChange={handleInputChange}
               required
               rows={4}
-              className="select-category"
+              disabled={isEditMode}
+              className={`select-category ${isEditMode ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             ></textarea>
           </div>
 
-          <div>
-            <label className="block text-[#3e0b05] font-medium mb-2">
-              Imágenes (máximo 5)
-            </label>
-            <div className="space-y-4">
-              <div className="grid grid-cols-5 gap-4">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative group aspect-square">
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-                {imagePreviews.length < 5 && (
-                  <label className="aspect-square flex items-center justify-center border-2 border-[#757575] border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
-                    <div className="flex flex-col items-center justify-center">
-                      <Plus className="text-[#b08562] mb-1" size={24} />
-                      <span className="text-xs text-[#757575]">Añadir</span>
+          {!isEditMode && (
+            <div>
+              <label className="block text-[#3e0b05] font-medium mb-2">
+                Imágenes (máximo 5)
+              </label>
+              <div className="space-y-4">
+                <div className="grid grid-cols-5 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group aspect-square">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                    />
-                  </label>
-                )}
+                  ))}
+                  {imagePreviews.length < 5 && (
+                    <label className="aspect-square flex items-center justify-center border-2 border-[#757575] border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                      <div className="flex flex-col items-center justify-center">
+                        <Plus className="text-[#b08562] mb-1" size={24} />
+                        <span className="text-xs text-[#757575]">Añadir</span>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {isEditMode && (
+            <div>
+              <label className="block text-[#3e0b05] font-medium mb-2">
+                Imágenes
+              </label>
+              <div className="space-y-4">
+                <div className="grid grid-cols-5 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative aspect-square">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg opacity-80"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-center space-x-4">
             <button
@@ -463,7 +516,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
               type="submit"
               className="px-6 py-2 bg-[#730f06] text-[#d9c6b0] rounded-lg hover:bg-[#b08562] transition-colors"
             >
-              {isEditMode ? "Actualizar" : "Registrar"}
+              {isEditMode ? "Actualizar Categoría" : "Registrar"}
             </button>
           </div>
         </form>

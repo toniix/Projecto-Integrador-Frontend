@@ -59,30 +59,41 @@ const instrumentService = {
     }
   },
 
-  // Modificamos la función updateInstrument para que sea compatible con nuestro componente
-  async updateInstrument(instrumentData) {
-    try {
-      const id = instrumentData.id || instrumentData.idInstrument;
-      if (!id) {
-        throw new Error("ID del instrumento no proporcionado para actualización");
-      }
-      
-      const response = await axios.put(
-        `${API_URL}/products/${id}`,
-        instrumentData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error al actualizar el instrumento:",
-        error.response?.data || error.message
-      );
-      throw error;
+// Método actualizado para solo actualizar la categoría
+
+async updateInstrument(instrumentData) {
+  try {
+    // Obtenemos el ID del instrumento y la categoría
+    const idproducto = instrumentData.id || instrumentData.idProduct;
+    const idCategory = instrumentData.idCategory;
+    
+    if (!idproducto) {
+      throw new Error("ID del instrumento no proporcionado para actualización");
     }
-  },
+    
+    if (!idCategory) {
+      throw new Error("ID de categoría no proporcionado para actualización");
+    }
+    
+    // Realizamos la petición PUT al endpoint correcto
+    const response = await axios.put(
+      `${API_URL}/products/${idproducto}/category/${idCategory}`,
+      {}, // No necesitamos enviar un cuerpo si el ID de categoría ya está en la URL
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+    
+    console.log("Respuesta de actualización de categoría:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error al actualizar la categoría del instrumento:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+},
 
   async deleteInstrument(id) {
     try {
