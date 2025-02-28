@@ -7,8 +7,9 @@ import { successToast, errorToast } from "../../utils/toastNotifications";
 import { X, Plus, Trash2 } from "lucide-react";
 import "../../styles/Modal.css";
 
-export const InstrumentForm = ({ isOpen, onClose }) => {
-  const { addInstrument } = useContext(InstrumentContext);
+export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => {
+  const { addInstrument, updateInstrument } = useContext(InstrumentContext);
+  const isEditMode = !!instrumentToEdit;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -29,6 +30,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   const [imageFiles, setImageFiles] = useState([]); // Para almacenar los archivos originales
   const [imagePreviews, setImagePreviews] = useState([]);
   // Para almacenar las URLs de vista previa
+  const [existingImages, setExistingImages] = useState([]); // Para imágenes ya existentes en modo edición
 
   // Función para obtener las categorías
   useEffect(() => {
@@ -55,6 +57,31 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
     fetchCategories();
   }, []);
 
+  // Cargar datos del instrumento a editar cuando estamos en modo edición
+  useEffect(() => {
+    if (isEditMode && instrumentToEdit) {
+      setFormData({
+        id: instrumentToEdit.id || instrumentToEdit.idInstrument,
+        name: instrumentToEdit.name || "",
+        brand: instrumentToEdit.brand || "",
+        model: instrumentToEdit.model || "",
+        year: instrumentToEdit.year || "",
+        stock: instrumentToEdit.stock || "",
+        description: instrumentToEdit.description || "",
+        price: instrumentToEdit.price || "",
+        available: instrumentToEdit.available || false,
+        idCategory: instrumentToEdit.idCategory || "",
+        imageUrls: [],
+      });
+
+      // Cargar imágenes existentes
+      if (instrumentToEdit.imageUrls && instrumentToEdit.imageUrls.length > 0) {
+        setExistingImages(instrumentToEdit.imageUrls);
+        setImagePreviews(instrumentToEdit.imageUrls);
+      }
+    }
+  }, [isEditMode, instrumentToEdit]);
+
   // Limpiar el formulario cuando se cierra y resetear cuando se abre de nuevo
   useEffect(() => {
     if (!isOpen) {
@@ -64,24 +91,12 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
           URL.revokeObjectURL(url);
         }
       });
-    } else {
-      // Al abrir el modal, reseteamos completamente el formulario
+    } else if (!isEditMode) {
+      // Solo reseteamos si no estamos en modo edición
       resetForm();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  // Limpiar las URLs de objetos cuando el componente se desmonte
-  // useEffect(() => {
-  //   return () => {
-  //     // Revocar todas las URLs de objetos al desmontar para evitar fugas de memoria
-  //     imagePreviews.forEach((url) => {
-  //       if (url.startsWith("blob:")) {
-  //         URL.revokeObjectURL(url);
-  //       }
-  //     });
-  //   };
-  // }, [imagePreviews]);
+  }, [isOpen, isEditMode]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -102,10 +117,11 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   // Manejo de imágenes
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files || []);
+    const totalImages = imageFiles.length + existingImages.length;
 
-    if (files.length && imageFiles.length < 5) {
-      // Limitar a 5 imágenes en total
-      const newFiles = files.slice(0, 5 - imageFiles.length);
+    if (files.length && totalImages < 5) {
+      // Limitar a 5 imágenes en total (nuevas + existentes)
+      const newFiles = files.slice(0, 5 - totalImages);
 
       // Crear URLs de vista previa para las nuevas imágenes
       const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
@@ -117,14 +133,26 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
   };
 
   const removeImage = (index) => {
-    // Revocar la URL de objeto para evitar fugas de memoria
-    if (imagePreviews[index] && imagePreviews[index].startsWith("blob:")) {
-      URL.revokeObjectURL(imagePreviews[index]);
-    }
+    // Determinar si la imagen es existente o nueva
+    const isExistingImage = index < existingImages.length;
+    
+    if (isExistingImage) {
+      // Eliminar una imagen existente
+      const imageUrl = existingImages[index];
+      setExistingImages(existingImages.filter((_, i) => i !== index));
+      setImagePreviews(imagePreviews.filter((url) => url !== imageUrl));
+    } else {
+      // Eliminar una nueva imagen
+      const newIndex = index - existingImages.length;
+      
+      // Revocar la URL de objeto para evitar fugas de memoria
+      if (imagePreviews[index] && imagePreviews[index].startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreviews[index]);
+      }
 
-    // Eliminar el archivo y la vista previa
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+      setImageFiles((prev) => prev.filter((_, i) => i !== newIndex));
+      setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   const resetForm = () => {
@@ -150,6 +178,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 
     setImageFiles([]);
     setImagePreviews([]);
+    setExistingImages([]);
   };
 
   // Función personalizada para cerrar el modal y limpiar el formulario
@@ -169,25 +198,42 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
         return;
       }
 
-      // Verificar que hay imágenes para subir
-      if (imageFiles.length === 0) {
+      // Verificar que hay imágenes para subir (nuevas o existentes)
+      if (imageFiles.length === 0 && existingImages.length === 0) {
         errorToast("Debes agregar al menos una imagen.");
         return;
       }
 
-      // Subir archivos de imagen a Cloudinary
-      const urls = await Promise.all(
-        imageFiles.map((file) => cloudinaryService.uploadImage(file))
-      );
+      // Subir nuevos archivos de imagen a Cloudinary (si hay)
+      let allImageUrls = [...existingImages];
+      
+      if (imageFiles.length > 0) {
+        const newUrls = await Promise.all(
+          imageFiles.map((file) => cloudinaryService.uploadImage(file))
+        );
+        allImageUrls = [...allImageUrls, ...newUrls];
+      }
 
-      // Crear el instrumento con las URLs de las imágenes
-      const newInstrument = await instrumentService.createInstrument({
-        ...formData,
-        imageUrls: urls,
-      });
+      if (isEditMode) {
+        // Actualizar el instrumento
+        const updatedInstrument = await instrumentService.updateInstrument({
+          ...formData,
+          imageUrls: allImageUrls,
+        });
 
-      addInstrument(newInstrument);
-      successToast("Instrumento agregado con éxito.");
+        updateInstrument(updatedInstrument);
+        successToast("Instrumento actualizado con éxito.");
+      } else {
+        // Crear el instrumento con las URLs de las imágenes
+        const newInstrument = await instrumentService.createInstrument({
+          ...formData,
+          imageUrls: allImageUrls,
+        });
+
+        addInstrument(newInstrument);
+        successToast("Instrumento agregado con éxito.");
+      }
+      
       handleClose();
     } catch (error) {
       console.error("Error completo:", error);
@@ -199,7 +245,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
       } else if (error.response?.status === 500) {
         errorToast("Error en el servidor. Inténtalo más tarde.");
       } else {
-        errorToast(error.message || "Error al crear el instrumento.");
+        errorToast(error.message || `Error al ${isEditMode ? 'actualizar' : 'crear'} el instrumento.`);
       }
     }
   };
@@ -209,7 +255,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-[#b08562] p-4 rounded-t-lg flex justify-between items-center">
           <h2 className="text-[#730f06] text-xl font-semibold">
-            Registrar Instrumento
+            {isEditMode ? "Editar Instrumento" : "Registrar Instrumento"}
           </h2>
           <button
             onClick={handleClose}
@@ -417,7 +463,7 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
               type="submit"
               className="px-6 py-2 bg-[#730f06] text-[#d9c6b0] rounded-lg hover:bg-[#b08562] transition-colors"
             >
-              Registrar
+              {isEditMode ? "Actualizar" : "Registrar"}
             </button>
           </div>
         </form>
@@ -429,4 +475,5 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
 InstrumentForm.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  instrumentToEdit: PropTypes.object,
 };

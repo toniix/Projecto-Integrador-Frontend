@@ -59,11 +59,17 @@ const instrumentService = {
     }
   },
 
-  async updateInstrument(id, updatedData) {
+  // Modificamos la función updateInstrument para que sea compatible con nuestro componente
+  async updateInstrument(instrumentData) {
     try {
+      const id = instrumentData.id || instrumentData.idInstrument;
+      if (!id) {
+        throw new Error("ID del instrumento no proporcionado para actualización");
+      }
+      
       const response = await axios.put(
         `${API_URL}/products/${id}`,
-        updatedData,
+        instrumentData,
         {
           headers: { "Content-Type": "application/json" },
         }
