@@ -88,7 +88,7 @@ function Home() {
             <input
               type="text"
               name="search"
-              className="w-full max-w-xs p-2 border border-[#757575] bg-[#F9F7F4] rounded-lg focus:outline-none focus:border-[#730f06]"
+              className="w-full max-w-xs p-2 border text-[#757575] border-[#b08562] bg-[#F9F7F4] rounded-lg focus:outline-none focus:border-[#730f06] mr-2 ml-2 "
               placeholder="Buscar productos..."
             />
 
