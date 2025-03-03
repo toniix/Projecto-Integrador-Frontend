@@ -4,6 +4,7 @@ import FullGallery from "./components/imagegalery/FullGallery";
 import ProductDetail from "./pages/ProductDetail";
 import Header from "./components/common/Header"; // Nuevo Header
 import Home from "./pages/Home"; // Nueva página Home
+import Footer from "./components/common/Footer"; // Nuevo Footer
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -28,6 +29,7 @@ export const App = () => {
           <Route path="/admin" element={<AdminPanel />} />{" "}
           {/* Nueva ruta de Admin */}
         </Routes>
+        <Footer /> {/* El Footer se muestra en todas las rutas */}
         <ToastContainer
           position="bottom-right"
           autoClose={3000}
