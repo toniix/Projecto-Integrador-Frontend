@@ -7,31 +7,8 @@
     text-[#b08562] rounded-lg focus:outline-none focus:border-[#b08562] bg-[#f1eae7]
 }
 
-/* Personalización del checkbox */
-/* .custom-checkbox .form-check-input {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--color3);  
+ 
 
-    background-color: transparent;
-    border-radius: 4px;
-    transition: all 0.3s;
-} */
-
-/* .custom-checkbox .form-check-input:checked { */
-    /* background-color: var(--color3); Color cuando está seleccionado */
-    /* border-color: var(--color3);
-} */
-
-/* .custom-checkbox .form-check-input:focus {
-    box-shadow: none;
-    border-color: var(--color3);
-}
-
-.custom-checkbox .form-check-label {
-    color: #0D0D0D;
-    padding-left: 8px;
-} */
 
 
 

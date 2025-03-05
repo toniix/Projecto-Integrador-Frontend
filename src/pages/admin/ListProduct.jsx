@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import instrumentService from "../../services/instrumentService";
 import PaginationComponent from "../../components/common/PaginationComponent";
 import "../../styles/ListProduct.css";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit,  Eye, ShoppingCart } from "lucide-react";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 import ConfirmationModal from "../../components/instrument/ConfirmationModal";
 import { InstrumentForm } from "../../components/instrument/InstrumentForm"; // Importamos el formulario
@@ -91,66 +91,90 @@ export const ListProduct = () => {
     };
 
     return (
-        <div className="p-6 bg-[#e6d1bb] rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-[#5a0c04] mb-4 text-center">Lista de Instrumentos</h2>
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border border-[#a37b63] rounded-lg shadow-md">
-                    <thead className="bg-[#730f06] text-[#e6d1bb] uppercase">
-                        <tr>
-                            <th className="p-3 border-b border-[#a37b63]">Id</th>
-                            <th className="p-3 border-b border-[#a37b63]">Nombre</th>
-                            <th className="p-3 border-b border-[#a37b63]">Stock</th>
-                            <th className="p-3 border-b border-[#a37b63] text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-[#5a0c04] bg-[#f1eae7]">
-                        {products.length > 0 ? (
-                            products.map((product) => (
-                                <tr key={product.idProduct} className="border-b border-[#a37b63] hover:bg-[#c6bcb049] transition">
-                                    <td className="p-3">{product.idProduct}</td>
-                                    <td className="p-3">{product.name}</td>
-                                    <td className="p-3">{product.stock}</td>
-                                    <td className="p-3 flex justify-center gap-2">
-                                        {/* Botón de editar */}
-                                        <button 
-                                            onClick={() => handleOpenEditModal(product)}
-                                            className="flex items-center justify-center text-[#730f06] bg-[#e6d1bb] hover:bg-[#d9c6b0] py-1 px-2 rounded transition w-10 h-10 border border-[#730f06]"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        
-                                        {/* Botón de eliminar */}
-                                        <button
-                                            onClick={() => {
-                                                setIsConfirmationModalOpen(true);
-                                                setProductId(product.idProduct);
-                                            }}
-                                            className="flex items-center justify-center text-[#e6d1bb] bg-[#730f06] hover:bg-[#e6d1bb] hover:text-[#730f06] py-1 px-2 rounded transition w-10 h-10 border border-[#730f06]"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="p-6 bg-gradient-to-r from-[#d9c6b0] to-[#f1eae7]">
+                <h2 className="text-2xl font-bold text-[#3e0b05] mb-4">Catálogo de Instrumentos</h2>
+                <p className="text-[#1e1e1e] mb-4">Administra tu inventario de instrumentos musicales</p>
+                
+                <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead className="bg-[#3e0b05] text-white">
+                            <tr>
+                                <th className="p-3">ID</th>
+                                <th className="p-3">Nombre</th>
+                                <th className="p-3">Stock</th>
+                                <th className="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#d9c6b0]">
+                            {products.length > 0 ? (
+                                products.map((product) => (
+                                    <tr key={product.idProduct} className="hover:bg-[#f1eae7] transition-colors">
+                                        <td className="p-3 text-[#1e1e1e]">{product.idProduct}</td>
+                                        <td className="p-3 font-medium text-[#3e0b05]">{product.name}</td>
+                                        <td className="p-3">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                product.stock > 10 
+                                                    ? 'bg-green-100 text-green-800' 
+                                                    : product.stock > 0 
+                                                        ? 'bg-yellow-100 text-yellow-800' 
+                                                        : 'bg-red-100 text-red-800'
+                                            }`}>
+                                                {product.stock} unidades
+                                            </span>
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="flex justify-center gap-2">
+                                                <button 
+                                                    onClick={() => handleOpenEditModal(product)}
+                                                    className="flex items-center justify-center text-[#3e0b05] bg-[#d9c6b0] hover:bg-[#b08562] hover:text-white p-2 rounded-md transition-colors"
+                                                    title="Editar"
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                                
+                                                <button
+                                                    onClick={() => {
+                                                        setIsConfirmationModalOpen(true);
+                                                        setProductId(product.idProduct);
+                                                    }}
+                                                    className="flex items-center justify-center text-white bg-[#730f06] hover:bg-[#3e0b05] p-2 rounded-md transition-colors"
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                                
+                                                <button 
+                                                    className="flex items-center justify-center text-[#1e1e1e] bg-[#f1eae7] hover:bg-[#d9c6b0] p-2 rounded-md transition-colors"
+                                                    title="Ver detalles"
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="p-6 text-center text-[#757575]">
+                                        No hay productos disponibles
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="p-4 text-center text-[#5a0c04]">
-                                    No hay productos disponibles
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-            {totalPages > 1 && (
-                <div className="mt-4 flex justify-center">
-                    <PaginationComponent
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        setCurrentPage={setCurrentPage}
-                    />
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            )}
+                
+                {totalPages > 1 && (
+                    <div className="mt-6 flex justify-center">
+                        <PaginationComponent
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    </div>
+                )}
+            </div>
             
             {/* Modal de confirmación para eliminar */}
             <ConfirmationModal
