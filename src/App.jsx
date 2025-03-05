@@ -5,6 +5,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Header from "./components/common/Header"; // Nuevo Header
 import Home from "./pages/Home"; // Nueva página Home
 import Footer from "./components/common/Footer"; // Nuevo Footer
+import RegisterForm from "./components/signupform/RegisterForm";
+
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -27,6 +29,7 @@ export const App = () => {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/product/:id/galeria" element={<FullGallery />} />
           <Route path="/admin" element={<AdminPanel />} />{" "}
+          <Route path="/registro" element={<RegisterForm />} />
           {/* Nueva ruta de Admin */}
         </Routes>
         <Footer /> {/* El Footer se muestra en todas las rutas */}

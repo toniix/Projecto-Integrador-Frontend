@@ -36,9 +36,12 @@ function Header() {
             <Button variant="primary">
               Iniciar Sesión
             </Button>
-            <Button variant="outline">
-              Registrarse
-            </Button>
+            <Link to="/registro">
+              <Button variant="outline">
+                Registrarse
+              </Button>
+            </Link>
+
             {/* <button className=" custom-button">Crear Cuenta</button>
             <button className=" custom-button">Iniciar Sesión</button> */}
           </div>
