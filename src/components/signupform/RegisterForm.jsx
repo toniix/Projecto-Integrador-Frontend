@@ -143,7 +143,7 @@ const RegisterForm = () => {
                 </div>
     
                 {/* Columna derecha */}
-                <div className="flex flex-col space-y-6 items-center space-y-6">
+                <div className="flex flex-col items-center space-y-6">
                   <input
                     type="email"
                     name="email"
