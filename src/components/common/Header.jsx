@@ -4,25 +4,16 @@ import { Menu, X } from "lucide-react";
 import Logo1 from "/img/logo1.svg";
 import Button from "./Button";
 import LoginModal from "../login/LoginModal";
+import { useGlobalContext } from "../../context/GlobalContext";
+import UserMenu from "./UserMenu";
+
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, logout } = useGlobalContext();
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
-
-  const handleLogin = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    setIsLoginModalOpen(false);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-  };
 
   return (
     <>
@@ -55,7 +46,7 @@ function Header() {
             {/* Desktop Menu */}
             <div className="hidden sm:flex sm:items-center sm:space-x-6">
               {isAuthenticated ? (
-                <UserMenu user={user} onLogout={handleLogout} />
+                <UserMenu user={user} onLogout={logout} />
               ) : (
                 <>
                   <Button
@@ -78,7 +69,7 @@ function Header() {
           >
             {isAuthenticated ? (
               <div className="px-4">
-                <UserMenu user={user} onLogout={handleLogout} />
+                <UserMenu user={user} onLogout={logout} />
               </div>
             ) : (
               <>
@@ -91,11 +82,7 @@ function Header() {
           </div>
         </div>
       </header>
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={closeLoginModal}
-        onLogin={handleLogin}
-      />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </>
   );
 }

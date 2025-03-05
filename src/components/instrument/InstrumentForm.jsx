@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
-import { useState, useEffect, useContext } from "react";
-import { InstrumentContext } from "../../context/InstrumentContext";
+import { useState, useEffect } from "react";
+import { useGlobalContext } from "../../context/GlobalContext";
 import instrumentService from "../../services/instrumentService";
 import cloudinaryService from "../../services/images/cloudinaryService";
 import { successToast, errorToast } from "../../utils/toastNotifications";
@@ -8,7 +8,7 @@ import { X, Plus, Trash2 } from "lucide-react";
 import "../../styles/Modal.css";
 
 export const InstrumentForm = ({ isOpen, onClose }) => {
-  const { addInstrument } = useContext(InstrumentContext);
+  const { addInstrument } = useGlobalContext();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -219,7 +219,10 @@ export const InstrumentForm = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <form className="p-6 space-y-6 verflow-y-auto max-h-[500px] scrollbar-form" onSubmit={handleSubmit}>
+        <form
+          className="p-6 space-y-6 verflow-y-auto max-h-[500px] scrollbar-form"
+          onSubmit={handleSubmit}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[#730f06] font-medium mb-2">

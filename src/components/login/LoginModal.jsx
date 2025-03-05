@@ -3,7 +3,7 @@ import { Eye, EyeOff, Lock, Mail, X } from "lucide-react";
 import { useGlobalContext } from "../../context/GlobalContext";
 import { errorToast, successToast } from "../../utils/toastNotifications";
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = ({ isOpen, onClose, onLogin }) => {
   // Estados
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
 
   const { login } = useGlobalContext();
 
@@ -24,6 +25,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     });
     setEmailError("");
     setPasswordError("");
+    setError("");
     setShowPassword(false);
     setRememberMe(false);
   };
@@ -80,7 +82,7 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError(""); // Limpiar error general
     // Validar campos
     const isEmailValid = validateEmail(formData.email);
     const isPasswordValid = validatePassword(formData.password);
@@ -93,12 +95,12 @@ const LoginModal = ({ isOpen, onClose }) => {
       const result = await login({
         email: formData.email,
         password: formData.password,
-        rememberMe,
       });
 
       if (result.success) {
         successToast("¡Bienvenido!");
         setFormData({ email: "", password: "" });
+        setError(""); // Limpiar error general
         onClose();
       } else {
         if (result.error.toLowerCase().includes("email")) {
@@ -106,8 +108,15 @@ const LoginModal = ({ isOpen, onClose }) => {
         } else if (result.error.toLowerCase().includes("contraseña")) {
           setPasswordError(result.error);
         } else {
-          errorToast(result.error);
+          setError(
+            "Campos inválidos. Por favor, verifica tu email y contraseña."
+          );
+          setFormData({
+            email: "",
+            password: "",
+          });
         }
+        errorToast(result.error); // Mostrar errorToast aquí
       }
     } catch (error) {
       errorToast("Error al intentar iniciar sesión");
@@ -157,6 +166,11 @@ const LoginModal = ({ isOpen, onClose }) => {
 
             {/* Formulario Mejorado */}
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="text-red-500 text-sm text-center mb-4">
+                  {error}
+                </div>
+              )}
               {/* Campo Email */}
               <div className="group">
                 <div className="relative">
@@ -166,24 +180,10 @@ const LoginModal = ({ isOpen, onClose }) => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full bg-gray-900/60 text-amber-100 text-base pl-12 pr-4 pt-7 pb-3 rounded-xl border 
-              ${emailError ? "border-red-500" : "border-white/10"} 
-              transition-all duration-200 peer focus:border-amber-700 focus:outline-none focus:ring-1 
-              ${
-                emailError ? "focus:ring-red-500/20" : "focus:ring-amber-700/20"
-              }`}
-                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-lg bg-[#2a0803] text-[#d9c6b0] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-700 transition-colors"
+                    placeholder="Email"
                   />
-                  <label
-                    htmlFor="email"
-                    className={`absolute text-gray-500 left-12 transform transition-all duration-200 pointer-events-none text-base
-              peer-focus:-translate-y-4 peer-focus:text-amber-700 peer-focus:text-sm
-              peer-valid:-translate-y-4 peer-valid:text-sm
-              top-1/2 -translate-y-1/2 peer-focus:top-4 peer-valid:top-4
-              ${emailError ? "text-red-500" : ""}`}
-                  >
-                    Email
-                  </label>
+
                   {emailError && (
                     <span className="text-red-500 text-xs mt-1 absolute -bottom-5 left-0">
                       {emailError}
@@ -201,26 +201,10 @@ const LoginModal = ({ isOpen, onClose }) => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full bg-gray-900/60 text-amber-100 text-base pl-12 pr-12 pt-7 pb-3 rounded-xl border 
-              ${passwordError ? "border-red-500" : "border-white/10"} 
-              transition-all duration-200 peer focus:border-amber-700 focus:outline-none focus:ring-1 
-              ${
-                passwordError
-                  ? "focus:ring-red-500/20"
-                  : "focus:ring-amber-700/20"
-              }`}
-                    required
+                    className="w-full pl-12 pr-4 py-3 rounded-lg bg-[#2a0803] text-[#d9c6b0] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-700 transition-colors"
+                    placeholder="Contraseña"
                   />
-                  <label
-                    htmlFor="password"
-                    className={`absolute text-gray-500 left-12 transform transition-all duration-200 pointer-events-none text-base
-              peer-focus:-translate-y-4 peer-focus:text-amber-700 peer-focus:text-sm
-              peer-valid:-translate-y-4 peer-valid:text-sm
-              top-1/2 -translate-y-1/2 peer-focus:top-4 peer-valid:top-4
-              ${passwordError ? "text-red-500" : ""}`}
-                  >
-                    Contraseña
-                  </label>
+
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}

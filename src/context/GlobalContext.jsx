@@ -7,6 +7,8 @@ import {
   useEffect,
 } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { successToast } from "../utils/toastNotifications";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const GlobalContext = createContext();
@@ -25,31 +27,18 @@ export const GlobalProvider = ({ children }) => {
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     if (token) {
-      validateToken(token);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  // Validar token
-  const validateToken = async (token) => {
-    try {
-      const response = await axios.get(`${API_URL}/api/auth/validate`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data.valid) {
-        setUser(response.data.user);
+      const decodedToken = jwtDecode(token);
+      console.log("Decoded Token on Load:", decodedToken); // Añadir esta línea para depuración
+      if (decodedToken.exp * 1000 > Date.now()) {
+        setUser(decodedToken); // Ajuste aquí
         setIsAuthenticated(true);
         setupAxiosInterceptors(token);
       } else {
         handleLogout();
       }
-    } catch (error) {
-      handleLogout();
-    } finally {
-      setLoading(false);
     }
-  };
+    setLoading(false);
+  }, []);
 
   // Configurar interceptores de Axios
   const setupAxiosInterceptors = (token) => {
@@ -81,19 +70,24 @@ export const GlobalProvider = ({ children }) => {
     console.log("Login", credentials);
     if (!credentials.email || !credentials.password) {
       //   errorToast("Por favor, completa todos los campos");
-      return { success: false, error: "Campos incompletos" };
+      return { success: false, error: "Por favor, completa todos los campos" };
     }
     try {
-      const response = await axios.post("/api/auth/login", credentials);
-      const { token, user: userData } = response.data;
-
+      const response = await axios.post(`${API_URL}/users/login`, credentials);
+      // console.log(response);
+      console.log(response.data);
+      const { token, user: userData } = response.data.response;
+      console.log(userData);
       sessionStorage.setItem("token", token);
-      setUser(userData);
+      const decodedToken = jwtDecode(token);
+      console.log("Decoded Token on Login:", decodedToken); // Añadir esta línea para depuración
+      setUser(userData); // Ajuste aquí
       setIsAuthenticated(true);
       setupAxiosInterceptors(token);
 
       return { success: true };
     } catch (error) {
+      console.log(error);
       return {
         success: false,
         error: error.response?.data?.message || "Error al iniciar sesión",
@@ -101,12 +95,14 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  console.log(user);
   // Logout
   const handleLogout = useCallback(() => {
     sessionStorage.removeItem("token");
     setUser(null);
     setIsAuthenticated(false);
-    window.location.reload(); // Recargar para limpiar estado
+    successToast("Sesión cerrada,exitosamente");
+    // window.location.reload();
   }, []);
 
   const value = {

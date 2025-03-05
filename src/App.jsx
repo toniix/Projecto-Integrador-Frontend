@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { InstrumentProvider } from "./context/InstrumentContext";
 import FullGallery from "./components/imagegalery/FullGallery";
 import ProductDetail from "./pages/ProductDetail";
 import Header from "./components/common/Header"; // Nuevo Header
@@ -19,29 +18,27 @@ export const App = () => {
   return (
     <GlobalProvider>
       <Router>
-        <InstrumentProvider>
-          <Header /> {/* El Header se muestra en todas las rutas */}
-          <Routes>
-            <Route path="/" element={<Home />} />{" "}
-            {/* Ruta principal para la Home */}
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/product/:id/galeria" element={<FullGallery />} />
-            <Route path="/admin" element={<AdminPanel />} />{" "}
-            {/* Nueva ruta de Admin */}
-          </Routes>
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="colored"
-          />
-        </InstrumentProvider>
+        <Header /> {/* El Header se muestra en todas las rutas */}
+        <Routes>
+          <Route path="/" element={<Home />} />{" "}
+          {/* Ruta principal para la Home */}
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/product/:id/galeria" element={<FullGallery />} />
+          <Route path="/admin" element={<AdminPanel />} />{" "}
+          {/* Nueva ruta de Admin */}
+        </Routes>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </Router>
     </GlobalProvider>
   );
