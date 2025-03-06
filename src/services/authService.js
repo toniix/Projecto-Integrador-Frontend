@@ -1,10 +1,9 @@
-import { apiClient, setupAuthInterceptor, setupResponseInterceptor } from './api';
+import {
+  apiClient,
+  setupAuthInterceptor,
+  setupResponseInterceptor,
+} from "./api";
 
-/**
- * Authentication Service
- * 
- * Single Responsibility: Handle authentication API calls
- */
 const authService = {
   /**
    * Login user with email and password
@@ -13,7 +12,7 @@ const authService = {
    */
   async login(credentials) {
     try {
-      const response = await apiClient.post('/users/login', credentials);
+      const response = await apiClient.post("/users/login", credentials);
       const { token, user } = response.data.response;
       return { token, userData: user };
     } catch (error) {
@@ -29,7 +28,7 @@ const authService = {
   setupAxiosInterceptors(token, logoutCallback) {
     setupAuthInterceptor(token);
     setupResponseInterceptor(logoutCallback);
-  }
+  },
 };
 
 export default authService;
