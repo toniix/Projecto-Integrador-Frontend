@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {successToast,errorToast} from "../../utils/toastNotifications"
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
@@ -22,13 +23,13 @@ const RegisterForm = () => {
 
     const validateForm = () => {
         let newErrors = {};
-        if (!formData.firstName) newErrors.firstName = "El firstName es obligatorio";
-        if (!formData.lastName) newErrors.lastName = "El lastName es obligatorio";
-        if (!formData.document) newErrors.document = "El document es obligatorio";
+        if (!formData.firstName) newErrors.firstName = "El nombre es obligatorio";
+        if (!formData.lastName) newErrors.lastName = "El apellido es obligatorio";
+        if (!formData.document) newErrors.document = "El documento es obligatorio";
         if (!formData.email) newErrors.email = "El email es obligatorio";
         if (!formData.phone) newErrors.phone = "El teléfono es obligatorio";
         if (!formData.address) newErrors.address = "La dirección es obligatoria";
-        if (!formData.locality) newErrors.locality = "La locality es obligatoria";
+        if (!formData.locality) newErrors.locality = "La localidad es obligatoria";
         if(!isChecked) newErrors.terminos = "Debe aceptar nuestros Términos de Servicio y Política de Privacidad para poder continuar";
         if (!formData.password) {
             newErrors.password = "La contraseña es obligatoria";
@@ -60,7 +61,7 @@ const RegisterForm = () => {
 
             if (!response.ok) throw new Error("Error en el registro");
 
-            alert("Registro exitoso");
+            successToast("Registro exitoso");
             setFormData({
                 firstName: "",
                 lastName: "",
@@ -74,7 +75,7 @@ const RegisterForm = () => {
             });
         } catch (error) {
             console.error(error);
-            alert("Hubo un problema con el registro");
+            errorToast("Hubo un problema con el registro");
         }
     };
 
