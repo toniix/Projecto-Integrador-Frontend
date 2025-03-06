@@ -37,7 +37,9 @@ const GlobalCompatibilityProvider = ({ children }) => {
     isAuthenticated, 
     loading, 
     login, 
-    logout 
+    logout,
+    updateUserData,
+    checkSessionStatus
   } = useAuth();
   
   const { 
@@ -55,6 +57,8 @@ const GlobalCompatibilityProvider = ({ children }) => {
     loading,
     login,
     logout,
+    updateUserData,
+    checkSessionStatus,
     
     // Instrument-related properties
     instruments,

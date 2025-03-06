@@ -8,7 +8,8 @@ import {
   LOGOUT, 
   SET_USER, 
   AUTH_LOADING,
-  AUTH_ERROR
+  AUTH_ERROR,
+  UPDATE_USER
 } from "./authActions";
 import { successToast } from "../../utils/toastNotifications";
 import axios from "axios";
@@ -32,45 +33,53 @@ const initialState = {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Initialize auth state from token
+  // Initialize auth state from token stored in localStorage
   useEffect(() => {
-    const loadUser = async () => {
-      const token = sessionStorage.getItem("token");
-      
-      if (!token) {
-        dispatch({ type: AUTH_ERROR });
-        return;
-      }
-      
+    const loadUserSession = async () => {
       try {
-        const decodedToken = jwtDecode(token);
-        
-        // Check if token is expired
-        if (decodedToken.exp * 1000 < Date.now()) {
+        const token = localStorage.getItem("token");
+        const savedUserData = localStorage.getItem("userData");
+
+        if (token && savedUserData) {
+          const decodedToken = jwtDecode(token);
+
+          // Verify if token is still valid
+          if (decodedToken.exp * 1000 > Date.now()) {
+            const userData = JSON.parse(savedUserData);
+            
+            dispatch({ 
+              type: SET_USER, 
+              payload: userData 
+            });
+            
+            setupAxiosInterceptors(token);
+          } else {
+            // Token expired
+            handleLogout();
+          }
+        } else {
           dispatch({ type: AUTH_ERROR });
-          sessionStorage.removeItem("token");
-          return;
         }
-        
-        // Set up axios interceptors
-        setupAxiosInterceptors(token);
-        
-        // Set authenticated user
-        dispatch({ 
-          type: SET_USER, 
-          payload: decodedToken 
-        });
       } catch (error) {
-        console.error("Error decoding token:", error);
-        dispatch({ type: AUTH_ERROR });
-        sessionStorage.removeItem("token");
+        console.error("Error loading session:", error);
+        handleLogout();
       }
     };
-    loadUser();
+
+    loadUserSession();
   }, []);
 
-  // Setup axios interceptors for auth
+  // Configure Axios interceptors for authentication
   const setupAxiosInterceptors = (token) => {
+    // Remove existing interceptors to avoid duplicates
+    if (axios.interceptors.request.handlers && axios.interceptors.request.handlers[0]) {
+      axios.interceptors.request.eject(axios.interceptors.request.handlers[0]);
+    }
+    
+    if (axios.interceptors.response.handlers && axios.interceptors.response.handlers[0]) {
+      axios.interceptors.response.eject(axios.interceptors.response.handlers[0]);
+    }
+
     // Request interceptor - Add auth token
     axios.interceptors.request.use(
       (config) => {
@@ -95,50 +104,100 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login user
-  const login = async (credentials) => {
-    dispatch({ type: AUTH_LOADING });
+// Inside your login function in AuthContext.jsx
+const login = async (credentials) => {
+  dispatch({ type: AUTH_LOADING });
 
-    if (!credentials.email || !credentials.password) {
-      dispatch({ 
-        type: LOGIN_FAIL, 
-        payload: "Por favor, completa todos los campos" 
-      });
-      return { success: false, error: "Por favor, completa todos los campos" };
-    }
+  if (!credentials.email || !credentials.password) {
+    dispatch({ 
+      type: LOGIN_FAIL, 
+      payload: "Por favor, completa todos los campos" 
+    });
+    return { success: false, error: "Por favor, completa todos los campos" };
+  }
 
-    try {
-      const response = await axios.post(`${API_URL}/users/login`, credentials);
-      const { token, user } = response.data.response;
+  try {
+    const response = await axios.post(`${API_URL}/users/login`, credentials);
+    const { token, user: userData = {} } = response.data.response;
+    
+    // Decode token to get additional information
+    const decodedToken = jwtDecode(token);
+    console.log("Decoded Token:", decodedToken);
+    
+    // Combine token data with any user data provided by API
+    const combinedUserData = {
+      ...decodedToken,  // Include roles, sub (email), etc.
+      ...userData,      // Include any additional user data if available
+      email: userData.email || decodedToken.sub || credentials.email // Ensure we have email
+    };
+    
+    // Save both token and combined user data
+    localStorage.setItem("token", token);
+    localStorage.setItem("userData", JSON.stringify(combinedUserData));
+    
+    // Update auth state with combined data
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: combinedUserData
+    });
+    
+    setupAxiosInterceptors(token);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Login error:", error);
+    
+    const errorMessage = error.response?.data?.message || "Error al iniciar sesión";
+    
+    dispatch({
+      type: LOGIN_FAIL,
+      payload: errorMessage
+    });
+    
+    return { success: false, error: errorMessage };
+  }
+};
+
+  // Update user data
+  const updateUserData = (newUserData) => {
+    if (state.isAuthenticated && state.user) {
+      const updatedUser = { ...state.user, ...newUserData };
       
-      // Save token and set up interceptors
-      sessionStorage.setItem("token", token);
-      setupAxiosInterceptors(token);
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
       
-      // Update auth state
       dispatch({
-        type: LOGIN_SUCCESS,
-        payload: user
+        type: UPDATE_USER,
+        payload: updatedUser
       });
-
-      return { success: true };
-    } catch (error) {
-      console.error("Login error:", error);
-      
-      const errorMessage = error.response?.data?.message || "Error al iniciar sesión";
-      
-      dispatch({
-        type: LOGIN_FAIL,
-        payload: errorMessage
-      });
-      
-      return { success: false, error: errorMessage };
     }
   };
 
+  // Check session status (can be called periodically)
+  const checkSessionStatus = useCallback(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp * 1000 <= Date.now()) {
+          handleLogout();
+          return false;
+        }
+        return true;
+      } catch (error) {
+        handleLogout();
+        return false;
+      }
+    }
+    return false;
+  }, []);
+
   // Logout user
   const handleLogout = useCallback(() => {
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userData");
+    
     dispatch({ type: LOGOUT });
+    
     successToast("Sesión cerrada exitosamente");
   }, []);
 
@@ -149,7 +208,9 @@ export const AuthProvider = ({ children }) => {
     loading: state.loading,
     error: state.error,
     login,
-    logout: handleLogout
+    logout: handleLogout,
+    updateUserData,
+    checkSessionStatus
   };
 
   return (

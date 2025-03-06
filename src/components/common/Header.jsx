@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo1 from "/img/logo1.svg";
@@ -10,7 +10,33 @@ import UserMenu from "./UserMenu";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [displayName, setDisplayName] = useState("Usuario");
+  
   const { user, isAuthenticated, logout } = useAuth();
+  
+  // Extract display name from user or token data
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // First try to get name from user object if it exists
+      if (user.name || user.firstName || user.fullName) {
+        setDisplayName(user.name || user.firstName || user.fullName);
+      } 
+      // Fall back to email from token subject
+      else if (user.sub) {
+        // Extract username part from email (everything before @)
+        const emailUsername = user.sub.split('@')[0];
+        // Capitalize first letter
+        setDisplayName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
+      } 
+      // Last resort: try email directly
+      else if (user.email) {
+        const emailUsername = user.email.split('@')[0];
+        setDisplayName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
+      }
+    } else {
+      setDisplayName("Usuario");
+    }
+  }, [user, isAuthenticated]);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
@@ -32,7 +58,7 @@ function Header() {
                 </span>
               </div>
             </Link>
-
+            
             {/* Mobile Menu Button */}
             <div className="sm:hidden">
               <button
@@ -42,15 +68,15 @@ function Header() {
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             </div>
-
+            
             {/* Desktop Menu */}
             <div className="hidden sm:flex sm:items-center sm:space-x-6">
               {isAuthenticated ? (
-                <UserMenu user={user} onLogout={logout} />
+                <UserMenu user={user} displayName={displayName} onLogout={logout} />
               ) : (
                 <>
                   <Button
-                    onClick={() => openLoginModal(true)}
+                    onClick={openLoginModal}
                     variant="primary"
                   >
                     Iniciar Sesión
@@ -60,7 +86,7 @@ function Header() {
               )}
             </div>
           </div>
-
+          
           {/* Mobile Menu Dropdown */}
           <div
             className={`${
@@ -69,11 +95,11 @@ function Header() {
           >
             {isAuthenticated ? (
               <div className="px-4">
-                <UserMenu user={user} onLogout={logout} />
+                <UserMenu user={user} displayName={displayName} onLogout={logout} />
               </div>
             ) : (
               <>
-                <Button onClick={() => openLoginModal(true)}>
+                <Button onClick={openLoginModal}>
                   Iniciar Sesión
                 </Button>
                 <Button variant="outline">Registrarse</Button>
