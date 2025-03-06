@@ -60,8 +60,6 @@ export const AuthProvider = ({ children }) => {
           type: SET_USER, 
           payload: decodedToken 
         });
-        console.log("Token decodificado: " + decodedToken)
-
       } catch (error) {
         console.error("Error decoding token:", error);
         dispatch({ type: AUTH_ERROR });
