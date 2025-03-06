@@ -8,9 +8,12 @@ import "./index.css";
 // import "./styles/styles.css";
 import "./App.css";
 import "./styles/Button.css";
+import { RootProvider } from "./context/index.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+     <RootProvider>
+      <App />
+    </RootProvider>
   </React.StrictMode>
 );

@@ -1,8 +1,18 @@
 import axios from "axios";
-//const API_LOCAL = import.meta.env.VITE_API_URL_LOCAL;
+
+// Environment variables
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Instrument Service
+ * 
+ * Single Responsibility: Handle instrument-related API calls
+ */
 const instrumentService = {
+  /**
+   * Get all categories
+   * @returns {Promise<Object>} Categories data
+   */
   async getCategories() {
     try {
       const response = await axios.get(`${API_URL}/categories`);
@@ -16,6 +26,11 @@ const instrumentService = {
     }
   },
 
+  /**
+   * Create new instrument
+   * @param {Object} instrumentData - Instrument data
+   * @returns {Promise<Object>} Created instrument
+   */
   async createInstrument(instrumentData) {
     try {
       const response = await axios.post(`${API_URL}/products`, instrumentData, {
@@ -30,6 +45,13 @@ const instrumentService = {
       throw error;
     }
   },
+
+  /**
+   * Get all instruments with pagination
+   * @param {number} page - Page number (0-based)
+   * @param {number} pageSize - Items per page
+   * @returns {Promise<Object>} Paginated instruments data
+   */
   async getInstrumenAll(page = 0, pageSize = 10) {
     try {
       // La API usa paginación base 0 (como es común en Spring Boot)
@@ -59,49 +81,58 @@ const instrumentService = {
     }
   },
 
-// Método actualizado para solo actualizar la categoría
-
-async updateInstrument(instrumentData) {
-  try {
-    // Obtenemos el ID del instrumento y la categoría
-    const idproducto = instrumentData.id || instrumentData.idProduct;
-    const idCategory = instrumentData.idCategory;
-    
-    if (!idproducto) {
-      throw new Error("ID del instrumento no proporcionado para actualización");
-    }
-    
-    if (!idCategory) {
-      throw new Error("ID de categoría no proporcionado para actualización");
-    }
-    
-    // Realizamos la petición PUT al endpoint correcto
-    const response = await axios.put(
-      `${API_URL}/products/${idproducto}/category/${idCategory}`,
-      {}, // No necesitamos enviar un cuerpo si el ID de categoría ya está en la URL
-      {
-        headers: { "Content-Type": "application/json" },
+  /**
+   * Update instrument category
+   * @param {Object} instrumentData - Contains id and idCategory
+   * @returns {Promise<Object>} Updated instrument
+   */
+  async updateInstrument(instrumentData) {
+    try {
+      // Obtenemos el ID del instrumento y la categoría
+      const idproducto = instrumentData.id || instrumentData.idProduct;
+      const idCategory = instrumentData.idCategory;
+      
+      if (!idproducto) {
+        throw new Error("ID del instrumento no proporcionado para actualización");
       }
-    );
-    
-    console.log("Respuesta de actualización de categoría:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error al actualizar la categoría del instrumento:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
-},
+      
+      if (!idCategory) {
+        throw new Error("ID de categoría no proporcionado para actualización");
+      }
+      
+      // Realizamos la petición PUT al endpoint correcto
+      const response = await axios.put(
+        `${API_URL}/products/${idproducto}/category/${idCategory}`,
+        {}, // No necesitamos enviar un cuerpo si el ID de categoría ya está en la URL
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      
+      console.log("Respuesta de actualización de categoría:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error al actualizar la categoría del instrumento:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
 
+  /**
+   * Delete instrument
+   * @param {number} id - Instrument ID
+   * @returns {Promise<void>}
+   */
   async deleteInstrument(id) {
     try {
       await axios.put(`${API_URL}/products/${id}`);
+      // Note: This function doesn't return a success message as commented out below
       // return { success: true, message: 'Instrumento eliminado correctamente' };
     } catch (error) {
       console.error(
-        "Error al eliminar el instrumentossss:",
+        "Error al eliminar el instrumento:",
         error.response?.data || error.message
       );
       throw error;
