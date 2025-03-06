@@ -89,6 +89,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
     const isPasswordValid = validatePassword(formData.password);
 
     if (!isEmailValid || !isPasswordValid) {
+      errorToast("Por favor, completa todos los campos"); // Mostrar errorToast aquí
       return;
     }
 
