@@ -93,6 +93,7 @@ export const ListUsers = () => {
                             <tr>
                                 <th className="p-3">ID</th>
                                 <th className="p-3">Nombre</th>
+                                <th className="p-3">Email</th>
                                 <th className="p-3 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -102,6 +103,7 @@ export const ListUsers = () => {
                                     <tr key={user.id} className="hover:bg-[#f1eae7] transition-colors">
                                         <td className="p-3 text-[#1e1e1e]">{user.id}</td>
                                         <td className="p-3 font-medium text-[#3e0b05]">{user.firstName}</td>
+                                        <td className="p-3 font-medium text-[#3e0b05]">{user.email}</td>
                                         <td className="p-3">
                                             <div className="flex justify-center gap-2">
                                                 <button 

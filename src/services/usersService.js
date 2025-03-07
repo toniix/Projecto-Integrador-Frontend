@@ -73,7 +73,7 @@ const usersService = {
       };
     } catch (error) {
       console.error(
-        "Error al listar los productos:",
+        "Error al listar los usuarios:",
         error.response?.data || error.message
       );
       return { users: [], totalPages: 1, currentPageIndex: 0 };
@@ -82,11 +82,11 @@ const usersService = {
 
 // Método actualizado para solo actualizar la categoría
 
-async assignRoles(assignRoles,token) {
+async assignRoles(id,assignRoles,token) {
   try {
     // Obtenemos el ID del instrumento y la categoría
-    const idUser = assignRoles.idUser;
-    const idsRol = assignRoles.idsRol;
+    const idUser = id;
+    const idsRol = assignRoles;
         
     // Realizamos la petición PUT al endpoint correcto
     const response = await axios.put(
@@ -103,11 +103,11 @@ async assignRoles(assignRoles,token) {
       }
     );
     
-    console.log("Respuesta de actualización de categoría:", response.data);
+    console.log("Respuesta de actualización de roles:", response.data);
     return response.data;
   } catch (error) {
     console.error(
-      "Error al actualizar la categoría del instrumento:",
+      "Error al actualizar los roles del usuario:",
       error.response?.data || error.message
     );
     throw error;

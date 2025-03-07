@@ -5,32 +5,31 @@ import usersService from "../../services/usersService";
 import "../../styles/Modal.css";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 
-export const AssignRolesModal = ({ isOpen, onClose, userRoles, allRoles = [],idUser }) => {
-  const [selectdRoles, setSelectedRoles] = useState([]);
+export const AssignRolesModal = ({ isOpen, onClose, userRoles, allRoles = [], idUser }) => {
+  const [selectedRoles, setSelectedRoles] = useState([]);
 
+  // Sincroniza los roles seleccionados cuando el modal se abre o cambian los roles del usuario
   useEffect(() => {
-    console.log("roles del usuario",userRoles)
-    if (isOpen && userRoles) {
-      const assignedRoles = allRoles.filter((role) =>
-        userRoles.some((r) => r.id === role.id)
-      );
-      setSelectedRoles(assignedRoles);
+    if (isOpen) {
+      setSelectedRoles(userRoles.map((r) => r.id)); // Guardamos solo los IDs
     }
-  }, [isOpen, userRoles, allRoles]);
+  }, [isOpen, userRoles]);
 
-  const handleRoleChange = (role) => {
+  // Maneja el cambio de selección de roles
+  const handleRoleChange = (roleId) => {
     setSelectedRoles((prevRoles) =>
-      prevRoles.some((r) => r.id === role.id)
-        ? prevRoles.filter((r) => r.id !== role.id)
-        : [...prevRoles, role]
+      prevRoles.includes(roleId)
+        ? prevRoles.filter((id) => id !== roleId)
+        : [...prevRoles, roleId]
     );
   };
 
-  const assignRoles = async (assignedRoles) => {
+  // Envía los roles seleccionados al backend
+  const assignRoles = async () => {
     try {
-      console.log("Enviando roles:", assignedRoles);
+      console.log("Enviando roles:", selectedRoles);
       const token = localStorage.getItem("token");
-      const data = await usersService.assignRoles(idUser, assignedRoles, token);
+      const data = await usersService.assignRoles(idUser, selectedRoles, token);
       console.log("Respuesta del servidor:", data);
 
       successToast("Roles actualizados correctamente");
@@ -42,7 +41,7 @@ export const AssignRolesModal = ({ isOpen, onClose, userRoles, allRoles = [],idU
   };
 
   const handleConfirm = () => {
-    assignRoles(userRoles);
+    assignRoles();
   };
 
   if (!isOpen) return null;
@@ -62,8 +61,8 @@ export const AssignRolesModal = ({ isOpen, onClose, userRoles, allRoles = [],idU
             <label key={role.id} className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={userRoles.some((r) => r.id == role.id)}
-                onChange={() => handleRoleChange(role)}
+                checked={selectedRoles.includes(role.id)}
+                onChange={() => handleRoleChange(role.id)}
                 className="form-checkbox text-[#730f06]"
               />
               <span className="text-[#1e1e1e]">{role.name}</span>
@@ -107,4 +106,5 @@ AssignRolesModal.propTypes = {
       name: PropTypes.string.isRequired,
     })
   ).isRequired,
+  idUser: PropTypes.number.isRequired,
 };

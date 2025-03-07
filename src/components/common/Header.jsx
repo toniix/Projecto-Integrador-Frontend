@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo1 from "/img/logo1.svg";
 import Button from "./Button";
@@ -11,7 +11,7 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [displayName, setDisplayName] = useState("Usuario");
-
+  const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
   // Extract display name from user or token data
@@ -82,7 +82,7 @@ function Header() {
                   <Button onClick={openLoginModal} variant="primary">
                     Iniciar Sesión
                   </Button>
-                  <Button variant="outline">Registrarse</Button>
+                  <Button  onClick={() => navigate("/register")} variant="outline">Registrarse</Button>
                 </>
               )}
             </div>
@@ -105,7 +105,7 @@ function Header() {
             ) : (
               <>
                 <Button onClick={openLoginModal}>Iniciar Sesión</Button>
-                <Button variant="outline">Registrarse</Button>
+                <Button  onClick={() => navigate("/register")}variant="outline">Registrarse</Button>
               </>
             )}
 
