@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 /**
  * Instrument Service
- * 
+ *
  * Single Responsibility: Handle instrument-related API calls
  */
 const instrumentService = {
@@ -61,12 +61,12 @@ const instrumentService = {
           pageSize,
         },
       });
-      
-      console.log("Respuesta completa del backend:", response.data);
-      
+
+      // console.log("Respuesta completa del backend:", response.data);
+
       // Asegurándonos de acceder correctamente a la estructura de la respuesta
       const data = response.data?.response || {};
-      
+
       return {
         products: data.content || [],
         totalPages: data.totalPages || 1,
@@ -91,15 +91,17 @@ const instrumentService = {
       // Obtenemos el ID del instrumento y la categoría
       const idproducto = instrumentData.id || instrumentData.idProduct;
       const idCategory = instrumentData.idCategory;
-      
+
       if (!idproducto) {
-        throw new Error("ID del instrumento no proporcionado para actualización");
+        throw new Error(
+          "ID del instrumento no proporcionado para actualización"
+        );
       }
-      
+
       if (!idCategory) {
         throw new Error("ID de categoría no proporcionado para actualización");
       }
-      
+
       // Realizamos la petición PUT al endpoint correcto
       const response = await axios.put(
         `${API_URL}/products/${idproducto}/category/${idCategory}`,
@@ -108,7 +110,7 @@ const instrumentService = {
           headers: { "Content-Type": "application/json" },
         }
       );
-      
+
       console.log("Respuesta de actualización de categoría:", response.data);
       return response.data;
     } catch (error) {

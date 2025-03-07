@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { UserCircle, LogOut, Settings, ChevronDown } from "lucide-react";
+import { LogOut, Settings, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
-function UserMenu({ user, displayName, onLogout }) {
+function UserMenu({ user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
-  
+
   // Use email from token subject if available
   const userEmail = user?.email || user?.sub || "usuario@example.com";
-  
+
   // Handle clicking outside to close the menu
   useEffect(() => {
     function handleClickOutside(event) {
@@ -17,60 +17,106 @@ function UserMenu({ user, displayName, onLogout }) {
         setIsOpen(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuRef]);
 
+  // Get the initial of the user's first name
+  const userInitial = user.firstName
+    ? user.firstName.charAt(0).toUpperCase()
+    : "";
+
   return (
     <div className="relative" ref={menuRef}>
-      <button 
+      {/* Botón principal mejorado */}
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 text-[#d9c6b0] hover:text-[#b08562] transition-colors bg-[#730f06]/20 px-3 py-2 rounded-lg"
+        className="flex items-center space-x-3 px-4 py-2.5 rounded-xl 
+          bg-gradient-to-r from-[#730f06] to-[#3e0b05]
+          hover:from-[#8b1208] hover:to-[#4e0d06]
+          text-[#d9c6b0] transition-all duration-300 
+          shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
-        <UserCircle size={20} />
-        <span className="font-medium">{displayName}</span>
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <div
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-[#b08562] to-[#730f06] 
+          flex items-center justify-center ring-2 ring-[#d9c6b0]/20 text-[#d9c6b0] font-bold"
+        >
+          {userInitial}
+        </div>
+        <span className="font-medium">{user.firstName}</span>
+        <ChevronDown
+          size={16}
+          className={`transition-transform duration-300 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
+      {/* Menú desplegable mejorado */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-xl bg-gradient-to-br from-[#3e0b05] to-[#2a0803] shadow-lg border border-[#ffffff08] py-2">
-          <div className="px-4 py-2 border-b border-[#ffffff08]">
-            <p className="font-medium text-sm text-[#d9c6b0]">{displayName}</p>
-            <p className="text-xs text-[#d9c6b0] truncate mt-1">{userEmail}</p>
+        <div
+          className="absolute right-0 mt-3 w-56 rounded-xl 
+          bg-gradient-to-b from-[#730f06] to-[#3e0b05]
+          shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-[#ffffff15]
+          backdrop-blur-sm transform transition-all duration-300 scale-100 origin-top-right
+          divide-y divide-[#ffffff15]"
+        >
+          {/* Sección de información del usuario */}
+          <div className="p-4">
+            <p className="text-[#b08562] text-sm truncate mt-0.5">
+              {user.email}
+            </p>
           </div>
-          
-          <div className="border-t border-[#b08562]/10">
-            <Link 
-              to="/profile" 
-              className="flex items-center px-4 py-2.5 text-sm text-[#d9c6b0] hover:bg-[#b08562]/10 transition-colors"
+
+          {/* Enlaces y opciones */}
+          <div className="p-2">
+            <Link
+              to="/profile"
+              className="flex items-center px-3 py-2.5 rounded-lg text-sm text-[#d9c6b0] 
+                hover:bg-[#ffffff0a] transition-colors group"
               onClick={() => setIsOpen(false)}
             >
-              <Settings size={16} className="mr-2 text-[#d9c6b0]" />
+              <Settings
+                size={16}
+                className="mr-3 text-[#b08562] group-hover:text-[#d9c6b0] transition-colors"
+              />
               Mi perfil
             </Link>
-            
+
             {user?.roles?.includes("ADMIN") && (
-              <Link 
-                to="/admin" 
-                className="flex items-center px-4 py-2.5 text-sm text-[#d9c6b0] hover:bg-[#b08562]/10 transition-colors"
+              <Link
+                to="/admin"
+                className="flex items-center px-3 py-2.5 rounded-lg text-sm text-[#d9c6b0] 
+                  hover:bg-[#ffffff0a] transition-colors group"
                 onClick={() => setIsOpen(false)}
               >
-                <Settings size={16} className="mr-2 text-[#d9c6b0]" />
+                <Settings
+                  size={16}
+                  className="mr-3 text-[#b08562] group-hover:text-[#d9c6b0] transition-colors"
+                />
                 Panel de administración
               </Link>
             )}
-            
-            <button 
+          </div>
+
+          {/* Botón de cerrar sesión */}
+          <div className="p-2">
+            <button
               onClick={() => {
                 setIsOpen(false);
                 onLogout();
               }}
-              className="flex items-center w-full text-left px-4 py-2.5 text-sm text-[#d9c6b0] hover:bg-[#b08562]/10 transition-colors"
+              className="flex items-center w-full px-3 py-2.5 rounded-lg text-sm text-[#d9c6b0] 
+                hover:bg-[#5c1c14] transition-all duration-300 group
+                hover:shadow-lg hover:scale-[1.02]"
             >
-              <LogOut size={16} className="mr-2 text-[#d9c6b0]" />
+              <LogOut
+                size={18}
+                className="mr-3 text-[#b08562] group-hover:text-[#d9c6b0] transition-colors"
+              />
               Cerrar sesión
             </button>
           </div>
@@ -83,7 +129,7 @@ function UserMenu({ user, displayName, onLogout }) {
 UserMenu.propTypes = {
   user: PropTypes.object.isRequired,
   displayName: PropTypes.string.isRequired,
-  onLogout: PropTypes.func.isRequired
+  onLogout: PropTypes.func.isRequired,
 };
 
 export default UserMenu;
