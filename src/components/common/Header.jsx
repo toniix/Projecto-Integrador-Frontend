@@ -88,21 +88,6 @@ function Header() {
             </div>
           </div>
 
-<<<<<<< HEAD
-          {/* Desktop Menu */}
-          <div className="hidden sm:flex sm:space-x-6">
-            <Button variant="primary">
-              Iniciar Sesión
-            </Button>
-            <Link to="/registro">
-              <Button variant="outline">
-                Registrarse
-              </Button>
-            </Link>
-
-            {/* <button className=" custom-button">Crear Cuenta</button>
-            <button className=" custom-button">Iniciar Sesión</button> */}
-=======
           {/* Mobile Menu Dropdown */}
           <div
             className={`${
@@ -123,7 +108,7 @@ function Header() {
                 <Button variant="outline">Registrarse</Button>
               </>
             )}
->>>>>>> dev
+
           </div>
         </div>
       </header>

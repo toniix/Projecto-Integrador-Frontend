@@ -5,6 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const usersService = {
   
   async getRoles(token) {
+    console.log(token)
     try {
       const response = await axios.get(`${API_URL}/roluser`,
         {
@@ -13,10 +14,32 @@ const usersService = {
           },
         }
       );
+      console.log("vemos si trae algo ",response);
       return response.data;
     } catch (error) {
       console.error(
-        "Error al obtener categorías:",
+        "Error al obtener roles:",
+        error.response?.data || error.message
+      );
+      throw error;
+    }
+  },
+
+  async getUserById(idUser,token) {
+    
+    try {
+      const response = await axios.get(`${API_URL}/users/${idUser}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregamos el token Bearer
+          },
+        }
+      );
+      console.log("vemos si trae algo ",response);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error al obtener roles:",
         error.response?.data || error.message
       );
       throw error;
@@ -27,7 +50,7 @@ const usersService = {
   async getUsers(page = 0, pageSize = 10, token) {
     try {
       // La API usa paginación base 0 (como es común en Spring Boot)
-      const response = await axios.get(`${API_URL}/products`, {
+      const response = await axios.get(`${API_URL}/users`, {
         params: {
           page, // Enviamos directamente el valor (que ya debe estar en base 0)
           pageSize,
@@ -53,13 +76,13 @@ const usersService = {
         "Error al listar los productos:",
         error.response?.data || error.message
       );
-      return { products: [], totalPages: 1, currentPageIndex: 0 };
+      return { users: [], totalPages: 1, currentPageIndex: 0 };
     }
   },
 
 // Método actualizado para solo actualizar la categoría
 
-async assignRoles(assignRoles) {
+async assignRoles(assignRoles,token) {
   try {
     // Obtenemos el ID del instrumento y la categoría
     const idUser = assignRoles.idUser;

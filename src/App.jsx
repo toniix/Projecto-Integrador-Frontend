@@ -3,7 +3,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Header from "./components/common/Header"; // Nuevo Header
 import Home from "./pages/Home"; // Nueva página Home
 import Footer from "./components/common/Footer"; // Nuevo Footer
-import RegisterForm from "./components/signupform/RegisterForm";
+import RegisterForm from "./components/user/signupform/RegisterForm";
 
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import Profile from "./pages/Profile"; // Nueva página Profile
@@ -26,7 +26,7 @@ export const App = () => {
           <Route path="/" element={<Home />} />{" "}
           {/* Ruta principal para la Home */}
           <Route path="/product/:id" element={<ProductDetail />} />
-
+          <Route path="/register/" element={<RegisterForm/>}/>
           <Route
             path="/admin"
             element={
