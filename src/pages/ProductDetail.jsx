@@ -216,19 +216,84 @@ const ProductDetail = () => {
             className="w-8 h-8"
           />
         </button>
-      </header>
-      <div className="product-detail-body">
-        <p className="product-description">{product.description}</p>
-
-        {/* Aquí se integra la galería de imágenes */}
-        <ImageGalleryPreview
-          productId={product.idProduct}
-          imagenPrincipal={product.imageUrls[0]}
-          galeria={product.imageUrls}
-        />
-        <p>{product.price}</p>
-        <p>{product.stock}</p>
       </div>
+
+      {/* Descripción y detalles */}
+      <p className="text-gray-700 mt-2">{product.description}</p>
+      <p className="mt-2 font-semibold text-lg">
+        Precio por unidad:
+        <span className="text-red-600"> ${product.price}</span>
+      </p>
+      <p className="text-gray-600">Unidades disponibles: {product.stock}</p>
+
+      {/* Galería de imágenes */}
+      <div className="mt-6 flex flex-col md:flex-row gap-6">
+        {/* Imagen principal */}
+        <div className="flex-1">
+          <img
+            src={productImages[0]}
+            alt={product.name}
+            className="w-100 h-100 object-cover rounded-xl shadow-md hover:opacity-75"
+            onClick={() => openGallery(0)}
+          />
+        </div>
+
+        {/* Grilla de imágenes secundarias */}
+        <div className="grid grid-cols-2 gap-4 flex-1">
+          {[
+            ...previewImages,
+            ...(previewImages.length < 4 ? [productImages[0]] : []),
+          ].map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt={`${product.name} ${index}`}
+              className="w-full h-full object-cover rounded-xl  shadow-md cursor-pointer hover:opacity-75"
+              onClick={() => openGallery(index + 1)}
+            />
+          ))}
+          <button
+            className="w-full px-6 py-2 bg-[#B08562] text-[#1E1E1E] font-semibold rounded-lg hover:bg-[#D9C6B0]"
+            onClick={() => openGallery(0)}
+          >
+            Ver galería
+          </button>
+          <button className="w-full px-6 py-2 bg-[#730F06] text-[#D4BDA8] font-semibold rounded-lg hover:bg-red-800">
+            Reservar
+          </button>
+        </div>
+      </div>
+
+      {/* BLOQUE DE CARACTERÍSTICAS, CON FONDO = COLOR DEL BOTÓN "VER GALERÍA" */}
+      <ProductFeatures features={product.features} />
+      {/* Modal de galería */}
+      {isGalleryOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <button
+            onClick={closeGallery}
+            className="absolute top-6 right-6 text-white text-3xl hover:text-gray-300"
+          >
+            ✖
+          </button>
+          <button
+            onClick={() => changeImage(-1)}
+            className="absolute left-10 text-white text-4xl hover:text-gray-300"
+          >
+            ◀
+          </button>
+          <img
+            src={productImages[currentImageIndex]}
+            alt={`Imagen ${currentImageIndex}`}
+            className="max-w-[80%] max-h-[80%] rounded-lg shadow-lg"
+          />
+          <button
+            onClick={() => changeImage(1)}
+            className="absolute right-10 text-white text-4xl hover:text-gray-300"
+          >
+            ▶
+          </button>
+        </div>
+      )}
     </div>
   );
 };
