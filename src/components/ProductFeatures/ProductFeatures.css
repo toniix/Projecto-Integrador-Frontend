@@ -1,0 +1,19 @@
+/* src/components/ProductFeatures/ProductFeatures.css */
+.product-features-container {
+  @apply p-4 my-4 rounded-md shadow-md bg-[#B08562] text-[#1E1E1E];
+}
+
+.product-features-title {
+  @apply text-xl font-bold mb-2;
+}
+
+.product-features-grid {
+  @apply grid grid-cols-2 md:grid-cols-3 gap-4;
+}
+
+.product-feature-item {
+  @apply flex items-center space-x-2;
+}
+.product-feature-item {
+  @apply flex items-center space-x-2 border-b border-gray-200 pb-2 mb-2;
+}

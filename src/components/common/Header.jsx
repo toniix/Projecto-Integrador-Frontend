@@ -1,45 +1,17 @@
-import { useState, useEffect } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import Logo1 from "/img/logo1.svg";
 import Button from "./Button";
 import LoginModal from "../login/LoginModal";
 import { useAuth } from "../../context";
 import UserMenu from "./UserMenu";
+import LoginModal from "../login/LoginModal";
+import { useAuth } from "../../context";
+import UserMenu from "./UserMenu";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [displayName, setDisplayName] = useState("Usuario");
-  const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
-
-  // Extract display name from user or token data
-  // useEffect(() => {
-  //   if (isAuthenticated && user) {
-  //     // First try to get name from user object if it exists
-  //     if (user.name || user.firstName || user.fullName) {
-  //       setDisplayName(user.name || user.firstName || user.fullName);
-  //     }
-  //     // Fall back to email from token subject
-  //     else if (user.sub) {
-  //       // Extract username part from email (everything before @)
-  //       const emailUsername = user.sub.split('@')[0];
-  //       // Capitalize first letter
-  //       setDisplayName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
-  //     }
-  //     // Last resort: try email directly
-  //     else if (user.email) {
-  //       const emailUsername = user.email.split('@')[0];
-  //       setDisplayName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
-  //     }
-  //   } else {
-  //     setDisplayName("Usuario");
-  //   }
-  // }, [user, isAuthenticated]);
-
-  const openLoginModal = () => setIsLoginModalOpen(true);
-  const closeLoginModal = () => setIsLoginModalOpen(false);
 
   return (
     <>
@@ -69,51 +41,34 @@ function Header() {
               </button>
             </div>
 
-            {/* Desktop Menu */}
-            <div className="hidden sm:flex sm:items-center sm:space-x-6">
-              {isAuthenticated ? (
-                <UserMenu
-                  user={user}
-                  // displayName={displayName}
-                  onLogout={logout}
-                />
-              ) : (
-                <>
-                  <Button onClick={openLoginModal} variant="primary">
-                    Iniciar Sesión
-                  </Button>
-                  <Button  onClick={() => navigate("/register")} variant="outline">Registrarse</Button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile Menu Dropdown */}
-          <div
-            className={`${
-              isMenuOpen ? "block" : "hidden"
-            } sm:hidden border-t border-[#757575] py-4 space-y-3`}
-          >
-            {isAuthenticated ? (
-              <div className="px-4">
-                <UserMenu
-                  user={user}
-                  // displayName={displayName}
-                  onLogout={logout}
-                />
-              </div>
-            ) : (
-              <>
-                <Button onClick={openLoginModal}>Iniciar Sesión</Button>
-                <Button  onClick={() => navigate("/register")}variant="outline">Registrarse</Button>
-              </>
-            )}
-
+          {/* Desktop Menu */}
+          <div className="hidden sm:flex sm:space-x-6">
+            <Button variant="primary">
+              Iniciar Sesión
+            </Button>
+            <Button variant="outline">
+              Registrarse
+            </Button>
+            {/* <button className=" custom-button">Crear Cuenta</button>
+            <button className=" custom-button">Iniciar Sesión</button> */}
           </div>
         </div>
-      </header>
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
-    </>
+
+        {/* Mobile Menu Dropdown */}
+        <div
+          className={`${
+            isMenuOpen ? "block" : "hidden"
+          } sm:hidden border-t border-[#757575] py-4 space-y-3`}
+        >
+          <Button variant="primary">
+            Iniciar Sesión
+          </Button>
+          <Button variant="outline" >
+            Registrarse
+          </Button>
+        </div>
+      </div>
+    </header>
   );
 }
 
