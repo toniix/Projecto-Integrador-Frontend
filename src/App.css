@@ -16,7 +16,7 @@
 
 html,
 body {
-  background: #f1eae7;
+  background: #ffffff;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -88,10 +88,10 @@ nav ul {
   background: #a83221;
 } */
 
-main {
+/* main {
   padding-top: 80px;
   background-color: var(--color1);
-}
+} */
 
 /* Sección Hero */
 /* .hero {

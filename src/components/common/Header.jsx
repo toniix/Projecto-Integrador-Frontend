@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import Logo1 from "/img/logo1.svg";
+import logo from "/img/logo_white.png";
 import Button from "./Button";
 import LoginModal from "../login/LoginModal";
 import { useAuth } from "../../context";
 import UserMenu from "./UserMenu";
+import { Search } from "lucide-react";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,24 +44,42 @@ function Header() {
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchQuery(e.target.elements.search.value);
+  };
+
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 bg-[#3e0b05] shadow-[0_2px_15px_-3px_rgba(115,15,6,0.2)] z-50">
+      <header className="fixed top-0 left-0 right-0 bg-[#3B0012]/90 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-24">
             {/* Logo and Name */}
             <Link
               to={"/"}
               className="group flex items-center space-x-3 transition-transform duration-300 hover:-translate-y-0.5"
             >
               <div className="flex items-center space-x-3">
-                <img src={Logo1} alt="Logo" className="w-10 h-10" />
-                <span className="text-[#b08562] text-xl font-bold hidden sm:block">
-                  Clave &amp; Compas
+                <img src={logo} alt="Logo" className="w-12 h-12" />
+                <span className="text-[#ffffff] text-xl hidden sm:block font-['Alata']">
+                  Clave&amp;Compas
                 </span>
               </div>
             </Link>
-
+            {/* Search Bar */}
+            <div className="hidden md:flex items-center w-2/5">
+              <form className="flex justify-center flex-1" onSubmit={handleSearch}>
+                      <input
+                        type="text"
+                        name="search"
+                        className="w-full p-2 px-2 text-[#757575] border-[#b08562] bg-[#2A2A2A] rounded-xl focus:outline-none focus:border-[#730f06] ml-2"
+                        placeholder="Buscar productos..."
+                      />
+                      <button type="submit" className="text-gray-400 hover:text-white -ml-14">
+                        <Search size={20} />
+                      </button>
+              </form>
+            </div>            
             {/* Mobile Menu Button */}
             <div className="sm:hidden">
               <button
@@ -81,15 +100,14 @@ function Header() {
                 />
               ) : (
                 <>
-                  <Button onClick={openLoginModal} variant="primary">
-                    Iniciar Sesión
-                  </Button>
-
                   <Button
                     onClick={() => navigate("/register")}
-                    variant="outline"
+                    variant="secondary"
                   >
                     Registrarse
+                  </Button>
+                  <Button onClick={openLoginModal} variant="primary">
+                    Iniciar Sesión
                   </Button>
                 </>
               )}

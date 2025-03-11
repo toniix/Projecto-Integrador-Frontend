@@ -6,7 +6,7 @@ import "./ProductFeatures.css";
 const ProductFeatures = ({ features }) => {
   return (
     <div className="product-features-container">
-      <h2 className="product-features-title">Características</h2>
+      <p className="text-2xl mb-4">Características</p>
       {features && features.length > 0 ? (
         <div className="product-features-grid">
           {features.map((feature, index) => (

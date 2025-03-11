@@ -203,37 +203,29 @@ const ProductDetail = () => {
     <div className="max-w-6xl mx-auto p-6 min-h-screen pt-28 relative">
       <div className="flex justify-between items-center">
         {/* Nombre del producto */}
-        <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+        <h1 className="text-5xl text-gray-900">{product.name}</h1>
 
         {/* Botón para volver */}
         <button
           onClick={() => navigate(-1)}
-          className="text-3xl hover:text-gray-700"
+          className="text-5xl hover:text-gray-700"
         >
           <img
             src="../public/img/back-button.png"
             alt="Volver"
-            className="w-8 h-8"
+            className="w-10 h-10"
           />
         </button>
       </div>
 
-      {/* Descripción y detalles */}
-      <p className="text-gray-700 mt-2">{product.description}</p>
-      <p className="mt-2 font-semibold text-lg">
-        Precio por unidad:
-        <span className="text-red-600"> ${product.price}</span>
-      </p>
-      <p className="text-gray-600">Unidades disponibles: {product.stock}</p>
-
       {/* Galería de imágenes */}
-      <div className="mt-6 flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
         {/* Imagen principal */}
         <div className="flex-1">
           <img
             src={productImages[0]}
             alt={product.name}
-            className="w-100 h-100 object-cover rounded-xl shadow-md hover:opacity-75"
+            className="w-100 h-100 object-cover rounded-xl shadow-lg hover:opacity-75"
             onClick={() => openGallery(0)}
           />
         </div>
@@ -253,16 +245,33 @@ const ProductDetail = () => {
             />
           ))}
           <button
-            className="w-full px-6 py-2 bg-[#B08562] text-[#1E1E1E] font-semibold rounded-lg hover:bg-[#D9C6B0]"
+            className="w-full px-6 py-2 bg-[#3D2130] text-[#ffffff] rounded-xl hover:bg-[#604152]"
             onClick={() => openGallery(0)}
           >
             Ver galería
           </button>
-          <button className="w-full px-6 py-2 bg-[#730F06] text-[#D4BDA8] font-semibold rounded-lg hover:bg-red-800">
+          <button className="w-full px-6 py-2 bg-[#7A0715] text-[#ffffff] font-semibold rounded-xl hover:bg-[#B32C3A]">
             Reservar
           </button>
         </div>
       </div>
+
+      {/* Descripción y detalles */}
+      <div className="flex justify-between items-center my-4">
+        <div className="flex-col my-4 mr-6">
+          <p className="text-2xl">Descripción</p>
+          <p className="text-gray-700 mt-2">{product.description}</p>
+        </div>
+        
+        <div className="flex-col justify-items-end my-4 ml-6">
+          <p className="text-5xl text-[#C78418] mt-2">
+            ${product.price}
+          </p>
+          <p className="text-xs text-gray-600 whitespace-nowrap mt-2">Unidades disponibles: {product.stock}</p>
+        </div>
+      </div>
+      
+
 
       {/* BLOQUE DE CARACTERÍSTICAS, CON FONDO = COLOR DEL BOTÓN "VER GALERÍA" */}
       <ProductFeatures features={product.features} />
