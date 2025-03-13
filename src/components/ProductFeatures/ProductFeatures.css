@@ -1,6 +1,6 @@
 /* src/components/ProductFeatures/ProductFeatures.css */
 .product-features-container {
-  @apply p-4 my-4 rounded-md shadow-md bg-[#B08562] text-[#1E1E1E];
+  @apply my-4 text-[#1E1E1E];
 }
 
 .product-features-title {
@@ -15,5 +15,5 @@
   @apply flex items-center space-x-2;
 }
 .product-feature-item {
-  @apply flex items-center space-x-2 border-b border-gray-200 pb-2 mb-2;
+  @apply flex items-center space-x-2 pb-2 mb-2;
 }

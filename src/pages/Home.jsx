@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PaginationComponent from "../components/common/PaginationComponent"; // Reutilizamos el componente
 import Button from "../components/common/Button";
 import CardsContainer from "../components/containers/CardsContainer";
+import Bienvenida from "/img/homeview.png"
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -25,11 +26,11 @@ function Home() {
   const navigate = useNavigate();
 
   const categories = [
-    { id: 1, name: "Cuerda" },
-    { id: 2, name: "Percusión" },
-    { id: 3, name: "Viento" },
-    { id: 4, name: "Audio Profesional" },
-    { id: 5, name: "Instrumentos Electrónicos" }
+    { id: 1, name: "Cuerdas", img: "/img/cuerdas.jpg" },
+    { id: 2, name: "Percusión", img: "/img/percusion.jpg" },
+    { id: 3, name: "Viento", img: "/img/viento.jpg" },
+    { id: 4, name: "Teclas", img: "/img/teclas.jpg" },
+    { id: 5, name: "Electrónica", img: "/img/electronica.jpg" },
   ];
 
   const fetchProducts = async (page) => {
@@ -112,34 +113,29 @@ function Home() {
   };
 
   return (
-    <main className="bg-[#F9F7F4] min-h-screen text-[#1e1e1e]">
+    <main className="bg-[#ffffff] min-h-screen text-[#1e1e1e]">
       {/* Sección Hero */}
-      <section className="bg-[#d9c6b0] text-center p-10 text-white">
-        <div className="hero-content">
-          <h1 className="text-3xl text-[#730f06] font-bold">Bienvenido a Clave &amp; Compas</h1>
-          <p className="text-lg text-[#b08562] mt-2">Tu ritmo, nuestro sonido.</p>
-          <form className="flex justify-center mt-4" onSubmit={handleSearch}>
-            <input
-              type="text"
-              name="search"
-              className="w-full max-w-xs p-2 border text-[#757575] border-[#b08562] bg-[#F9F7F4] rounded-lg focus:outline-none focus:border-[#730f06] mr-2 ml-2 "
-              placeholder="Buscar productos..."
-            />
-
-            <Button variant="accent">
-              Buscar
-            </Button>
-          </form>
-        </div>
+      <section className="hidden md:flex bg-[url('../img/homeview.png')] bg-cover bg-center p-10 text-white h-[600px] flex flex-col justify-end items-end">
+          <p className="text-8xl text-[#ffffff] text-right mb-2">Tu ritmo,</p>
+          <p className="text-8xl text-[#ffffff] text-right">nuestro sonido</p>        
       </section>
 
       {/* Sección de Categorías */}
       <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#F9F7F4] outline outline-1 outline-[#b08562]">
       <button
           onClick={handleResetFilters}
-          className={`px-4 py-2 rounded-lg ${
+          className={`px-6 py-3 rounded-lg w-48 h-16 text-lg ${
             selectedCategory === null ? "bg-[#b08562] text-white" : "text-[#b08562] hover:bg-[#c6bcb049]"
           }`}
+          style={{ 
+            backgroundImage: `url("/img/todos.png")`, 
+            backgroundSize: 'cover', 
+            backgroundPosition: 'center',
+            filter: 'grayscale(100%)',
+            transition: 'filter 0.3s ease'
+          }}
+          onMouseOver={(e) => e.target.style.filter = 'grayscale(0%)'}
+          onMouseOut={(e) => e.target.style.filter = 'grayscale(100%)'}
         >
           Todos
         </button>
@@ -147,13 +143,21 @@ function Home() {
           <button
             key={category.id}
             onClick={() => handleCategoryClick(category.id)}
-            className={`text-[#b08562] px-4 py-2 rounded-lg hover:bg-[#c6bcb049] ${
+            className={`text-[#ffffff] px-6 py-3 rounded-xl w-48 h-16 text-lg hover:bg-[#c6bcb049] ${
               selectedCategory === category.id ? "bg-[#b08562] text-white" : ""
             }`}
+            style={{ 
+              backgroundImage: `url(${category.img})`, 
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center',
+              filter: 'grayscale(100%)',
+              transition: 'filter 0.3s ease'
+            }}
+            onMouseOver={(e) => e.target.style.filter = 'grayscale(0%)'}
+            onMouseOut={(e) => e.target.style.filter = 'grayscale(100%)'}
           >
             {category.name}
-          </button>
-        ))}
+          </button>        ))}
       </section>
       
       {/* Indicador de carga */}
@@ -182,7 +186,7 @@ function Home() {
       
 
       {/* Botón para volver arriba */}
-      <div className="bg-[#f1eae7] flex justify-center py-4">
+      <div className="flex justify-center py-4">
         <button
           className="bg-[#730f06] text-[#d9c6b0] px-4 py-2 rounded-lg hover:bg-[#3e0b05]"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

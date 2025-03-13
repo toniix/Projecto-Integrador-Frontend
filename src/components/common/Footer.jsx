@@ -6,7 +6,7 @@ import {
   Instagram,
   Linkedin,
 } from "lucide-react";
-import Logo1 from "/img/logo1.svg";
+import Logo1 from "/img/logo.png";
 
 export default function Footer() {
   return (
@@ -15,13 +15,10 @@ export default function Footer() {
         {/* Main content section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-18 h-18 rounded-full bg-[#730f06] flex items-center justify-center">
-                <img src={Logo1} alt="Logo" className="w-10 h-10" />
-              </div>
-
-              <span className="text-lg font-bold text-[#b08562]">
-                Clave &amp; Compas
+            <div className="flex items-center">
+              <img src={Logo1} alt="Logo" className="w-10 h-10 opacity-60" />
+              <span className="text-lg text-[#757575]">
+                Clave&amp;Compas
               </span>
             </div>
             <p className="text-[#757575] text-sm">
@@ -31,7 +28,7 @@ export default function Footer() {
           </div>
           {/* Links section */}
           <div>
-            <h3 className="font-semibold text-[#b08562] mb-3">Empresa</h3>
+            <h3 className="text-[#b08562] mb-3">Empresa</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <a
@@ -61,7 +58,7 @@ export default function Footer() {
           </div>
           {/* Contact information */}
           <div>
-            <h3 className="font-semibold text-[#b08562] mb-3">Contacto</h3>
+            <h3 className="text-[#b08562] mb-3">Contacto</h3>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center space-x-2">
                 <Mail className="text-[#b08562]" size={16} />
