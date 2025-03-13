@@ -129,7 +129,7 @@ const instrumentService = {
    */
   async deleteInstrument(id) {
     try {
-      await axios.put(`${API_URL}/products/${id}`);
+      await axios.delete(`${API_URL}/products/${id}`);
       // Note: This function doesn't return a success message as commented out below
       // return { success: true, message: 'Instrumento eliminado correctamente' };
     } catch (error) {
