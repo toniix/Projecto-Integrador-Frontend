@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, X, ChevronDown, RefreshCw } from 'lucide-react';
 import DateRangePicker from '../common/DateRangePicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import PropTypes from 'prop-types';
 
 const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -250,3 +251,9 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
 };
 
 export default SearchBar;
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+  categories: PropTypes.array.isRequired,
+  initialFilters: PropTypes.object.isRequired,
+}

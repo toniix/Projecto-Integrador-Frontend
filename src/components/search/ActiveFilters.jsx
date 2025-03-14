@@ -1,5 +1,5 @@
-// src/components/search/ActiveFilters.jsx
 import { X, Filter, Music, CalendarDays } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 const ActiveFilters = ({ filters, categories, onRemoveFilter, onResetFilters }) => {
   const { keyword, category, dateRange } = filters;
@@ -61,6 +61,13 @@ const ActiveFilters = ({ filters, categories, onRemoveFilter, onResetFilters }) 
       </button>
     </div>
   );
+};
+
+ActiveFilters.propTypes = {
+  filters: PropTypes.object.isRequired,
+  categories: PropTypes.array.isRequired,
+  onRemoveFilter: PropTypes.func.isRequired,
+  onResetFilters: PropTypes.func.isRequired,
 };
 
 export default ActiveFilters;

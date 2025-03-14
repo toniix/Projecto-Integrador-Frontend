@@ -13,23 +13,6 @@
     transform: scale(1.05) !important;
 } 
 
-/*.custom-button:active,
-.custom-button:active:focus-visible {
-    background-color: #a83221;
-    color: #e0cfbc;
-    outline: none;
-} */
 
-/* Botón para volver arriba */
-/* .btn-subir {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-size: 14px;
-    z-index: 999;
-    color: #f1eae7;
-} */
 
 

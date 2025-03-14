@@ -24,12 +24,14 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const categories = [
     { id: 1, name: "Cuerdas", img: "/img/cuerdas.jpg" },
     { id: 2, name: "Percusión", img: "/img/percusion.jpg" },
     { id: 3, name: "Viento", img: "/img/viento.jpg" },
     { id: 4, name: "Teclas", img: "/img/teclas.jpg" },
-    { id: 5, name: "Electrónica", img: "/img/electronica.jpg" },
+    { id: 5, name: "Electrónicas", img: "/img/electronica.jpg" },
   ];
 
   // Usar hook personalizado para la búsqueda
@@ -49,7 +51,7 @@ function Home() {
       const apiPage = page - 1;
       
       // Construimos la URL base
-      let url = `https://clavecompas-production.up.railway.app/clavecompas/products?page=${apiPage}&pageSize=10`;
+      let url = `${API_URL}/products?page=${apiPage}&pageSize=10`;
       
       // Añadimos parámetros de búsqueda si existen
       if (filters.keyword) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useInstrumentContext } from "../../../context";
 import instrumentService from "../../../services/instrumentService";
 import cloudinaryService from "../../../services/images/cloudinaryService";
@@ -35,7 +35,34 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
 
-  // Load categories on component mount
+  // Form reset - Using useCallback to memoize the function
+  const resetForm = useCallback(() => {
+    // Clean up any object URLs to prevent memory leaks
+    imagePreviews.forEach((url) => {
+      if (url.startsWith("blob:")) {
+        URL.revokeObjectURL(url);
+      }
+    });
+
+    setFormData({
+      name: "",
+      brand: "",
+      model: "",
+      year: "",
+      stock: "",
+      description: "",
+      price: "",
+      available: false,
+      idCategory: "",
+      imageUrls: [],
+    });
+
+    setImageFiles([]);
+    setImagePreviews([]);
+    setExistingImages([]);
+  }, [imagePreviews]); // Only depend on imagePreviews
+
+  // Load categories on component mount - only once
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -53,7 +80,7 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
     };
 
     fetchCategories();
-  }, []);
+  }, []); // Empty dependency array = only on mount
 
   // Load instrument data when in edit mode
   useEffect(() => {
@@ -77,21 +104,44 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
         setImagePreviews(instrumentToEdit.imageUrls);
       }
     }
-  }, [isEditMode, instrumentToEdit]);
+  }, [isEditMode, instrumentToEdit]); // Only when these change
 
-  // Cleanup on modal close
+  // Handle modal state changes
   useEffect(() => {
+    // When modal closes, we'll clean up object URLs
     if (!isOpen) {
-      // Release object URLs to prevent memory leaks
+      // Cleanup function for blob URLs
       imagePreviews.forEach((url) => {
         if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
         }
       });
-    } else if (!isEditMode) {
-      resetForm();
     }
-  }, [isOpen, isEditMode, imagePreviews]);
+  }, [isOpen, imagePreviews]);
+
+  // This is a separate effect just for resetting the form when opening in non-edit mode
+  // IMPORTANT: Removed the call to resetForm inside the effect body to prevent infinite loop
+  useEffect(() => {
+    if (isOpen && !isEditMode) {
+      // Initialize empty form when opening in create mode
+      setFormData({
+        name: "",
+        brand: "",
+        model: "",
+        year: "",
+        stock: "",
+        description: "",
+        price: "",
+        available: false,
+        idCategory: "",
+        imageUrls: [],
+      });
+      
+      setImageFiles([]);
+      setImagePreviews([]);
+      setExistingImages([]);
+    }
+  }, [isOpen, isEditMode]);
 
   // Form input handlers
   const handleInputChange = (e) => {
@@ -152,34 +202,7 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
     }
   };
 
-  // Form reset
-  const resetForm = () => {
-    imagePreviews.forEach((url) => {
-      if (url.startsWith("blob:")) {
-        URL.revokeObjectURL(url);
-      }
-    });
-
-    setFormData({
-      name: "",
-      brand: "",
-      model: "",
-      year: "",
-      stock: "",
-      description: "",
-      price: "",
-      available: false,
-      idCategory: "",
-      imageUrls: [],
-    });
-
-    setImageFiles([]);
-    setImagePreviews([]);
-    setExistingImages([]);
-  };
-
   const handleClose = () => {
-    resetForm();
     onClose();
   };
 
