@@ -79,7 +79,7 @@ function Header() {
                         <Search size={20} />
                       </button>
               </form>
-            </div>            
+            </div>         
             {/* Mobile Menu Button */}
             <div className="sm:hidden">
               <button
