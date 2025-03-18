@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "/img/logo_white.png";
@@ -6,7 +6,7 @@ import Button from "./Button";
 import LoginModal from "../login/LoginModal";
 import { useAuth } from "../../context";
 import UserMenu from "./UserMenu";
-import { Search } from "lucide-react";
+
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,10 +44,6 @@ function Header() {
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSearchQuery(e.target.elements.search.value);
-  };
 
   return (
     <>
@@ -65,21 +61,7 @@ function Header() {
                   Clave&amp;Compas
                 </span>
               </div>
-            </Link>
-            {/* Search Bar */}
-            <div className="hidden md:flex items-center w-2/5">
-              <form className="flex justify-center flex-1" onSubmit={handleSearch}>
-                      <input
-                        type="text"
-                        name="search"
-                        className="w-full p-2 px-2 text-[#757575] border-[#b08562] bg-[#2A2A2A] rounded-xl focus:outline-none focus:border-[#730f06] ml-2"
-                        placeholder="Buscar productos..."
-                      />
-                      <button type="submit" className="text-gray-400 hover:text-white -ml-14">
-                        <Search size={20} />
-                      </button>
-              </form>
-            </div>         
+            </Link>        
             {/* Mobile Menu Button */}
             <div className="sm:hidden">
               <button

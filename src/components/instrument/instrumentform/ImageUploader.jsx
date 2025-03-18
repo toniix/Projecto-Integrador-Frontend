@@ -49,7 +49,7 @@ const ImageUploader = ({ isEditMode, imagePreviews, removeImage, handleImageUplo
               <button
                 type="button"
                 onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 p-1 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 p-1 bg-[#b08562] rounded-full text-white hover:bg-[#3e0b05] transition-all shadow-md"
               >
                 <Trash2 size={16} />
               </button>
