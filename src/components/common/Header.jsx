@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "/img/logo_white.png";
@@ -6,7 +6,7 @@ import Button from "./Button";
 import LoginModal from "../login/LoginModal";
 import { useAuth } from "../../context";
 import UserMenu from "./UserMenu";
-import { Search } from "lucide-react";
+
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,10 +44,6 @@ function Header() {
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSearchQuery(e.target.elements.search.value);
-  };
 
   return (
     <>

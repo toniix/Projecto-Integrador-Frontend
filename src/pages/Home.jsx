@@ -8,6 +8,16 @@ import { Music } from "lucide-react";
 import searchService from "../services/search/searchService";
 import instrumentService from "../services/instrumentService";
 
+
+// function shuffleArray(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
+
+
 function Home() {
   const navigate = useNavigate();
   const location = useLocation();
