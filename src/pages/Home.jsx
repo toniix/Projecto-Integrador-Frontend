@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import PaginationComponent from "../components/common/PaginationComponent";
@@ -77,6 +76,7 @@ function Home() {
     } finally {
       setLoadingCategories(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Función para buscar productos utilizando el servicio
@@ -262,19 +262,17 @@ function Home() {
 
   return (
     <main className="bg-[#ffffff] min-h-screen text-[#1e1e1e]">
-      {/* Sección Hero - Solo visible si no hay búsqueda activa */}
-      {!hasActiveFilters && (
-        <section className="hidden md:flex bg-[url('../img/homeview.png')] bg-cover bg-center p-10 text-white h-[600px] flex flex-col justify-end items-end">
-          <p className="text-8xl text-[#ffffff] text-right mb-2">Tu ritmo,</p>
-          <p className="text-8xl text-[#ffffff] text-right">nuestro sonido</p>        
-        </section>
-      )}
+      {/* Sección Hero - SIEMPRE visible según criterio de aceptación #22 */}
+      <section className="hidden md:flex bg-[url('../img/homeview.png')] bg-cover bg-center p-10 text-white h-[600px] flex flex-col justify-end items-end">
+        <p className="text-8xl text-[#ffffff] text-right mb-2">Tu ritmo,</p>
+        <p className="text-8xl text-[#ffffff] text-right">nuestro sonido</p>        
+      </section>
 
       {/* Sección de búsqueda */}
       <section className="py-6 px-6 bg-[#F9F7F4] border-b border-[#b08562]">
         <SearchBar 
           onSearch={handleSearch} 
-          categories={Array.isArray(categories) ? categories : []} // Garantizar que sea array
+          categories={Array.isArray(categories) ? categories : []} 
           initialFilters={activeFiltersForComponent}
         />
         
@@ -282,15 +280,15 @@ function Home() {
         <div className="max-w-5xl mx-auto mt-4">
           <ActiveFilters 
             filters={activeFiltersForComponent}
-            categories={Array.isArray(categories) ? categories : []} // Garantizar que sea array
+            categories={Array.isArray(categories) ? categories : []} 
             onRemoveFilter={handleRemoveFilter}
             onResetFilters={handleResetFilters}
           />
         </div>
       </section>
 
-      {/* Sección de Categorías - Solo visible si no hay búsqueda activa o solo filtro por categoría */}
-      {(!hasActiveFilters || (filters.categoryId && !filters.keyword && !filters.startDate)) && Array.isArray(categories) && categories.length > 0 && (
+      {/* Sección de Categorías - SIEMPRE visible según criterio de aceptación #22 */}
+      {Array.isArray(categories) && categories.length > 0 && (
         <section className="flex flex-wrap justify-center gap-4 p-6 bg-[#F9F7F4] outline outline-1 outline-[#b08562]">
           <button
             onClick={handleResetFilters}
@@ -334,27 +332,8 @@ function Home() {
         </section>
       )}
       
-      {/* Título de resultados - Solo visible cuando hay búsqueda activa */}
-      {hasActiveFilters && (
-        <div className="max-w-7xl mx-auto pt-8 px-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-[#3e0b05]">
-              {loading ? 'Buscando...' : 
-                filters.categoryId && !filters.keyword ? 
-                `Categoría: ${Array.isArray(categories) ? 
-                  (categories.find(c => c.id === filters.categoryId)?.name || 'Seleccionada') : 
-                  'Seleccionada'}` :
-                `Resultados ${filters.keyword ? `para "${filters.keyword}"` : ''}`}
-            </h2>
-            
-            <div className="text-sm text-[#757575]">
-              {!loading && pagination && (
-                <span>{pagination.totalElements} productos encontrados</span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Título de resultados - Visible cuando hay búsqueda activa */}
+      {/* La sección de título de resultados se mueve al bloque de productos */}
       
       {/* Indicador de carga */}
       {(loading || loadingCategories) && (
@@ -379,33 +358,39 @@ function Home() {
       {/* Mostrar productos o mensaje si no hay resultados */}
       {!loading && !loadingCategories && !error && (
         <>
-          {hasActiveFilters ? (
-            // Resultados de búsqueda
-            products.length === 0 ? (
-              <div className="text-center py-10">
-                <Music size={48} className="mx-auto text-[#b08562] mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No encontramos instrumentos que coincidan con tu búsqueda</h3>
-                <p className="text-[#757575] mb-4">Intenta con otros términos o navega por nuestras categorías</p>
-                <Button
-                  onClick={handleResetFilters}
-                  variant="primary"
-                >
-                  Ver todos los instrumentos
-                </Button>
-              </div>
-            ) : (
-              <CardsContainer 
-                products={products} 
-                handleViewDetail={handleViewDetail} 
-              />
-            )
+          {products.length === 0 && hasActiveFilters ? (
+            <div className="text-center py-10">
+              <Music size={48} className="mx-auto text-[#b08562] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No encontramos instrumentos que coincidan con tu búsqueda</h3>
+              <p className="text-[#757575] mb-4">Intenta con otros términos o navega por nuestras categorías</p>
+              <Button
+                onClick={handleResetFilters}
+                variant="primary"
+              >
+                Ver todos los instrumentos
+              </Button>
+            </div>
           ) : (
-            // Productos aleatorios/destacados en la página de inicio
             <div>
               <div className="max-w-7xl mx-auto pt-8 px-6 mb-6">
-                <h2 className="text-2xl font-semibold text-[#3e0b05]">
-                  Instrumentos destacados
-                </h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-semibold text-[#3e0b05]">
+                    {loading ? 'Buscando...' : 
+                      hasActiveFilters ? 
+                        (filters.categoryId && !filters.keyword ? 
+                          `Categoría: ${Array.isArray(categories) ? 
+                            (categories.find(c => c.id === filters.categoryId)?.name || 'Seleccionada') : 
+                            'Seleccionada'}` :
+                          `Resultados ${filters.keyword ? `para "${filters.keyword}"` : ''}`) : 
+                        'Instrumentos destacados'}
+                  </h2>
+                  
+                  {hasActiveFilters && !loading && pagination && (
+                    <div className="text-sm text-[#757575]">
+                      <span>{pagination.totalElements} productos encontrados</span>
+                    </div>
+                  )}
+                </div>
               </div>
               <CardsContainer 
                 products={products} 
@@ -430,7 +415,7 @@ function Home() {
       {/* Botón para volver arriba */}
       <div className="flex justify-center py-6">
         <button
-          className="bg-[#730f06] text-[#d9c6b0] px-4 py-2 rounded-lg hover:bg-[#3e0b05] transition-colors"
+          className="bg-[#730f06] text-[#d9c6b0] px-4 py-2 rounded-lg hover:bg-[#3e0b05] transition-colors duration-300 shadow-md"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
           ↑ Volver arriba
