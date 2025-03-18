@@ -1,35 +1,47 @@
 // src/components/search/SearchBar.jsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X, ChevronDown, RefreshCw } from 'lucide-react';
 import DateRangePicker from '../common/DateRangePicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import PropTypes from 'prop-types';
+import searchService from '../../services/search/searchService';
 
 const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [keyword, setKeyword] = useState(initialFilters.keyword || '');
   const [startDate, setStartDate] = useState(initialFilters.startDate || null);
   const [endDate, setEndDate] = useState(initialFilters.endDate || null);
-  const [selectedCategory, setSelectedCategory] = useState(initialFilters.category || null);
+  const [selectedCategory, setSelectedCategory] = useState(initialFilters.categoryId || null);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const searchRef = useRef(null);
   const suggestionsRef = useRef(null);
   const categoryDropdownRef = useRef(null);
 
-  // Ejemplo de datos para autocompletado
-  const popularSearches = [
-    'Guitarra eléctrica',
-    'Piano de cola',
-    'Batería acústica',
-    'Violín profesional',
-    'Saxofón alto',
-    'Sintetizador',
-    'Bajo eléctrico',
-    'Amplificador',
-  ];
+  // Función debounced para obtener sugerencias de autocompletado
+  const fetchSuggestions = useCallback(async (query) => {
+    if (!query || query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const data = await searchService.getAutocompleteSuggestions(query);
+      setSuggestions(data || []);
+      setShowSuggestions(data.length > 0);
+    } catch (error) {
+      console.error('Error al obtener sugerencias:', error);
+      setSuggestions([]);
+      setShowSuggestions(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Detectar clics fuera de las sugerencias y dropdowns
   useEffect(() => {
@@ -50,25 +62,22 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
     };
   }, []);
 
-  // Filtrar sugerencias
+  // Obtener sugerencias cuando cambia la palabra clave
   useEffect(() => {
-    if (keyword.length > 1) {
-      const filtered = popularSearches.filter(item =>
-        item.toLowerCase().includes(keyword.toLowerCase())
-      );
-      setSuggestions(filtered.slice(0, 5));
-      setShowSuggestions(filtered.length > 0);
-    } else {
-      setShowSuggestions(false);
-    }
-  }, [keyword]);
+    // Implementar debounce para evitar demasiadas llamadas a la API
+    const debounceTimer = setTimeout(() => {
+      fetchSuggestions(keyword);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [keyword, fetchSuggestions]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearch({
       keyword,
       dateRange: startDate && endDate ? { startDate, endDate } : null,
-      category: selectedCategory
+      categoryId: selectedCategory
     });
     setShowSuggestions(false);
   };
@@ -103,7 +112,7 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto">
       <div
         className={`transition-all duration-300 ease-in-out bg-white rounded-full shadow-lg border border-[#b08562] 
                     ${isExpanded ? 'py-6 rounded-2xl' : 'py-3'}`}
@@ -116,7 +125,7 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
                 <Search size={20} className="text-[#730f06] absolute left-3" />
                 <input
                   type="text"
-                  placeholder="¿Qué instrumento estás buscando?"
+                  placeholder="¿Qué estás buscando?"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onFocus={() => setIsExpanded(true)}
@@ -133,21 +142,27 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
                 )}
               </div>
 
-              {/* Sugerencias */}
+              {/* Sugerencias desde la API */}
               {showSuggestions && (
                 <div
                   ref={suggestionsRef}
                   className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 py-2"
                 >
-                  {suggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      className="px-4 py-2 hover:bg-[#F9F7F4] cursor-pointer flex items-center"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      <span>{suggestion}</span>
-                    </div>
-                  ))}
+                  {isLoading ? (
+                    <div className="px-4 py-2 text-gray-500">Cargando sugerencias...</div>
+                  ) : suggestions.length > 0 ? (
+                    suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-2 hover:bg-[#F9F7F4] cursor-pointer flex items-center"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <span>{suggestion}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-gray-500">No se encontraron sugerencias</div>
+                  )}
                 </div>
               )}
             </div>
@@ -216,14 +231,14 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
                     <span>Limpiar</span>
                   </button>
                   <button
-      type="button"
-      onClick={handleReset}
-      className="flex items-center justify-center bg-white border border-[#730f06] rounded-full hover:bg-gray-300 transition"
-      title="Resetear búsqueda"
-      aria-label="Resetear búsqueda"
-    >
-      <RefreshCw size={16} className="text-[#730f06]" strokeWidth={2} />
-    </button>
+                    type="button"
+                    onClick={handleReset}
+                    className="flex items-center justify-center h-10  bg-white border border-[#730f06] rounded-full hover:bg-[#F9F7F4] transition-colors"
+                    title="Resetear búsqueda"
+                    aria-label="Resetear búsqueda"
+                  >
+                    <RefreshCw size={16} className="text-[#730f06]" strokeWidth={2} />
+                  </button>
 
                   <button
                     type="submit"
@@ -255,5 +270,5 @@ export default SearchBar;
 SearchBar.propTypes = {
   onSearch: PropTypes.func.isRequired,
   categories: PropTypes.array.isRequired,
-  initialFilters: PropTypes.object.isRequired,
-}
+  initialFilters: PropTypes.object
+};

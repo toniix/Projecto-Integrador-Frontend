@@ -140,6 +140,23 @@ const instrumentService = {
       throw error;
     }
   },
+    /**
+   * Obtiene productos por categoría
+   * @param {number} categoryId - ID de la categoría
+   * @returns {Promise<Array>} Lista de productos de la categoría
+   */
+    getProductsByCategory: async (categoryId) => {
+      try {
+        const response = await axios.get(`${API_URL}/products/search/category/${categoryId}`);
+        return response.data.response || [];
+      } catch (error) {
+        console.error(
+          "Error al obtener productos por categoría:",
+          error.response?.data || error.message
+        );
+        throw error;
+      }
+    }
 };
 
 export default instrumentService;

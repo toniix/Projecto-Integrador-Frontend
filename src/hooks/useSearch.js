@@ -1,68 +1,139 @@
-// src/hooks/useSearch.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import searchService from '../services/searchService';
 
 /**
- * Hook personalizado para la lógica de búsqueda
- * @param {Array} allItems - Lista completa de elementos
+ * Hook personalizado para la lógica de búsqueda con API
  * @param {Object} initialFilters - Filtros iniciales
+ * @param {Object} initialPagination - Configuración inicial de paginación
  */
-const useSearch = (allItems = [], initialFilters = {}) => {
+const useSearch = (initialFilters = {}, initialPagination = { page: 0, size: 8 }) => {
+  // Estado para los filtros
   const [filters, setFilters] = useState({
     keyword: initialFilters.keyword || '',
-    category: initialFilters.category || null,
-    dateRange: initialFilters.dateRange || null,
+    categoryId: initialFilters.categoryId || null,
+    startDate: initialFilters.startDate || null,
+    endDate: initialFilters.endDate || null,
+    minPrice: initialFilters.minPrice || null,
+    maxPrice: initialFilters.maxPrice || null,
+    quantity: initialFilters.quantity || 1,
   });
   
-  const [filteredItems, setFilteredItems] = useState([]);
+  // Estado para la paginación y ordenamiento
+  const [pagination, setPagination] = useState({
+    page: initialPagination.page || 0,
+    size: initialPagination.size || 8,
+    sortBy: initialPagination.sortBy || 'name',
+    sortDirection: initialPagination.sortDirection || 'asc',
+    totalPages: 0,
+    totalElements: 0
+  });
+  
+  // Estado para los resultados
+  const [results, setResults] = useState({
+    products: [],
+    loading: false,
+    error: null
+  });
+  
+  // Estado para indicar si hay filtros activos
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
+  
+  // Estado para sugerencias de autocompletado
+  const [suggestions, setSuggestions] = useState([]);
   
   // Verificar si hay filtros activos
   useEffect(() => {
-    const { keyword, category, dateRange } = filters;
+    const { keyword, categoryId, startDate, endDate, minPrice, maxPrice } = filters;
     setHasActiveFilters(
       Boolean(keyword) || 
-      Boolean(category) || 
-      Boolean(dateRange && dateRange.startDate && dateRange.endDate)
+      Boolean(categoryId) || 
+      Boolean(startDate && endDate) ||
+      Boolean(minPrice) ||
+      Boolean(maxPrice)
     );
   }, [filters]);
   
-  // Aplicar filtros localmente
+  // Función para buscar productos
+  const searchProducts = useCallback(async () => {
+    try {
+      setResults(prev => ({ ...prev, loading: true, error: null }));
+      
+      // Preparar parámetros de búsqueda combinando filtros y paginación
+      const searchParams = {
+        ...filters,
+        page: pagination.page,
+        size: pagination.size,
+        sortBy: pagination.sortBy,
+        sortDirection: pagination.sortDirection
+      };
+      
+      // Formatear dateRange si existe
+      if (filters.startDate && filters.endDate) {
+        searchParams.startDate = filters.startDate;
+        searchParams.endDate = filters.endDate;
+      }
+      
+      // Llamar a la API
+      const data = await searchService.searchProducts(searchParams);
+      
+      // Actualizar resultados y paginación
+      setResults({
+        products: data.content || [],
+        loading: false,
+        error: null
+      });
+      
+      // Actualizar información de paginación
+      setPagination(prev => ({
+        ...prev,
+        totalPages: data.totalPages || 0,
+        totalElements: data.totalElements || 0
+      }));
+      
+    } catch (error) {
+      setResults({
+        products: [],
+        loading: false,
+        error: error.message || 'Error al buscar productos'
+      });
+    }
+  }, [filters, pagination.page, pagination.size, pagination.sortBy, pagination.sortDirection]);
+  
+  // Buscar productos cuando cambian los filtros o paginación
   useEffect(() => {
-    let results = [...allItems];
-    
-    // Filtrar por palabra clave
-    if (filters.keyword) {
-      const keyword = filters.keyword.toLowerCase();
-      results = results.filter(item => 
-        (item.name && item.name.toLowerCase().includes(keyword)) ||
-        (item.description && item.description.toLowerCase().includes(keyword))
-      );
+    searchProducts();
+  }, [searchProducts]);
+  
+  // Función para obtener sugerencias de autocompletado
+  const getAutocompleteSuggestions = useCallback(async (query) => {
+    if (!query || query.length < 2) {
+      setSuggestions([]);
+      return;
     }
     
-    // Filtrar por categoría
-    if (filters.category) {
-      results = results.filter(item => item.idCategory === filters.category);
+    try {
+      const data = await searchService.getAutocompleteSuggestions(query);
+      setSuggestions(data || []);
+    } catch (error) {
+      console.error('Error al obtener sugerencias:', error);
+      setSuggestions([]);
     }
-    
-    // Filtrar por rango de fechas (esto dependería de la estructura de tus datos)
-    if (filters.dateRange && filters.dateRange.startDate && filters.dateRange.endDate) {
-      // Implementa la lógica específica de filtrado por fechas según tu modelo de datos
-      console.log("Aplicando filtro de fechas:", filters.dateRange);
-    }
-    
-    setFilteredItems(results);
-  }, [filters, allItems]);
+  }, []);
   
   // Función para actualizar todos los filtros
-  const updateFilters = (newFilters) => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      ...newFilters
-    }));
-  };
+  const updateFilters = useCallback((newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    // Reiniciar paginación al cambiar filtros
+    setPagination(prev => ({ ...prev, page: 0 }));
+  }, []);
+  
+  // Función para actualizar paginación
+  const updatePagination = useCallback((newPagination) => {
+    setPagination(prev => ({ ...prev, ...newPagination }));
+  }, []);
   
   // Función para quitar un filtro específico
-  const removeFilter = (filterName) => {
+  const removeFilter = useCallback((filterName) => {
     setFilters(prevFilters => {
       const newFilters = { ...prevFilters };
       
@@ -70,11 +141,16 @@ const useSearch = (allItems = [], initialFilters = {}) => {
         case 'keyword':
           newFilters.keyword = '';
           break;
-        case 'category':
-          newFilters.category = null;
+        case 'categoryId':
+          newFilters.categoryId = null;
           break;
         case 'dateRange':
-          newFilters.dateRange = null;
+          newFilters.startDate = null;
+          newFilters.endDate = null;
+          break;
+        case 'price':
+          newFilters.minPrice = null;
+          newFilters.maxPrice = null;
           break;
         default:
           break;
@@ -82,24 +158,47 @@ const useSearch = (allItems = [], initialFilters = {}) => {
       
       return newFilters;
     });
-  };
+    
+    // Reiniciar paginación al quitar filtros
+    setPagination(prev => ({ ...prev, page: 0 }));
+  }, []);
   
   // Función para resetear todos los filtros
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setFilters({
       keyword: '',
-      category: null,
-      dateRange: null
+      categoryId: null,
+      startDate: null,
+      endDate: null,
+      minPrice: null,
+      maxPrice: null,
+      quantity: 1
     });
-  };
+    
+    // Reiniciar paginación
+    setPagination(prev => ({ 
+      ...prev, 
+      page: 0,
+      sortBy: 'name',
+      sortDirection: 'asc'
+    }));
+  }, []);
   
   return {
+    // Estados
     filters,
-    filteredItems,
+    results,
     hasActiveFilters,
+    suggestions,
+    pagination,
+    
+    // Acciones
+    searchProducts,
     updateFilters,
+    updatePagination,
     removeFilter,
-    resetFilters
+    resetFilters,
+    getAutocompleteSuggestions
   };
 };
 
