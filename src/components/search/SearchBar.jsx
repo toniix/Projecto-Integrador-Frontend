@@ -9,13 +9,16 @@ import searchService from '../../services/search/searchService';
 const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [keyword, setKeyword] = useState(initialFilters.keyword || '');
-  const [startDate, setStartDate] = useState(initialFilters.startDate || null);
-  const [endDate, setEndDate] = useState(initialFilters.endDate || null);
-  const [selectedCategory, setSelectedCategory] = useState(initialFilters.categoryId || null);
+  const [startDate, setStartDate] = useState(initialFilters.dateRange?.startDate || null);
+  const [endDate, setEndDate] = useState(initialFilters.dateRange?.endDate || null);
+  const [selectedCategory, setSelectedCategory] = useState(initialFilters.category || null);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Estado para forzar la actualización del DateRangePicker
+  const [datePickerKey, setDatePickerKey] = useState(0);
 
   const searchRef = useRef(null);
   const suggestionsRef = useRef(null);
@@ -77,7 +80,7 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
     onSearch({
       keyword,
       dateRange: startDate && endDate ? { startDate, endDate } : null,
-      categoryId: selectedCategory
+      category: selectedCategory
     });
     setShowSuggestions(false);
   };
@@ -103,6 +106,8 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
     setStartDate(null);
     setEndDate(null);
     setSelectedCategory(null);
+    // Incrementar el key del DateRangePicker para forzar su rerenderizado
+    setDatePickerKey(prev => prev + 1);
   };
 
   // Resetear todo el buscador a su estado original
@@ -214,6 +219,7 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
               <div className="flex w-full md:w-auto flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 md:items-center">
                 <div className="w-full md:w-auto">
                   <DateRangePicker
+                    key={datePickerKey} // Forzar rerenderizado cuando cambia este valor
                     startDate={startDate}
                     endDate={endDate}
                     onChange={handleDateChange}
@@ -233,7 +239,7 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="flex items-center justify-center h-10  bg-white border border-[#730f06] rounded-full hover:bg-[#F9F7F4] transition-colors"
+                    className="flex items-center justify-center h-10 bg-white border border-[#730f06] rounded-full hover:bg-[#F9F7F4] transition-colors"
                     title="Resetear búsqueda"
                     aria-label="Resetear búsqueda"
                   >

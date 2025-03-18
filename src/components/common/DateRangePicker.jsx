@@ -6,15 +6,23 @@ import { Calendar } from 'lucide-react';
 const DateRangePicker = ({ 
   onChange, 
   placeholder = "Selecciona fechas",
-  excludedDates = [] 
+  excludedDates = [],
+  startDate: externalStartDate, // Renombrado para claridad
+  endDate: externalEndDate     // Renombrado para claridad
 }) => {
   // Estados para manejar las fechas y la UI
   const [isOpen, setIsOpen] = useState(false);
-  // Eliminada la variable viewType que ya no se necesita
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  // Usar los valores externos como valores iniciales
+  const [startDate, setStartDate] = useState(externalStartDate);
+  const [endDate, setEndDate] = useState(externalEndDate);
   const [hoveredDate, setHoveredDate] = useState(null);
   const calendarRef = useRef(null);
+
+  // Sincronizar el estado interno con las props externas
+  useEffect(() => {
+    setStartDate(externalStartDate);
+    setEndDate(externalEndDate);
+  }, [externalStartDate, externalEndDate]);
 
   // Obtener fecha actual
   const today = new Date();
@@ -430,10 +438,13 @@ const DateRangePicker = ({
     </div>
   );
 };
+
 DateRangePicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  excludedDates: PropTypes.arrayOf(PropTypes.instanceOf(Date))
+  excludedDates: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
+  startDate: PropTypes.instanceOf(Date),
+  endDate: PropTypes.instanceOf(Date)
 };
 
 export default DateRangePicker;
