@@ -1,10 +1,9 @@
 // src/pages/Home.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PaginationComponent from "../components/common/PaginationComponent"; // Reutilizamos el componente
+import PaginationComponent from "../components/common/PaginationComponent";
 import Button from "../components/common/Button";
 import CardsContainer from "../components/containers/CardsContainer";
-import Bienvenida from "/img/homeview.png"
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
