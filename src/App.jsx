@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./context/auth/privateRoute"; // Ensure this path is correct
 import NotFound from "./pages/NotFound"; // Nueva página NotFound
 import 'react-datepicker/dist/react-datepicker.css'; // Para implementar la selección de rango de fechas requerida en la HU #22
+import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
 
 export const App = () => {
   return (
@@ -41,6 +42,15 @@ export const App = () => {
             element={
               <PrivateRoute roles={["USER", "ADMIN"]}>
                 <Profile />
+              </PrivateRoute>
+            }
+          />{" "}
+          {/* Nueva ruta de Profile Favoritos*/}
+          <Route
+            path="/favorites"
+            element={
+              <PrivateRoute roles={["USER", "ADMIN"]}>
+                <FavoritesPage />
               </PrivateRoute>
             }
           />{" "}

@@ -1,22 +1,78 @@
 // src/components/common/DateRangePicker.jsx
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Calendar } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react';
+
+// Agregar estilos globales para forzar los bordes redondeados
+const addGlobalStyles = () => {
+  const styleId = 'date-range-picker-styles';
+  
+  // Evitar duplicar los estilos si ya existen
+  if (document.getElementById(styleId)) return;
+  
+  const style = document.createElement('style');
+  style.id = styleId;
+  style.textContent = `
+    /* Asegurar que las fechas del rango tengan bordes redondeados */
+    .calendar-grid [class*="bg-[#e6b465]"] {
+      border-radius: 9999px !important;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .animate-fadeIn {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .animate-slideIn {
+      animation: slideIn 0.3s ease-out;
+    }
+  `;
+  document.head.appendChild(style);
+};
 
 const DateRangePicker = ({ 
   onChange, 
   placeholder = "Selecciona fechas",
   excludedDates = [],
-  startDate: externalStartDate, // Renombrado para claridad
-  endDate: externalEndDate     // Renombrado para claridad
+  startDate: externalStartDate,
+  endDate: externalEndDate
 }) => {
+  // Agregar estilos globales al montar el componente
+  useEffect(() => {
+    addGlobalStyles();
+  }, []);
+
   // Estados para manejar las fechas y la UI
   const [isOpen, setIsOpen] = useState(false);
-  // Usar los valores externos como valores iniciales
   const [startDate, setStartDate] = useState(externalStartDate);
   const [endDate, setEndDate] = useState(externalEndDate);
   const [hoveredDate, setHoveredDate] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [viewMode, setViewMode] = useState('firstMonth'); // 'firstMonth', 'secondMonth'
   const calendarRef = useRef(null);
+
+  // Detectar si el dispositivo es móvil
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
 
   // Sincronizar el estado interno con las props externas
   useEffect(() => {
@@ -113,25 +169,31 @@ const DateRangePicker = ({
     );
   };
 
+  // Verificar si una fecha es la de inicio
+  const isStartDate = (day, month, year) => {
+    if (!startDate) return false;
+    
+    return (
+      day === startDate.getDate() &&
+      month === startDate.getMonth() &&
+      year === startDate.getFullYear()
+    );
+  };
+
+  // Verificar si una fecha es la de fin
+  const isEndDate = (day, month, year) => {
+    if (!endDate) return false;
+    
+    return (
+      day === endDate.getDate() &&
+      month === endDate.getMonth() &&
+      year === endDate.getFullYear()
+    );
+  };
+
   // Verificar si una fecha está seleccionada como inicio o fin
   const isStartOrEndDate = (day, month, year) => {
-    if (!startDate && !endDate) return false;
-    
-    const dateStr = formatDateString(day, month, year);
-    
-    const start = startDate ? formatDateString(
-      startDate.getDate(), 
-      startDate.getMonth(), 
-      startDate.getFullYear()
-    ) : null;
-    
-    const end = endDate ? formatDateString(
-      endDate.getDate(), 
-      endDate.getMonth(), 
-      endDate.getFullYear()
-    ) : null;
-    
-    return dateStr === start || dateStr === end;
+    return isStartDate(day, month, year) || isEndDate(day, month, year);
   };
 
   // Verificar si una fecha está en el rango seleccionado
@@ -227,6 +289,11 @@ const DateRangePicker = ({
     });
   };
 
+  // Cambiar entre meses en móvil
+  const toggleMonthView = () => {
+    setViewMode(viewMode === 'firstMonth' ? 'secondMonth' : 'firstMonth');
+  };
+
   // Aplicar la selección
   const handleApply = () => {
     if (startDate && endDate && onChange) {
@@ -237,6 +304,9 @@ const DateRangePicker = ({
 
   // Cancelar la selección
   const handleCancel = () => {
+    // Restaurar las fechas externas si se cancela
+    setStartDate(externalStartDate);
+    setEndDate(externalEndDate);
     setIsOpen(false);
   };
 
@@ -258,36 +328,40 @@ const DateRangePicker = ({
   // El segundo mes es siempre el siguiente al primero
   const secondMonth = getSecondMonth();
 
-    // Renderizar un día del calendario
+  // Renderizar un día del calendario
   const renderDay = (dayInfo, monthIndex) => {
     if (!dayInfo) {
       return (
         <div 
           key={`empty-${monthIndex}`} 
-          className="w-8 h-8"
+          className="w-8 h-8 md:w-8 md:h-8"
         ></div>
       );
     }
     
     const { day, month, year } = dayInfo;
     const isDisabled = isPastDate(day, month, year) || isExcludedDate(day, month, year);
-    const isSelected = isStartOrEndDate(day, month, year);
+    const isStart = isStartDate(day, month, year);
+    const isEnd = isEndDate(day, month, year);
     const isRangeDay = isInRange(day, month, year);
     const isTodayDate = isToday(day, month, year);
     
     // Definir clases para estilos
-    let dayClass = "w-8 h-8 flex items-center justify-center text-xs transition-colors duration-300";
+    let dayClass = `${isMobile ? 'w-10 h-10' : 'w-8 h-8'} flex items-center justify-center text-xs transition-all duration-300 relative`;
     
     if (isDisabled) {
       dayClass += ' text-gray-300 cursor-not-allowed';
-    } else if (isSelected) {
-      dayClass += ' bg-[#730f06] text-white rounded-full cursor-pointer hover:bg-[#3e0b05]';
+    } else if (isStart) {
+      dayClass += ' bg-[#7a0715] text-white rounded-full cursor-pointer hover:bg-[#3b0012] shadow-sm z-10';
+    } else if (isEnd) {
+      dayClass += ' bg-[#7a0715] text-white rounded-full cursor-pointer hover:bg-[#3b0012] shadow-sm z-10';
     } else if (isRangeDay) {
-      dayClass += ' bg-[#b08562]/30 text-[#3e0b05] cursor-pointer hover:bg-[#b08562]/50';
+      // Todas las fechas en el rango ahora tienen bordes completamente redondeados
+      dayClass += ' bg-[#e6b465]/50 text-[#3d2130] cursor-pointer hover:bg-[#e6b465]/60 rounded-full';
     } else if (isTodayDate) {
-      dayClass += ' border border-[#b08562] bg-[#F9F7F4] rounded-full cursor-pointer hover:bg-[#d9c6b0]';
+      dayClass += ' border border-[#c78418] bg-[#F9F7F4] rounded-full cursor-pointer hover:bg-[#e6b465]/30';
     } else {
-      dayClass += ' text-[#1e1e1e] cursor-pointer hover:bg-[#d9c6b0] hover:rounded-full';
+      dayClass += ' text-[#1e1e1e] cursor-pointer hover:bg-[#e6b465]/30 hover:rounded-full';
     }
     
     return (
@@ -310,16 +384,14 @@ const DateRangePicker = ({
       <div className="calendar-month">
         {/* Encabezado del mes con año debajo */}
         <div className="flex justify-between items-center mb-2">
-          {!isSecondMonth ? (
+          {!isSecondMonth || (isMobile && viewMode === 'secondMonth') ? (
             <button 
-              onClick={goToPreviousMonth}
-              className="p-1 text-[#3e0b05] hover:bg-gray-100 rounded-full transition-colors duration-300"
+              onClick={isMobile ? (isSecondMonth ? toggleMonthView : goToPreviousMonth) : goToPreviousMonth}
+              className="p-1 text-[#7a0715] hover:bg-[#e6b465]/20 rounded-full transition-all duration-300 transform hover:scale-105"
               type="button"
               aria-label="Mes anterior"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
+              <ChevronLeft size={isMobile ? 20 : 16} />
             </button>
           ) : (
             <div className="w-6">{/* Espacio para mantener alineación */}</div>
@@ -330,16 +402,14 @@ const DateRangePicker = ({
             <p className="text-xs text-gray-500">{year}</p>
           </div>
           
-          {isSecondMonth ? (
+          {isSecondMonth || (isMobile && viewMode === 'firstMonth') ? (
             <button 
-              onClick={goToNextMonth}
-              className="p-1 text-[#3e0b05] hover:bg-gray-100 rounded-full transition-colors duration-300"
+              onClick={isMobile ? (isSecondMonth ? goToNextMonth : toggleMonthView) : goToNextMonth}
+              className="p-1 text-[#7a0715] hover:bg-[#e6b465]/20 rounded-full transition-all duration-300 transform hover:scale-105"
               type="button"
-              aria-label="Mes siguiente"
+              aria-label={isMobile && !isSecondMonth ? "Ver mes siguiente" : "Mes siguiente"}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
+              <ChevronRight size={isMobile ? 20 : 16} />
             </button>
           ) : (
             <div className="w-6">{/* Espacio para mantener alineación */}</div>
@@ -349,7 +419,7 @@ const DateRangePicker = ({
         {/* Días de la semana */}
         <div className="grid grid-cols-7 mb-1">
           {weekDays.map((day, i) => (
-            <div key={day} className="w-8 h-8 flex items-center justify-center text-xs text-[#757575]">
+            <div key={day} className={`${isMobile ? 'w-10 h-10' : 'w-8 h-8'} flex items-center justify-center text-xs text-[#757575]`}>
               {day.substring(0, 1)}
             </div>
           ))}
@@ -363,9 +433,6 @@ const DateRangePicker = ({
             </div>
           ))}
         </div>
-        
-        {/* No mostrar etiquetas del mes dentro del calendario */}
-        {/* La etiqueta se mostrará en la parte inferior del componente */}
       </div>
     );
   };
@@ -374,10 +441,10 @@ const DateRangePicker = ({
     <div className="relative" ref={calendarRef}>
       {/* Input para mostrar las fechas seleccionadas */}
       <div 
-        className="flex items-center relative cursor-pointer border border-gray-300 rounded-lg px-4 py-2 hover:border-[#b08562] transition-colors duration-300 focus-within:ring-2 focus-within:ring-[#730f06]/30 focus-within:border-[#730f06]"
+        className="flex items-center relative cursor-pointer border border-gray-300 rounded-lg px-4 py-2 hover:border-[#c78418] transition-colors duration-300 focus-within:ring-2 focus-within:ring-[#7a0715]/30 focus-within:border-[#7a0715]"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="text-[#730f06] mr-3">
+        <span className="text-[#7a0715] mr-3">
           <Calendar size={20} />
         </span>
         <span className={startDate && endDate ? 'text-[#1e1e1e]' : 'text-gray-400'}>
@@ -385,9 +452,89 @@ const DateRangePicker = ({
         </span>
       </div>
       
-      {/* Panel del calendario */}
-      {isOpen && (
-        <div className="absolute z-50 mt-2 bg-white rounded-lg shadow-md border border-gray-200 w-[580px] overflow-hidden">
+      {/* Panel del calendario - Versión móvil */}
+      {isOpen && isMobile && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm max-h-[90vh] overflow-hidden flex flex-col animate-fadeIn">
+            {/* Cabecera con título y botón de cerrar */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-[#3d2130]">Seleccionar fechas</h3>
+              <button 
+                onClick={handleCancel}
+                className="text-gray-500 hover:text-[#7a0715] transition-colors duration-300 p-1 hover:bg-gray-100 rounded-full"
+                type="button"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Contenedor del calendario */}
+            <div className="p-4 flex-1 overflow-auto">
+              {/* Mostrar solo un mes a la vez en móvil */}
+              {viewMode === 'firstMonth' ? (
+                renderMonth(firstMonth.year, firstMonth.month, false)
+              ) : (
+                renderMonth(secondMonth.year, secondMonth.month, true)
+              )}
+              
+              {/* Información de fechas seleccionadas */}
+              <div className="mt-4 mb-2 flex justify-between">
+                <div>
+                  <div className="text-xs font-medium text-[#3d2130]">Fecha de inicio:</div>
+                  <div className="text-[#7a0715] font-bold">
+                    {startDate ? formatDateDisplay(startDate) : '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs font-medium text-[#3d2130]">Fecha de fin:</div>
+                  <div className="text-[#7a0715] font-bold">
+                    {endDate ? formatDateDisplay(endDate) : '-'}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Botones de acción */}
+            <div className="flex border-t border-gray-200 px-4 py-3 space-x-2">
+              <button
+                className="flex-1 px-4 py-2 text-center text-[#7a0715] border border-[#7a0715] rounded-full text-sm transition-all duration-300 hover:bg-[#F9F7F4] shadow-sm"
+                onClick={handleCancel}
+                type="button"
+              >
+                Cancelar
+              </button>
+              <button
+                className={`flex-1 px-4 py-2 text-center text-sm font-medium rounded-full transition-all duration-300 shadow-sm ${
+                  canApply 
+                    ? 'bg-[#7a0715] hover:bg-[#3b0012] text-white transform hover:scale-[1.02]' 
+                    : 'bg-[#e6b465] text-[#3d2130]'
+                }`}
+                onClick={canApply ? handleApply : undefined}
+                disabled={!canApply}
+                type="button"
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Panel del calendario - Versión desktop */}
+      {isOpen && !isMobile && (
+        <div className="absolute z-50 mt-2 bg-white rounded-lg shadow-xl border border-[#e6b465] w-[580px] overflow-hidden animate-slideIn">
+          {/* Cabecera con título y botón de cerrar */}
+          <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-[#F9F7F4]/50">
+            <h3 className="text-lg font-medium text-[#3d2130]">Seleccionar fechas</h3>
+            <button 
+              onClick={handleCancel}
+              className="text-gray-500 hover:text-[#7a0715] transition-colors duration-300 p-1 hover:bg-white rounded-full"
+              type="button"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          
           {/* Contenedor de calendarios */}
           <div className="p-4 flex flex-row space-x-6">
             {/* Primer mes (actual) */}
@@ -401,30 +548,36 @@ const DateRangePicker = ({
             </div>
           </div>
           
-          {/* Etiquetas de inicio y fin fuera del calendario */}
+          {/* Fechas seleccionadas - Ahora visible en desktop igual que en móvil */}
           <div className="px-5 pb-3 flex justify-between">
-            <div className="text-xs font-medium text-[#730f06]">
-              Fecha de inicio
+            <div>
+              <div className="text-xs font-medium text-[#3d2130]">Fecha de inicio:</div>
+              <div className="text-[#7a0715] font-bold">
+                {startDate ? formatDateDisplay(startDate) : '-'}
+              </div>
             </div>
-            <div className="text-xs font-medium text-[#730f06]">
-              Fecha de fin
+            <div>
+              <div className="text-xs font-medium text-[#3d2130]">Fecha de fin:</div>
+              <div className="text-[#7a0715] font-bold">
+                {endDate ? formatDateDisplay(endDate) : '-'}
+              </div>
             </div>
           </div>
           
           {/* Botones de acción */}
-          <div className="flex border-t border-gray-200">
+          <div className="flex border-t border-gray-200 p-2 bg-[#F9F7F4]/50">
             <button
-              className="flex-1 px-4 py-2 text-center text-[#1e1e1e] text-sm transition-colors duration-300 hover:bg-gray-50"
+              className="flex-1 px-4 py-2 text-center text-[#7a0715] border border-[#7a0715] mx-2 rounded-full text-sm transition-all duration-300 hover:bg-white shadow-sm"
               onClick={handleCancel}
               type="button"
             >
               Cancelar
             </button>
             <button
-              className={`flex-1 px-4 py-2 text-center text-white text-sm font-medium transition-colors duration-300 ${
+              className={`flex-1 px-4 py-2 text-center text-sm font-medium mx-2 rounded-full transition-all duration-300 shadow-sm ${
                 canApply 
-                  ? 'bg-[#730f06] hover:bg-[#3e0b05]' 
-                  : 'bg-gray-400 cursor-not-allowed'
+                  ? 'bg-[#7a0715] hover:bg-[#3b0012] text-white transform hover:scale-[1.02]' 
+                  : 'bg-[#e6b465] text-[#3d2130]'
               }`}
               onClick={canApply ? handleApply : undefined}
               disabled={!canApply}
