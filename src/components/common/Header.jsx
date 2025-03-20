@@ -58,7 +58,7 @@ function Header() {
               <div className="flex items-center space-x-3">
                 <img src={logo} alt="Logo" className="w-12 h-12" />
                 <span className="text-[#ffffff] text-xl hidden sm:block font-['Alata']">
-                  Clave&amp;Compas
+                  Clave&amp;Compás
                 </span>
               </div>
             </Link>        

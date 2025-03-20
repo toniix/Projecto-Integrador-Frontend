@@ -300,7 +300,7 @@ function Home() {
       </section>
 
       {/* Sección de búsqueda */}
-      <section className="py-6 px-6 bg-[#F9F7F4] border-b border-[#b08562]">
+      <section className="py-6 px-4 bg-[#F9F7F4] border-b border-[#b08562] mt-24 md:mt-0">
         <SearchBar
           onSearch={handleSearch}
           categories={Array.isArray(categories) ? categories : []}
