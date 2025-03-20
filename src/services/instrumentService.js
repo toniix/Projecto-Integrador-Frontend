@@ -129,7 +129,7 @@ const instrumentService = {
    */
   async deleteInstrument(id) {
     try {
-      await axios.put(`${API_URL}/products/${id}`);
+      await axios.delete(`${API_URL}/products/${id}`);
       // Note: This function doesn't return a success message as commented out below
       // return { success: true, message: 'Instrumento eliminado correctamente' };
     } catch (error) {
@@ -140,6 +140,23 @@ const instrumentService = {
       throw error;
     }
   },
+    /**
+   * Obtiene productos por categoría
+   * @param {number} categoryId - ID de la categoría
+   * @returns {Promise<Array>} Lista de productos de la categoría
+   */
+    getProductsByCategory: async (categoryId) => {
+      try {
+        const response = await axios.get(`${API_URL}/products/search/category/${categoryId}`);
+        return response.data.response || [];
+      } catch (error) {
+        console.error(
+          "Error al obtener productos por categoría:",
+          error.response?.data || error.message
+        );
+        throw error;
+      }
+    }
 };
 
 export default instrumentService;

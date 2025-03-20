@@ -28,51 +28,57 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#1e1e1e]/75 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-[#b08562] p-4 rounded-t-lg flex justify-between items-center">
-          <h2 className="text-[#730f06] text-xl font-semibold">
+    <div className="fixed inset-0 bg-[#1e1e1e]/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl w-full max-w-3xl max-h-[92vh] overflow-hidden shadow-xl">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-[#b08562] to-[#d9c6b0] p-4 rounded-t-xl flex justify-between items-center border-b border-[#d9c6b0] z-10">
+          <h2 className="text-[#3e0b05] text-xl font-bold">
             {isEditMode ? "Editar Categoría del Instrumento" : "Registrar Instrumento"}
           </h2>
           <button
             onClick={handleClose}
-            className="text-[#730f06] hover:text-[#d9c6b0] transition-colors"
+            className="lex items-center justify-center rounded-full bg-white/20 text-[#3e0b05] hover:bg-white/40 transition-all"
+            aria-label="Cerrar"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         <form
-          className="p-6 space-y-6 verflow-y-auto max-h-[500px] scrollbar-form"
+          className="p-5 space-y-5 overflow-y-auto max-h-[calc(92vh-64px)]"
           onSubmit={handleSubmit}
         >
-          <FormFields 
-            formData={formData}
-            categories={categories}
-            isEditMode={isEditMode}
-            handleInputChange={handleInputChange}
-          />
+          <div className="bg-[#F9F7F4] p-5 rounded-xl">
+            <FormFields 
+              formData={formData}
+              categories={categories}
+              isEditMode={isEditMode}
+              handleInputChange={handleInputChange}
+            />
+          </div>
 
-          <ImageUploader 
-            isEditMode={isEditMode}
-            imagePreviews={imagePreviews}
-            removeImage={removeImage}
-            handleImageUpload={handleImageUpload}
-          />
+          <div className="bg-[#F9F7F4] p-5 rounded-xl">
+            <ImageUploader 
+              isEditMode={isEditMode}
+              imagePreviews={imagePreviews}
+              removeImage={removeImage}
+              handleImageUpload={handleImageUpload}
+            />
+          </div>
 
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-end space-x-4 pt-4 border-t border-[#d9c6b0]">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2 border-2 border-[#730f06] text-[#730f06] rounded-lg text-[#1e1e1e] hover:text-[#d9c6b0] hover:bg-[#730f06]"
+              className="px-4 py-2 border border-[#d9c6b0] text-[#3e0b05] rounded-lg hover:bg-[#F9F7F4] transition-all font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#730f06] text-[#d9c6b0] rounded-lg hover:bg-[#b08562] transition-colors"
+              className="px-4 py-2 bg-[#3e0b05] text-white rounded-lg hover:bg-[#730f06] transition-all shadow-sm"
             >
-              {isEditMode ? "Actualizar Categoría" : "Registrar"}
+              {isEditMode ? "Actualizar Categoría" : "Registrar Instrumento"}
             </button>
           </div>
         </form>
@@ -86,3 +92,6 @@ InstrumentForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   instrumentToEdit: PropTypes.object,
 };
+
+// Exportación dual para máxima compatibilidad
+export default InstrumentForm;

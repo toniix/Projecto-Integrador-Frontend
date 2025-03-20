@@ -15,6 +15,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./context/auth/privateRoute"; // Ensure this path is correct
 import NotFound from "./pages/NotFound"; // Nueva página NotFound
+import 'react-datepicker/dist/react-datepicker.css'; // Para implementar la selección de rango de fechas requerida en la HU #22
 
 export const App = () => {
   return (

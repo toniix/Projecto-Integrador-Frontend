@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -14,6 +14,8 @@ moment.locale('es', {
   weekdaysShort: 'Dom_Lun_Mar_Mié_Jue_Vie_Sáb'.split('_'),
   weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sá'.split('_'),
 });
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const localizer = momentLocalizer(moment);
 
@@ -80,12 +82,7 @@ function AvailabilityCalendar({ productId, productStock }) {
     const fetchReservations = async () => {
       try {
         setLoading(true);
-        // Obtener reservaciones para el producto desde el backend
-        // Local development endpoint
-        // const response = await axios.get(`http://localhost:8080/clavecompas/reservations/product/${productId}`);
-
-        // Production endpoint
-        const response = await axios.get(`https://clavecompas-production.up.railway.app/clavecompas/reservations/product/${productId}`);
+        const response = await axios.get(`${API_URL}/reservations/product/${productId}`);
         
         const events = response.data.response.map(reservation => ({
           title: `Disponible: ${productStock - reservation.quantity} unidad(es)`,
@@ -248,3 +245,4 @@ function AvailabilityCalendar({ productId, productStock }) {
   );
 }
 export default AvailabilityCalendar;
+
