@@ -10,7 +10,7 @@ import favoritesService from '../../services/favoritesService';
 const FavoriteButton = ({ productId }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [ setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+    const [setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
     // Verificar estado inicial al cargar el componente
     useEffect(() => {
@@ -54,8 +54,22 @@ const FavoriteButton = ({ productId }) => {
         try {
             if (isFavorite) {
                 await favoritesService.removeFromFavorites(productId);
+
+                // Emitir evento para notificar que se ha eliminado un favorito
+                window.dispatchEvent(
+                    new CustomEvent('favorite-removed', {
+                        detail: { productId: Number(productId) }
+                    })
+                );
             } else {
                 await favoritesService.addToFavorites(productId);
+
+                // Emitir evento para notificar que se ha añadido un favorito
+                window.dispatchEvent(
+                    new CustomEvent('favorite-added', {
+                        detail: { productId: Number(productId) }
+                    })
+                );
             }
 
             // Actualizar estado local
@@ -76,7 +90,7 @@ const FavoriteButton = ({ productId }) => {
         }
     };
 
-      // Renderizamos el botón solo si productId es válido
+    // Renderizamos el botón solo si productId es válido
     if (!productId) {
         return null; // No renderizamos nada si no hay ID válido
     }
