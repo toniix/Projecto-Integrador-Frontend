@@ -80,7 +80,12 @@ function AvailabilityCalendar({ productId, productStock }) {
     const fetchReservations = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/clavecompas/reservations/product/${productId}`);
+        // Obtener reservaciones para el producto desde el backend
+        // Local development endpoint
+        // const response = await axios.get(`http://localhost:8080/clavecompas/reservations/product/${productId}`);
+
+        // Production endpoint
+        const response = await axios.get(`https://clavecompas-production.up.railway.app/clavecompas/reservations/product/${productId}`);
         
         const events = response.data.response.map(reservation => ({
           title: `Disponible: ${productStock - reservation.quantity} unidad(es)`,
