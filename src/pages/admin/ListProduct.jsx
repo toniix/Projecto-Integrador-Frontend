@@ -5,7 +5,7 @@ import "../../styles/ListProduct.css";
 import { Trash2, Edit, Eye, Plus, RefreshCw, Package, Filter, SortDesc, Download, X, Check, ChevronDown, ChevronUp, Search } from "lucide-react";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 import ConfirmationModal from "../../components/instrument/ConfirmationModal";
-import { InstrumentForm } from "../../components/instrument/InstrumentForm"; 
+import { InstrumentForm } from "../../components/instrument/instrumentform/index";
 import Button from "../../components/common/Button";
 
 export const ListProduct = () => {
