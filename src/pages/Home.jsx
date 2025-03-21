@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/auth/AuthContext"; 
 import PaginationComponent from "../components/common/PaginationComponent";
 import Button from "../components/common/Button";
 import CardsContainer from "../components/containers/CardsContainer";
@@ -13,7 +12,6 @@ function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const { isAuthenticated, refreshFavorites } = useAuth(); // Usar el contexto de autenticación
 
   // Estados para productos y control de UI
   const [products, setProducts] = useState([]);
@@ -178,14 +176,6 @@ function Home() {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
-
-  // Refrescar el estado de favoritos cuando se monta el componente
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Si el usuario está autenticado, disparar el evento para refrescar favoritos
-      refreshFavorites();
-    }
-  }, [isAuthenticated, refreshFavorites]);
 
   // Actualizar productos cuando cambian los filtros o paginación
   useEffect(() => {
@@ -359,7 +349,6 @@ function Home() {
             Todos
           </button>
 
-          {/* Verificación adicional antes de mapear categories */}
           {categories.map((category) => (
             <button
               key={category.id}
@@ -392,11 +381,25 @@ function Home() {
               {category.name}
             </button>
           ))}
+
+          {/* Botón "Ver Más" con imagen de /provisorio/27.jpg */}
+          <button
+            onClick={() => navigate("/categories")}
+            className="text-[#ffffff] px-6 py-3 rounded-xl w-48 h-16 text-lg hover:bg-[#c6bcb049] transition-colors"
+            style={{
+              backgroundImage: `url("/provisorio/27.jpg")`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: "grayscale(100%)",
+              transition: "filter 0.3s ease",
+            }}
+            onMouseOver={(e) => (e.target.style.filter = "grayscale(0%)")}
+            onMouseOut={(e) => (e.target.style.filter = "grayscale(100%)")}
+          >
+            Ver Más
+          </button>
         </section>
       )}
-
-      {/* Título de resultados - Visible cuando hay búsqueda activa */}
-      {/* La sección de título de resultados se mueve al bloque de productos */}
 
       {/* Indicador de carga */}
       {(loading || loadingCategories) && (

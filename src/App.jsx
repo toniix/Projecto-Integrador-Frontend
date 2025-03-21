@@ -6,6 +6,11 @@ import Footer from "./components/common/Footer"; // Nuevo Footer
 import RegisterForm from "./components/user/signupform/RegisterForm";
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import Profile from "./pages/Profile"; // Nueva página Profile
+import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
+import NotFound from "./pages/NotFound"; // Nueva página NotFound
+// Importamos el nuevo componente de filtrado por categorías
+import CategoriesFilterPage from "./pages/CategoriesFilterPage";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { RootProvider } from "./context";
@@ -14,9 +19,7 @@ import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./context/auth/privateRoute"; // Ensure this path is correct
-import NotFound from "./pages/NotFound"; // Nueva página NotFound
-import 'react-datepicker/dist/react-datepicker.css'; // Para implementar la selección de rango de fechas requerida en la HU #22
-import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
+import "react-datepicker/dist/react-datepicker.css"; // Para implementar la selección de rango de fechas requerida en la HU #22
 
 export const App = () => {
   return (
@@ -45,7 +48,7 @@ export const App = () => {
               </PrivateRoute>
             }
           />{" "}
-          {/* Nueva ruta de Profile Favoritos*/}
+          {/* Nueva ruta de Profile */}
           <Route
             path="/favorites"
             element={
@@ -54,7 +57,8 @@ export const App = () => {
               </PrivateRoute>
             }
           />{" "}
-          {/* Nueva ruta de Profile */}
+          {/* Nueva ruta para la página de filtrado de categorías */}
+          <Route path="/categories" element={<CategoriesFilterPage />} />
           <Route path="*" element={<NotFound />} />{" "}
           {/* Ruta para manejar páginas no encontradas */}
         </Routes>
