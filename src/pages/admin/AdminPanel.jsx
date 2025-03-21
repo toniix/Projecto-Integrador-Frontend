@@ -167,12 +167,11 @@ export const AdminPanel = () => {
               </div>
             </Button>
           </div>
-
-          <InstrumentForm
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
         </aside>
+        <InstrumentForm
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
 
         {/* Contenido con margen izquierdo para el sidebar */}
         <main className="ml-[280px] flex-1 p-6 bg-[#F9F7F4] overflow-y-auto">
