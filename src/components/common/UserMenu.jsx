@@ -7,9 +7,6 @@ function UserMenu({ user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Use email from token subject if available
-  const userEmail = user?.email || user?.sub || "usuario@example.com";
-
   // Handle clicking outside to close the menu
   useEffect(() => {
     function handleClickOutside(event) {
@@ -85,7 +82,7 @@ function UserMenu({ user, onLogout }) {
               />
               Mis favoritos
             </Link>
-            
+
             <Link
               to="/profile"
               className="flex items-center px-3 py-2.5 rounded-lg text-sm text-[#e6b465] 

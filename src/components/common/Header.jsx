@@ -1,53 +1,37 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logo from "/img/logo_white.png";
 import Button from "./Button";
-import LoginModal from "../login/LoginModal";
+import LoginModal from "../user/login/LoginModal";
 import { useAuth } from "../../context";
 import UserMenu from "./UserMenu";
-
+import RegisterModal from "../user/register/RegisterModal";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  // const [displayName, setDisplayName] = useState("Usuario");
-
-  const navigate = useNavigate();
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const { user, isAuthenticated, logout } = useAuth();
 
-  // Extract display name from user or token data
-  // useEffect(() => {
-  //   if (isAuthenticated && user) {
-  //     // First try to get name from user object if it exists
-  //     if (user.name || user.firstName || user.fullName) {
-  //       setDisplayName(user.name || user.firstName || user.fullName);
-  //     }
-  //     // Fall back to email from token subject
-  //     else if (user.sub) {
-  //       // Extract username part from email (everything before @)
-  //       const emailUsername = user.sub.split('@')[0];
-  //       // Capitalize first letter
-  //       setDisplayName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
-  //     }
-  //     // Last resort: try email directly
-  //     else if (user.email) {
-  //       const emailUsername = user.email.split('@')[0];
-  //       setDisplayName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
-  //     }
-  //   } else {
-  //     setDisplayName("Usuario");
-  //   }
-  // }, [user, isAuthenticated]);
+  const openRegisterModal = () => {
+    setIsLoginModalOpen(false); // Cerrar el modal de login
+    setIsRegisterModalOpen(true); // Abrir el modal de registro
+  };
 
-  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeRegisterModal = () => setIsRegisterModalOpen(false);
+
+  const openLoginModal = () => {
+    setIsRegisterModalOpen(false); // Cerrar el modal de registro
+    setIsLoginModalOpen(true); // Abrir el modal de login
+  };
+
   const closeLoginModal = () => setIsLoginModalOpen(false);
-
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 bg-[#3B0012]/90 z-50">
+      <header className="fixed top-0 left-0 right-0 bg-[#3B0012]/95 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-24">
             {/* Logo and Name */}
@@ -61,7 +45,7 @@ function Header() {
                   Clave&amp;Compás
                 </span>
               </div>
-            </Link>        
+            </Link>
             {/* Mobile Menu Button */}
             <div className="sm:hidden">
               <button
@@ -75,17 +59,10 @@ function Header() {
             {/* Desktop Menu */}
             <div className="hidden sm:flex sm:items-center sm:space-x-6">
               {isAuthenticated ? (
-                <UserMenu
-                  user={user}
-                  // displayName={displayName}
-                  onLogout={logout}
-                />
+                <UserMenu user={user} onLogout={logout} />
               ) : (
                 <>
-                  <Button
-                    onClick={() => navigate("/register")}
-                    variant="secondary"
-                  >
+                  <Button onClick={openRegisterModal} variant="secondary">
                     Registrarse
                   </Button>
                   <Button onClick={openLoginModal} variant="primary">
@@ -104,25 +81,27 @@ function Header() {
           >
             {isAuthenticated ? (
               <div className="px-4">
-                <UserMenu
-                  user={user}
-                  // displayName={displayName}
-                  onLogout={logout}
-                />
+                <UserMenu user={user} onLogout={logout} />
               </div>
             ) : (
               <>
                 <Button onClick={openLoginModal}>Iniciar Sesión</Button>
-
-                <Button onClick={() => navigate("/register")} variant="outline">
-                  Registrarse
-                </Button>
+                <Button onClick={openRegisterModal}>Registrarse</Button>
               </>
             )}
           </div>
         </div>
       </header>
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        openRegisterModal={openRegisterModal}
+      />
+      <RegisterModal
+        isOpen={isRegisterModalOpen}
+        onClose={closeRegisterModal}
+        openLoginModal={openLoginModal} // Pasar función para abrir el modal de login
+      />
     </>
   );
 }

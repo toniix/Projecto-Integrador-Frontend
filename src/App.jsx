@@ -2,8 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProductDetail from "./pages/ProductDetail";
 import Header from "./components/common/Header"; // Nuevo Header
 import Home from "./pages/Home"; // Nueva página Home
-import Footer from "./components/common/Footer"; // Nuevo Footer
-import RegisterForm from "./components/user/signupform/RegisterForm";
+import FooterWrapper from "./layouts/FooterWrapper"; // Nuevo FooterWrapper
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import Profile from "./pages/Profile"; // Nueva página Profile
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -15,7 +14,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./context/auth/privateRoute"; // Ensure this path is correct
 import NotFound from "./pages/NotFound"; // Nueva página NotFound
-import 'react-datepicker/dist/react-datepicker.css'; // Para implementar la selección de rango de fechas requerida en la HU #22
+import "react-datepicker/dist/react-datepicker.css"; // Para implementar la selección de rango de fechas requerida en la HU #22
 import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
 
 export const App = () => {
@@ -27,7 +26,7 @@ export const App = () => {
           <Route path="/" element={<Home />} />{" "}
           {/* Ruta principal para la Home */}
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/register/" element={<RegisterForm />} />
+          {/* <Route path="/register" element={<RegisterForm />} /> */}
           <Route
             path="/admin"
             element={
@@ -58,7 +57,8 @@ export const App = () => {
           <Route path="*" element={<NotFound />} />{" "}
           {/* Ruta para manejar páginas no encontradas */}
         </Routes>
-        <Footer /> {/* El Footer se muestra en todas las rutas */}
+        <FooterWrapper />{" "}
+        {/* Reemplazar el <Footer /> existente por <FooterWrapper /> */}
         <ToastContainer
           position="bottom-right"
           autoClose={3000}

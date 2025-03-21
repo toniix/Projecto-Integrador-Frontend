@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, X } from "lucide-react";
-import { useAuth } from "../../context";
+import { useAuth } from "../../../context";
+import { errorToast, successToast } from "../../../utils/toastNotifications";
 
-import { errorToast, successToast } from "../../utils/toastNotifications";
-
-const LoginModal = ({ isOpen, onClose, onLogin }) => {
+const LoginModal = ({ isOpen, onClose, openRegisterModal }) => {
   // Estados
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -138,7 +137,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
       >
         <div className="relative">
           <div
-            className="relative bg-gradient-to-br from-[#3e0b05] to-[#2a0803] rounded-3xl 
+            className="relative bg-gradient-to-br from-[#7a0715] to-[#3b0012] rounded-3xl 
            shadow-[0_10px_40px_rgba(0,0,0,0.6)] 
            backdrop-blur-sm 
            p-8
@@ -159,7 +158,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
             {/* Encabezado Mejorado */}
             <div className="text-center space-y-2">
               <h1 className="text-3xl font-bold text-[#d9c6b0] tracking-tight">
-                Bienvenido de nuevo a Clave & Compas
+                Bienvenido a Clave & Compas
               </h1>
               <p className="text-[#9e9e9e] text-base mt-1">
                 Inicia sesión para continuar
@@ -210,7 +209,8 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-amber-700 transition-colors"
+                    className="absolute right-4 top-[50%] -translate-y-[50%] text-[#757575] hover:text-[#b08562]"
+                    style={{ transform: "translateY(-50%)" }}
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -280,12 +280,12 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
               {/* Enlace Registrarse Mejorado */}
               <p className="text-center text-[#9e9e9e] text-sm pt-2">
                 ¿No tienes una cuenta?{" "}
-                <a
-                  href="#"
+                <button
+                  onClick={openRegisterModal} // Llamar a la función para abrir el modal de registro
                   className="text-[#b08562] hover:text-[#d9c6b0] transition-colors duration-200 font-medium"
                 >
-                  Regístrate
-                </a>
+                  Regístrate Ahora
+                </button>
               </p>
             </form>
           </div>

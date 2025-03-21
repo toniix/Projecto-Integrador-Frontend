@@ -34,9 +34,8 @@ const ShareInstrument = ({ product, closeModal }) => {
     switch (selectedNetwork) {
       case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-          currentUrl
+          window.location.href
         )}&quote=${encodeURIComponent(message)}`;
-
         break;
 
       case "twitter":
