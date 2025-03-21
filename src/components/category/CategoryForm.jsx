@@ -62,6 +62,9 @@ const CategoryForm = ({ isOpen, onClose, initialData  }) => {
                   imagePreviews={imagePreviews}
                   removeImage={removeImage}
                   handleImageUpload={handleImageUpload}
+                  maxImages = {1}
+                  isSingle ={true}
+                  
                 />
               </div>
       
