@@ -481,7 +481,7 @@ export const ListProduct = () => {
                 {!isLoading && filteredProducts.length > 0 && totalPages > 1 && (
                     <div className="mt-6 flex justify-center">
                         <PaginationComponent
-                            currentPage={currentPage}
+                            currentPage={currentPage} 
                             totalPages={totalPages}
                             setCurrentPage={setCurrentPage}
                         />

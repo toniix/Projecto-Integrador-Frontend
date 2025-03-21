@@ -3,7 +3,7 @@ import { InstrumentForm } from "../../components/instrument/instrumentform/index
 import { ListProduct } from "./ListProduct";
 import { ListUsers } from "./ListUsers";
 import Button from "../../components/common/Button";
-import { Home, Package, Calendar, Users, Plus, AlertTriangle, RefreshCw } from "lucide-react";
+import { Home, Package, Calendar, Users, Plus, AlertTriangle, RefreshCw, List, Folder } from "lucide-react";
 import "../../styles/AdminPanel.css";
 
 export const AdminPanel = () => {
@@ -161,6 +161,20 @@ export const AdminPanel = () => {
             text="Instrumentos"
             active={view === "list"}
           />
+
+          <SidebarButton 
+            onClick={() => setView("manage-category")}
+            icon={Folder}
+            text="Categorias"
+            active={view === "manage-category"}
+          />
+
+          <SidebarButton 
+            onClick={() => setView("manage-feature")}
+            icon={List}
+            text="Caracteristicas"
+            active={view === "manage-feature"}
+          />
           
           <SidebarButton 
             onClick={() => setView("manage-reservations")}
@@ -313,6 +327,24 @@ export const AdminPanel = () => {
               Gestión de Usuarios
             </h2>
             <ListUsers />
+          </div>
+        )}
+
+        {view === "manage-category" && (
+          <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
+            <h2 className="text-xl font-bold text-[#1e1e1e] mb-4 border-b border-[#d9c6b0] pb-2">
+              Gestión de Categorias
+            </h2>
+            <ListCategories/>
+          </div>
+        )}
+
+        {view === "manage-feature" && (
+          <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
+            <h2 className="text-xl font-bold text-[#1e1e1e] mb-4 border-b border-[#d9c6b0] pb-2">
+              Gestión de Caracteristicas
+            </h2>
+            <ListFeatures />
           </div>
         )}
       </section>
