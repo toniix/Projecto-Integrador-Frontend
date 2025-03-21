@@ -2,17 +2,18 @@ import { useState, useEffect } from "react";
 import categoryService from "../../services/categoryService";
 import PaginationComponent from "../../components/common/PaginationComponent";
 import "../../styles/ListProduct.css";
-import { Trash2, Edit, ShieldCheck, RefreshCw , Plus} from "lucide-react";
+import { Trash2, Edit, ShieldCheck, RefreshCw, Plus } from "lucide-react";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 import ConfirmationModal from "../../components/instrument/ConfirmationModal";
 import Button from "../../components/common/Button";
+import CategoryForm from "../../components/category/CategoryForm";
 
 
 export const ListCategories = () => {
     const [categories, setAllcategories] = useState([]);
-    
 
-  
+
+
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -24,17 +25,17 @@ export const ListCategories = () => {
     // Obtener categorias paginados
     const fetchcategorys = async (uiPage) => {
         setIsLoading(true);
-        try{
+        try {
 
             const apiPage = uiPage - 1;
             console.log(`Solicitando página ${apiPage} a la API`);
             const token = localStorage.getItem("token");
             const data = await categoryService.getCategoryAll(apiPage, 10, token);
             console.log("Respuesta procesada:", data);
-            
+
             setAllcategories(data.categories);
             setTotalPages(data.totalPages);
-    
+
             if (data.currentPageIndex !== undefined) {
                 const uiPageFromApi = data.currentPageIndex + 1;
                 if (uiPageFromApi !== currentPage) {
@@ -50,9 +51,9 @@ export const ListCategories = () => {
         }
     };
 
-    
 
-   
+
+
     useEffect(() => {
         fetchcategorys(currentPage);
     }, [currentPage]);
@@ -73,24 +74,19 @@ export const ListCategories = () => {
         }
     };
 
-    
 
-    // Cerrar modal de asignación de roles
-    const handleCloseAssignRolesModal = () => {
-        setIsAssignRolesOpen(false);
-        setSelectedcategory(null);
-        fetchcategorys(currentPage);
-    };
+
+
 
     const handleCloseCreateModal = () => {
         setIsCreateModalOpen(false);
-        fetchProducts(currentPage);
+        fetchcategorys(currentPage);
     };
 
     const handleDelete = (id) => {
         const token = localStorage.getItem("token");
         categoryService
-            .createCategory(id,token)
+            .deleteCategory(id, token)
             .then(() => {
                 fetchcategorys(currentPage);
                 successToast("Categoria eliminada correctamente");
@@ -107,15 +103,15 @@ export const ListCategories = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <h2 className="text-2xl font-bold text-[#3e0b05] mb-4">Categorias</h2>
                     <p className="text-[#1e1e1e] mb-4">Todos las Categorias</p>
-                    <Button 
-                                variant="primary"
-                                onClick={() => setIsCreateModalOpen(true)}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Plus size={16} />
-                                    <span>Nueva Categoria</span>
-                                </div>
-                            </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => setIsCreateModalOpen(true)}
+                    >
+                        <div className="flex items-center gap-2">
+                            <Plus size={16} />
+                            <span>Nueva Categoria</span>
+                        </div>
+                    </Button>
                 </div>
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <table className="w-full text-left">
@@ -128,45 +124,49 @@ export const ListCategories = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#d9c6b0]">
-                            
+
                             {
-                            isLoading ? (
-                                <div className="flex flex-col justify-center items-center p-12 space-y-4">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#730f06]"></div>
-                                    <p className="text-[#757575]">Cargando Categorias...</p>
-                                </div>
-                            ) : (categories.length > 0 ? (
-                                categories.map((category) => (
-                                    <tr key={category.idCategory} className="hover:bg-[#f1eae7] transition-colors">
-                                        <td className="p-3 text-[#1e1e1e]">{category.idCategory}</td>
-                                        <td className="p-3 font-medium text-[#3e0b05]">{category.name}</td>
-                                        <td className="p-3 font-medium text-[#3e0b05]">{category.description}</td>
-                                        <td className="p-3">
-                                            <div className="flex justify-center gap-2">
-                                                <button 
-                                                    className="flex items-center justify-center text-white bg-[#730f06] hover:bg-[#3e0b05] p-2 rounded-md transition-colors"
-                                                    title="Eliminar"
-                                                    onClick={() => {
-                                                        setIsConfirmationModalOpen(true);
-                                                        setCategoryId(category.idCategory);
-                                                        setCategoryName(category.name);
-                                                    }}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                                
-                                                
+                                isLoading ? (
+                                    <tr>
+                                        <td colSpan="4" className="p-12 text-center">
+                                            <div className="flex flex-col justify-center items-center space-y-4">
+                                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#730f06]"></div>
+                                                <p className="text-[#757575]">Cargando Categorías...</p>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="3" className="p-6 text-center text-[#757575]">
-                                        No hay usuarios disponibles
-                                    </td>
-                                </tr>
-                            ))}
+                                ) : (categories.length > 0 ? (
+                                    categories.map((category) => (
+                                        <tr key={category.idCategory} className="hover:bg-[#f1eae7] transition-colors">
+                                            <td className="p-3 text-[#1e1e1e]">{category.idCategory}</td>
+                                            <td className="p-3 font-medium text-[#3e0b05]">{category.name}</td>
+                                            <td className="p-3 font-medium text-[#3e0b05]">{category.description}</td>
+                                            <td className="p-3">
+                                                <div className="flex justify-center gap-2">
+                                                    <button
+                                                        className="flex items-center justify-center text-white bg-[#730f06] hover:bg-[#3e0b05] p-2 rounded-md transition-colors"
+                                                        title="Eliminar"
+                                                        onClick={() => {
+                                                            setIsConfirmationModalOpen(true);
+                                                            setCategoryId(category.idCategory);
+                                                            setCategoryName(category.name);
+                                                        }}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="3" className="p-6 text-center text-[#757575]">
+                                            No hay usuarios disponibles
+                                        </td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                 </div>
@@ -181,20 +181,20 @@ export const ListCategories = () => {
                     </div>
                 )}
             </div>
-                {/* Modal de confirmación para eliminar */}
-                            <ConfirmationModal
-                                isOpen={isConfirmationModalOpen}
-                                onClose={() => setIsConfirmationModalOpen(false)}
-                                onDelete={handleDelete}
-                                id={categoryId}
-                                name={categoryName}
-                            />
-                            {/* Modal para crear instrumentos */}
+            {/* Modal de confirmación para eliminar */}
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => setIsConfirmationModalOpen(false)}
+                onDelete={handleDelete}
+                id={categoryId}
+                name={categoryName}
+            />
+            {/* Modal para crear instrumentos */}
             <CategoryForm
                 isOpen={isCreateModalOpen}
                 onClose={handleCloseCreateModal}
             />
-           
+
         </div>
     );
 };
