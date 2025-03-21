@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { InstrumentForm } from "../../components/instrument/instrumentform/index";
 import { ListProduct } from "./ListProduct";
 import { ListUsers } from "./ListUsers";
+import { ListCategories } from "./ListCategories";
 import Button from "../../components/common/Button";
 import { Home, Package, Calendar, Users, Plus, AlertTriangle, RefreshCw, List, Folder } from "lucide-react";
 import "../../styles/AdminPanel.css";

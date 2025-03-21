@@ -75,7 +75,7 @@ const categoryService = {
       const data = response.data?.response || {};
 
       return {
-        products: data.content || [],
+        categories: data.content || [],
         totalPages: data.totalPages || 1,
         currentPageIndex: data.number || 0, // Página actual en base 0
       };
@@ -111,4 +111,4 @@ const categoryService = {
   },
 };
 
-export default usersService;
+export default categoryService;

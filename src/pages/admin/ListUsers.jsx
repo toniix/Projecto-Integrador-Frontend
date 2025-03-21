@@ -15,23 +15,32 @@ export const ListUsers = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [isAssignRolesOpen, setIsAssignRolesOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-
+    const [isLoading, setIsLoading] = useState(true);
     // Obtener usuarios paginados
     const fetchUsers = async (uiPage) => {
-        const apiPage = uiPage - 1;
-        console.log(`Solicitando página ${apiPage} a la API`);
-        const token = localStorage.getItem("token");
-        const data = await usersService.getUsers(apiPage, 10, token);
-        console.log("Respuesta procesada:", data);
-        
-        setAllUsers(data.users);
-        setTotalPages(data.totalPages);
+        setIsLoading(true)
+        try{
+            const apiPage = uiPage - 1;
+            console.log(`Solicitando página ${apiPage} a la API`);
+            const token = localStorage.getItem("token");
+            const data = await usersService.getUsers(apiPage, 10, token);
+            console.log("Respuesta procesada:", data);
+            
+            setAllUsers(data.users);
+            setTotalPages(data.totalPages);
 
-        if (data.currentPageIndex !== undefined) {
-            const uiPageFromApi = data.currentPageIndex + 1;
-            if (uiPageFromApi !== currentPage) {
-                setCurrentPage(uiPageFromApi);
+            if (data.currentPageIndex !== undefined) {
+                const uiPageFromApi = data.currentPageIndex + 1;
+                if (uiPageFromApi !== currentPage) {
+                    setCurrentPage(uiPageFromApi);
+                }
             }
+        }catch (error) {
+            console.error("Error al cargar usuarios:", error);
+            errorToast("No se pudieron cargar los usuarios");
+            setAllcategories([]);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -98,7 +107,12 @@ export const ListUsers = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#d9c6b0]">
-                            {users.length > 0 ? (
+                            {isLoading ? (
+                                <div className="flex flex-col justify-center items-center p-12 space-y-4">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#730f06]"></div>
+                                    <p className="text-[#757575]">Cargando Categorias...</p>
+                                </div>
+                            ) : (users.length > 0 ? (
                                 users.map((user) => (
                                     <tr key={user.id} className="hover:bg-[#f1eae7] transition-colors">
                                         <td className="p-3 text-[#1e1e1e]">{user.id}</td>
@@ -130,7 +144,7 @@ export const ListUsers = () => {
                                         No hay usuarios disponibles
                                     </td>
                                 </tr>
-                            )}
+                            ))}
                         </tbody>
                     </table>
                 </div>

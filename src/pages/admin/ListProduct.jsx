@@ -15,6 +15,7 @@ export const ListProduct = () => {
     const [totalPages, setTotalPages] = useState(1); 
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [productId, setProductId] = useState(null);
+    const [productName, setProductName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [lastUpdate, setLastUpdate] = useState(new Date());
     
@@ -418,6 +419,7 @@ export const ListProduct = () => {
                                                         onClick={() => {
                                                             setIsConfirmationModalOpen(true);
                                                             setProductId(product.idProduct);
+                                                            setProductName(product.name);
                                                         }}
                                                         className="p-2 h-auto"
                                                         title="Eliminar"
@@ -495,6 +497,7 @@ export const ListProduct = () => {
                 onClose={() => setIsConfirmationModalOpen(false)}
                 onDelete={handleDelete}
                 id={productId}
+                name={productName}
             />
             
             {/* Modal para editar instrumentos */}
