@@ -12,54 +12,85 @@ const FavoritesPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Cargar favoritos al montar el componente
-  useEffect(() => {
-    const loadFavorites = async () => {
-      // Verificar si hay token directamente
-      const token = localStorage.getItem("token");
-      if (!token) {
+  // Función para cargar favoritos
+  const loadFavorites = async () => {
+    // Verificar si hay token directamente
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await favoritesService.getUserFavorites();
+      console.log("Datos recibidos de favoritos:", data);
+
+      // Adaptador: Transformar FavoriteDTO al formato esperado por Card
+      const adaptedData = data.map((favorite) => ({
+        idProduct: favorite.productId,
+        name: favorite.productName,
+        // Como no tenemos price en FavoriteDTO, podemos establecer un valor por defecto
+        price: favorite.price || 0,
+        // Adaptamos la URL de la imagen
+        image: favorite.productImage,
+      }));
+
+      console.log("Datos adaptados:", adaptedData);
+      setFavorites(adaptedData);
+      setError(null);
+    } catch (err) {
+      console.error("Error al cargar favoritos:", err);
+
+      // Si hay error de autorización, redirigir al inicio
+      if (err.response && err.response.status === 401) {
+        localStorage.removeItem("token");
         navigate("/");
         return;
       }
 
-      try {
-        setLoading(true);
-        const data = await favoritesService.getUserFavorites();
-        console.log("Datos recibidos de favoritos:", data);
+      setError(
+        "No pudimos cargar tus favoritos. Por favor, intenta más tarde."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // Adaptador: Transformar FavoriteDTO al formato esperado por Card
-        const adaptedData = data.map((favorite) => ({
-          idProduct: favorite.productId,
-          name: favorite.productName,
-          // Como no tenemos price en FavoriteDTO, podemos establecer un valor por defecto
-          price: favorite.price || 0,
-          // Adaptamos la URL de la imagen
-          image: favorite.productImage,
-        }));
+  // Cargar favoritos al montar el componente y configurar listeners
+  useEffect(() => {
+    loadFavorites();
+    // Handler para cuando se elimina un favorito
+    const handleFavoriteRemoved = (event) => {
+      const { productId } = event.detail;
+      console.log(
+        "Evento recibido: favorite-removed para productId:",
+        productId
+      );
 
-        console.log("Datos adaptados:", adaptedData);
-        setFavorites(adaptedData);
-        setError(null);
-      } catch (err) {
-        console.error("Error al cargar favoritos:", err);
-
-        // Si hay error de autorización, redirigir al inicio
-        if (err.response && err.response.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/");
-          return;
-        }
-
-        setError(
-          "No pudimos cargar tus favoritos. Por favor, intenta más tarde."
-        );
-      } finally {
-        setLoading(false);
-      }
+      // Actualizar la lista filtrando el producto eliminado
+      setFavorites((prevFavorites) =>
+        prevFavorites.filter((fav) => fav.idProduct !== productId)
+      );
     };
 
-    loadFavorites();
-  }, [navigate]);
+    // Handler para cuando se añade un favorito
+    const handleFavoriteAdded = (event) => {
+      console.log("Evento recibido: favorite-added");
+      // Recargar los favoritos para incluir el nuevo
+      loadFavorites();
+    };
+
+    // Agregar los listeners de eventos
+    window.addEventListener("favorite-removed", handleFavoriteRemoved);
+    window.addEventListener("favorite-added", handleFavoriteAdded);
+
+    // Limpiar los listeners cuando el componente se desmonte
+    return () => {
+      window.removeEventListener("favorite-removed", handleFavoriteRemoved);
+      window.removeEventListener("favorite-added", handleFavoriteAdded);
+    };
+  }, [navigate]); // Solo navigate como dependencia
 
   // Función para manejar la eliminación de un favorito
   const handleRemoveFavorite = async (productId) => {

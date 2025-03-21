@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/auth/AuthContext"; 
 import PaginationComponent from "../components/common/PaginationComponent";
 import Button from "../components/common/Button";
 import CardsContainer from "../components/containers/CardsContainer";
@@ -12,6 +13,7 @@ function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
+  const { isAuthenticated, refreshFavorites } = useAuth(); // Usar el contexto de autenticación
 
   // Estados para productos y control de UI
   const [products, setProducts] = useState([]);
@@ -176,6 +178,14 @@ function Home() {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  // Refrescar el estado de favoritos cuando se monta el componente
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Si el usuario está autenticado, disparar el evento para refrescar favoritos
+      refreshFavorites();
+    }
+  }, [isAuthenticated, refreshFavorites]);
 
   // Actualizar productos cuando cambian los filtros o paginación
   useEffect(() => {

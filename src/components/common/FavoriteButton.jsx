@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import favoritesService from "../../services/favoritesService";
+import { successToast } from "../../utils/toastNotifications";
 
 /**
  * Componente de botón para marcar/desmarcar favoritos
@@ -12,23 +13,52 @@ const FavoriteButton = ({ productId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [setIsAuthenticated] = useState(!!localStorage.getItem("token"));
 
-  // Verificar estado inicial al cargar el componente
-  useEffect(() => {
-    // Solo verificamos si hay token, no dependemos del estado isAuthenticated
+  // Función para verificar el estado de favorito
+  const checkFavoriteStatus = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const checkStatus = async () => {
-      try {
-        const status = await favoritesService.checkFavoriteStatus(productId);
-        setIsFavorite(status);
-      } catch (error) {
-        console.error("Error al verificar estado de favorito:", error);
-      }
+    try {
+      setIsLoading(true);
+      const status = await favoritesService.checkFavoriteStatus(productId);
+      setIsFavorite(status);
+    } catch (error) {
+      console.error("Error al verificar estado de favorito:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Verificar estado inicial al cargar el componente
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [productId]);
+
+  // Escuchar el evento de actualización de favoritos
+  useEffect(() => {
+    const handleRefreshFavorites = () => {
+      console.log(
+        "Recibido evento refresh-favorites para productId:",
+        productId
+      );
+      checkFavoriteStatus();
     };
 
-    checkStatus();
-  }, [productId]); // Eliminamos isAuthenticated de las dependencias
+    const handleUserLoggedOut = () => {
+      console.log("Usuario cerró sesión, limpiando estado de favorito");
+      setIsFavorite(false); // Resetear el estado a "no favorito"
+    };
+
+    // Registrar listeners
+    window.addEventListener("refresh-favorites", handleRefreshFavorites);
+    window.addEventListener("user-logged-out", handleUserLoggedOut);
+
+    // Limpiar listeners al desmontar
+    return () => {
+      window.removeEventListener("refresh-favorites", handleRefreshFavorites);
+      window.removeEventListener("user-logged-out", handleUserLoggedOut);
+    };
+  }, [productId]);
 
   /**
    * Gestiona el toggle de favorito
@@ -54,8 +84,23 @@ const FavoriteButton = ({ productId }) => {
     try {
       if (isFavorite) {
         await favoritesService.removeFromFavorites(productId);
+        // Emitir evento para notificar que se ha eliminado un favorito
+        window.dispatchEvent(
+          new CustomEvent("favorite-removed", {
+            detail: { productId: Number(productId) },
+          })
+        );
+        successToast("Instrumento eliminado de favoritos");
       } else {
         await favoritesService.addToFavorites(productId);
+
+        // Emitir evento para notificar que se ha añadido un favorito
+        window.dispatchEvent(
+          new CustomEvent("favorite-added", {
+            detail: { productId: Number(productId) },
+          })
+        );
+        successToast("Instrumento añadido a favoritos");
       }
 
       // Actualizar estado local
