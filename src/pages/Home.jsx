@@ -395,9 +395,6 @@ function Home() {
         </section>
       )}
 
-      {/* Título de resultados - Visible cuando hay búsqueda activa */}
-      {/* La sección de título de resultados se mueve al bloque de productos */}
-
       {/* Indicador de carga */}
       {(loading || loadingCategories) && (
         <div className="flex justify-center items-center py-16">
