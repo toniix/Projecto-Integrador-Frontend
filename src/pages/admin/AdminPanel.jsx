@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { InstrumentForm } from "../../components/instrument/instrumentform/index";
 import { ListProduct } from "./ListProduct";
 import { ListUsers } from "./ListUsers";
+import { ListCategories } from "./ListCategories";
 import Button from "../../components/common/Button";
 import {
   Home,
@@ -11,7 +12,10 @@ import {
   Plus,
   AlertTriangle,
   RefreshCw,
+  Folder,
+  List
 } from "lucide-react";
+
 import "../../styles/AdminPanel.css";
 import SidebarButton from "./SidebarButton";
 import StatCard from "./StatCard";
@@ -118,6 +122,7 @@ export const AdminPanel = () => {
         </div>
       )}
 
+
       {/* Nueva estructura con sidebar fijo */}
       <div className="min-h-screen flex bg-[#F9F7F4] text-[#1e1e1e] pt-24 admin-background">
         {/* Menú Lateral Fijo */}
@@ -128,46 +133,64 @@ export const AdminPanel = () => {
               Admin Panel
             </h3>
           </div>
+        
+        <div className="flex flex-col gap-2">
+          <SidebarButton 
+            onClick={() => setView("home")}
+            icon={Home}
+            text="Dashboard"
+            active={view === "home"}
+          />
+          
+          <SidebarButton 
+            onClick={() => setView("list")}
+            icon={Package}
+            text="Instrumentos"
+            active={view === "list"}
+          />
 
-          <div className="flex flex-col gap-2">
-            <SidebarButton
-              onClick={() => setView("home")}
-              icon={Home}
-              text="Dashboard"
-              active={view === "home"}
-            />
+          <SidebarButton 
+            onClick={() => setView("manage-category")}
+            icon={Folder}
+            text="Categorias"
+            active={view === "manage-category"}
+          />
 
-            <SidebarButton
-              onClick={() => setView("list")}
-              icon={Package}
-              text="Instrumentos"
-              active={view === "list"}
-            />
+          <SidebarButton 
+            onClick={() => setView("manage-feature")}
+            icon={List}
+            text="Caracteristicas"
+            active={view === "manage-feature"}
+          />
+          
+          <SidebarButton 
+            onClick={() => setView("manage-reservations")}
+            icon={Calendar}
+            text="Reservas"
+            active={view === "manage-reservations"}
+          />
+          
+          <SidebarButton 
+            onClick={() => setView("manage-users")}
+            icon={Users}
+            text="Usuarios"
+            active={view === "manage-users"}
+          />
+        </div>
+        
+        <div className="mt-auto pt-4 border-t border-[#b08562]/30">
+          <Button 
+            variant="accent"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <Plus size={18} />
+              <span>Nuevo Instrumento</span>
+            </div>
+          </Button>
+        </div>
+      </aside>
 
-            <SidebarButton
-              onClick={() => setView("manage-reservations")}
-              icon={Calendar}
-              text="Reservas"
-              active={view === "manage-reservations"}
-            />
-
-            <SidebarButton
-              onClick={() => setView("manage-users")}
-              icon={Users}
-              text="Usuarios"
-              active={view === "manage-users"}
-            />
-          </div>
-
-          <div className="mt-auto pt-4 border-t border-[#b08562]/30">
-            <Button variant="accent" onClick={() => setIsModalOpen(true)}>
-              <div className="flex items-center justify-center gap-2">
-                <Plus size={18} />
-                <span>Nuevo Instrumento</span>
-              </div>
-            </Button>
-          </div>
-        </aside>
         <InstrumentForm
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -333,16 +356,37 @@ export const AdminPanel = () => {
             </div>
           )}
 
-          {view === "manage-users" && (
-            <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
-              <h2 className="text-xl font-bold text-[#1e1e1e] mb-4 border-b border-[#d9c6b0] pb-2">
-                Gestión de Usuarios
-              </h2>
-              <ListUsers />
-            </div>
-          )}
-        </main>
+        {view === "manage-users" && (
+          <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
+            <h2 className="text-xl font-bold text-[#1e1e1e] mb-4 border-b border-[#d9c6b0] pb-2">
+              Gestión de Usuarios
+            </h2>
+            <ListUsers />
+          </div>
+        )}
+
+        {view === "manage-category" && (
+          <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
+            <h2 className="text-xl font-bold text-[#1e1e1e] mb-4 border-b border-[#d9c6b0] pb-2">
+              Gestión de Categorias
+            </h2>
+            <ListCategories/>
+          </div>
+        )}
+
+        {view === "manage-feature" && (
+          <div className="bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg">
+            <h2 className="text-xl font-bold text-[#1e1e1e] mb-4 border-b border-[#d9c6b0] pb-2">
+              Gestión de Caracteristicas
+            </h2>
+            <ListFeatures />
+          </div>
+        )}
+      
+    </main>
+
       </div>
     </>
+
   );
 };
