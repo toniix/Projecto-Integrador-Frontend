@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import categoryService from "../../services/categoryService";
 import PaginationComponent from "../../components/common/PaginationComponent";
 import "../../styles/ListProduct.css";
-import { Trash2, Edit, ShieldCheck, RefreshCw, Plus } from "lucide-react";
+import { Trash2, Edit, ShieldCheck, RefreshCw, Plus, Package } from "lucide-react";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 import ConfirmationModal from "../../components/instrument/ConfirmationModal";
 import Button from "../../components/common/Button";
@@ -118,6 +118,7 @@ export const ListCategories = () => {
                         <thead className="bg-[#3e0b05] text-white">
                             <tr>
                                 <th className="p-3">ID</th>
+                                <th className="p-4 font-medium">Imagen</th>
                                 <th className="p-3">Nombre</th>
                                 <th className="p-3">Descripcion</th>
                                 <th className="p-3 text-center">Acciones</th>
@@ -139,6 +140,21 @@ export const ListCategories = () => {
                                     categories.map((category) => (
                                         <tr key={category.idCategory} className="hover:bg-[#f1eae7] transition-colors">
                                             <td className="p-3 text-[#1e1e1e]">{category.idCategory}</td>
+                                            <td className="p-4">
+                                                {category.imageUrl ? (
+                                                    <div className="h-16 w-16 rounded-xl overflow-hidden bg-[#d9c6b0] shadow-sm">
+                                                        <img 
+                                                            src={category.imageUrl} 
+                                                            alt={category.name}
+                                                            className="h-full w-full object-cover object-center"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="h-16 w-16 rounded-xl bg-[#d9c6b0] flex items-center justify-center text-[#3e0b05]">
+                                                        <Package size={24} />
+                                                    </div>
+                                                )}
+                                            </td>
                                             <td className="p-3 font-medium text-[#3e0b05]">{category.name}</td>
                                             <td className="p-3 font-medium text-[#3e0b05]">{category.description}</td>
                                             <td className="p-3">

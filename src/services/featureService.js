@@ -2,11 +2,11 @@ import axios from "axios";
 //const API_LOCAL = import.meta.env.VITE_API_URL_LOCAL;
 const API_URL = import.meta.env.VITE_API_URL;
 
-const categoryService = {
+const featureService = {
   
   
 
-  async getCategoryById(idUser,token) {
+  async getFeatureById(idUser,token) {
     
     try {
       const response = await axios.get(`${API_URL}/users/${idUser}`,
@@ -28,13 +28,13 @@ const categoryService = {
   },
 
   /**
-   * Create new Category
-   * @param {Object} categoryData - Category data
+   * Create new Feature
+   * @param {Object} featureData - Feature data
    * @returns {Promise<Object>} Created instrument
    */
-  async createCategory(categoryData,token) {
+  async createFeature(featureData,token) {
     try {
-      const response = await axios.post(`${API_URL}/categories`, categoryData, {
+      const response = await axios.post(`${API_URL}/features`, featureData, {
         headers: { 
             "Content-Type": "application/json" ,
              "Authorization":`Bearer ${token}`  
@@ -43,7 +43,7 @@ const categoryService = {
       return response.data;
     } catch (error) {
       console.error(
-        "Error al crear la categoria:",
+        "Error al crear la caracteristica:",
         error.response?.data || error.message
       );
       throw error;
@@ -56,10 +56,10 @@ const categoryService = {
    * @param {number} pageSize - Items per page
    * @returns {Promise<Object>} Paginated instruments data
    */
-  async getCategoryAll(page = 0, pageSize = 10, token) {
+  async getFeatureAll(page = 0, pageSize = 10, token) {
     try {
       // La API usa paginación base 0 (como es común en Spring Boot)
-      const response = await axios.get(`${API_URL}/categories/admin`, {
+      const response = await axios.get(`${API_URL}/features/admin`, {
         params: {
           page, // Enviamos directamente el valor (que ya debe estar en base 0)
           pageSize,
@@ -75,13 +75,13 @@ const categoryService = {
       const data = response.data?.response || {};
 
       return {
-        categories: data.content || [],
+        features: data.content || [],
         totalPages: data.totalPages || 1,
         currentPageIndex: data.number || 0, // Página actual en base 0
       };
     } catch (error) {
       console.error(
-        "Error al listar las categorias:",
+        "Error al listar las caracteristicas:",
         error.response?.data || error.message
       );
       return { products: [], totalPages: 1, currentPageIndex: 0 };
@@ -92,9 +92,9 @@ const categoryService = {
    * @param {number} id - Instrument ID
    * @returns {Promise<void>}
    */
-   async deleteCategory(id, token) {
+   async deleteFeature(id, token) {
     try {
-      await axios.delete(`${API_URL}/categories/${id}`,{
+      await axios.delete(`${API_URL}/features/${id}`,{
         headers:{
             Authorization:`Bearer ${token}`
         }
@@ -103,7 +103,7 @@ const categoryService = {
       // return { success: true, message: 'Instrumento eliminado correctamente' };
     } catch (error) {
       console.error(
-        "Error al eliminar la categoria:",
+        "Error al eliminar la caracteristica:",
         error.response?.data || error.message
       );
       throw error;
@@ -111,4 +111,4 @@ const categoryService = {
   },
 };
 
-export default categoryService;
+export default featureService;
