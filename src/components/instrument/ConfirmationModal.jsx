@@ -2,7 +2,7 @@
 import { X, AlertTriangle } from "lucide-react";
 import PropTypes from "prop-types";
 
-const ConfirmationModal = ({ isOpen, onClose, onDelete, id }) => {
+const ConfirmationModal = ({ isOpen, onClose, onDelete, id, name }) => {
   if (!isOpen) return null;
 
   return (
@@ -23,13 +23,12 @@ const ConfirmationModal = ({ isOpen, onClose, onDelete, id }) => {
               <AlertTriangle size={24} className="text-[#730f06]" />
             </div>
             <h2 className="text-[#1e1e1e] text-xl font-semibold">
-              Confirmar eliminación de instrumento
+              Confirmar eliminación
             </h2>
           </div>
 
           <p className="text-[#757575] mb-6">
-            ¿Estás seguro que deseas eliminar este instrumento? Esta acción no
-            se puede deshacer.
+            ¿Estás seguro que deseas eliminar <strong className="font-bold">{name}</strong>? Esta acción no se puede deshacer.
           </p>
 
           {/* Action buttons */}
@@ -60,6 +59,7 @@ ConfirmationModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
 };
 
 export default ConfirmationModal;

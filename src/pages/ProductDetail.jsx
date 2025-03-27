@@ -14,6 +14,7 @@ import StarRating from "../components/review/StarRating";
 import ReviewsList from "../components/review/ReviewList";
 import ReviewForm from "../components/review/ReviewForm";
 import { useAuth } from "../context/auth/AuthContext";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -238,9 +239,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(
-          `https://clavecompas-production.up.railway.app/clavecompas/products/${id}`
-        );
+        const response = await axios.get(`${API_URL}/products/${id}`);
         const apiProduct = response.data.response;
         console.log("apiProduct", apiProduct);
         setProduct({
@@ -314,43 +313,46 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 min-h-screen pt-28 relative">
-      <div className="flex justify-between items-center mt-4 mb-5">
-        {/* Nombre del producto y botón de volver */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-full hover:bg-[#ffffff0a] transition-colors text-[#730f06] hover:text-[#b08562]"
-          >
-            <CircleArrowLeft size={32} />
-          </button>
-          <h1 className="text-4xl font-semibold text-[#2a0803]">
-            {product.name}
-          </h1>
-        </div>
+      {/* Header Container */}
+      <div className="w-full bg-white mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Título y botón de volver */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-full hover:bg-[#ffffff0a] transition-colors text-[#730f06] hover:text-[#b08562]"
+            >
+              <CircleArrowLeft size={28} className="sm:w-8 sm:h-8" />
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#2a0803] leading-tight">
+              {product.name}
+            </h1>
+          </div>
 
-        {/* Botones de acción */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={openShareModal}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl
-        border-2 border-[#730f06] text-[#730f06] font-medium
-        hover:bg-[#730f06]/5 transition-all duration-300
-        transform hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            <Share size={20} />
-            Compartir
-          </button>
+          {/* Botones de acción */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={openShareModal}
+              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl
+                border-2 border-[#730f06] text-[#730f06] text-sm sm:text-base font-medium
+                hover:bg-[#730f06]/5 transition-all duration-300
+                transform hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              <Share size={18} className="sm:w-5 sm:h-5" />
+              <span>Compartir</span>
+            </button>
 
-          <button
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl
-        bg-gradient-to-r from-[#730f06] to-[#b08562] text-white font-medium
-        hover:from-[#8b1208] hover:to-[#c49573]
-        transform hover:-translate-y-0.5 transition-all duration-300
-        hover:shadow-lg shadow-md"
-          >
-            <Calendar size={20} />
-            Reservar ahora
-          </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl
+                bg-gradient-to-r from-[#730f06] to-[#b08562] text-white text-sm sm:text-base font-medium
+                hover:from-[#8b1208] hover:to-[#c49573]
+                transform hover:-translate-y-0.5 transition-all duration-300
+                hover:shadow-lg shadow-md"
+            >
+              <Calendar size={18} className="sm:w-5 sm:h-5" />
+              <span>Reservar</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -367,7 +369,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Grilla de imágenes secundarias */}
-        <div className="grid grid-cols-2 gap-4 flex-1">
+        <div className="grid grid-cols-2 gap-4 flex-1 relative">
           {[
             ...previewImages,
             ...(previewImages.length < 4 ? [productImages[0]] : []),
@@ -381,13 +383,10 @@ const ProductDetail = () => {
             />
           ))}
           <button
-            className="w-full px-6 py-2 bg-[#3D2130] text-[#ffffff] rounded-xl hover:bg-[#604152]"
+            className="absolute bottom-4 right-4 px-6 py-2 bg-[#7a0715]/90 text-[#ffffff] rounded-xl hover:bg-[#604152] shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5"
             onClick={() => openGallery(0)}
           >
             Ver galería
-          </button>
-          <button className="w-full px-6 py-2 bg-[#7A0715] text-[#ffffff] font-semibold rounded-xl hover:bg-[#B32C3A]">
-            Reservar
           </button>
         </div>
       </div>

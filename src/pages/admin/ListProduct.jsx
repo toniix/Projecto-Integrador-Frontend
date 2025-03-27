@@ -5,7 +5,7 @@ import "../../styles/ListProduct.css";
 import { Trash2, Edit, Eye, Plus, RefreshCw, Package, Filter, SortDesc, Download, X, Check, ChevronDown, ChevronUp, Search } from "lucide-react";
 import { successToast, errorToast } from "../../utils/toastNotifications";
 import ConfirmationModal from "../../components/instrument/ConfirmationModal";
-import { InstrumentForm } from "../../components/instrument/InstrumentForm"; 
+import { InstrumentForm } from "../../components/instrument/instrumentform/index";
 import Button from "../../components/common/Button";
 
 export const ListProduct = () => {
@@ -15,6 +15,7 @@ export const ListProduct = () => {
     const [totalPages, setTotalPages] = useState(1); 
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [productId, setProductId] = useState(null);
+    const [productName, setProductName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [lastUpdate, setLastUpdate] = useState(new Date());
     
@@ -418,6 +419,7 @@ export const ListProduct = () => {
                                                         onClick={() => {
                                                             setIsConfirmationModalOpen(true);
                                                             setProductId(product.idProduct);
+                                                            setProductName(product.name);
                                                         }}
                                                         className="p-2 h-auto"
                                                         title="Eliminar"
@@ -481,7 +483,7 @@ export const ListProduct = () => {
                 {!isLoading && filteredProducts.length > 0 && totalPages > 1 && (
                     <div className="mt-6 flex justify-center">
                         <PaginationComponent
-                            currentPage={currentPage}
+                            currentPage={currentPage} 
                             totalPages={totalPages}
                             setCurrentPage={setCurrentPage}
                         />
@@ -495,6 +497,7 @@ export const ListProduct = () => {
                 onClose={() => setIsConfirmationModalOpen(false)}
                 onDelete={handleDelete}
                 id={productId}
+                name={productName}
             />
             
             {/* Modal para editar instrumentos */}

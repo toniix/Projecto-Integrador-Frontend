@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/auth/AuthContext"; 
 import PaginationComponent from "../components/common/PaginationComponent";
 import Button from "../components/common/Button";
 import CardsContainer from "../components/containers/CardsContainer";
@@ -12,6 +13,7 @@ function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
+  const { isAuthenticated, refreshFavorites } = useAuth(); // Usar el contexto de autenticación
 
   // Estados para productos y control de UI
   const [products, setProducts] = useState([]);
@@ -177,6 +179,14 @@ function Home() {
     fetchCategories();
   }, [fetchCategories]);
 
+  // Refrescar el estado de favoritos cuando se monta el componente
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Si el usuario está autenticado, disparar el evento para refrescar favoritos
+      refreshFavorites();
+    }
+  }, [isAuthenticated, refreshFavorites]);
+
   // Actualizar productos cuando cambian los filtros o paginación
   useEffect(() => {
     fetchProducts();
@@ -300,7 +310,7 @@ function Home() {
       </section>
 
       {/* Sección de búsqueda */}
-      <section className="py-6 px-6 bg-[#F9F7F4] border-b border-[#b08562]">
+      <section className="py-6 px-4 bg-[#F9F7F4] border-b border-[#b08562] mt-24 md:mt-0">
         <SearchBar
           onSearch={handleSearch}
           categories={Array.isArray(categories) ? categories : []}
@@ -384,9 +394,6 @@ function Home() {
           ))}
         </section>
       )}
-
-      {/* Título de resultados - Visible cuando hay búsqueda activa */}
-      {/* La sección de título de resultados se mueve al bloque de productos */}
 
       {/* Indicador de carga */}
       {(loading || loadingCategories) && (

@@ -39,6 +39,15 @@ const initialState = {
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  // Función para refrescar los favoritos en la UI
+  const refreshFavorites = useCallback(() => {
+    // Emitir un evento global para que todos los componentes FavoriteButton se actualicen
+    window.dispatchEvent(new CustomEvent('refresh-favorites'));
+    
+    // Además, forzar actualización de la lista de favoritos si está visible
+    window.dispatchEvent(new CustomEvent('refresh-favorites-list'));
+  }, []);
+
   // Initialize auth state from token stored in localStorage
   useEffect(() => {
     const loadUserSession = async () => {
@@ -59,6 +68,10 @@ export const AuthProvider = ({ children }) => {
             });
 
             setupAxiosInterceptors(token);
+
+            // Cuando se carga la sesión, también refrescamos los favoritos
+            refreshFavorites();
+
           } else {
             // Token expired
             handleLogout();
@@ -73,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     loadUserSession();
-  }, []);
+  }, [refreshFavorites]);
 
   // Configure Axios interceptors for authentication
   const setupAxiosInterceptors = (token) => {
@@ -163,6 +176,9 @@ export const AuthProvider = ({ children }) => {
 
       setupAxiosInterceptors(token);
 
+      // Después de iniciar sesión exitosamente, refrescar favoritos
+      refreshFavorites();
+
       return { success: true };
     } catch (error) {
       console.error("Login error:", error);
@@ -219,6 +235,9 @@ export const AuthProvider = ({ children }) => {
 
     dispatch({ type: LOGOUT });
 
+    // Disparar evento para limpiar el estado de favoritos cuando el usuario cierra sesión
+    window.dispatchEvent(new CustomEvent('user-logged-out'));
+
     successToast("Sesión cerrada exitosamente");
   }, []);
 
@@ -239,6 +258,7 @@ export const AuthProvider = ({ children }) => {
     updateUserData,
     checkSessionStatus,
     hasRole,
+    refreshFavorites, // Exportamos la función para usarla desde otros componentes
   };
 
   return (

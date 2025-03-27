@@ -19,10 +19,55 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
   
   // Estado para forzar la actualización del DateRangePicker
   const [datePickerKey, setDatePickerKey] = useState(0);
+  // Estado para controlar si estamos en móvil
+  const [isMobile, setIsMobile] = useState(false);
 
   const searchRef = useRef(null);
   const suggestionsRef = useRef(null);
   const categoryDropdownRef = useRef(null);
+
+  // Comprueba si estamos en móvil al cargar y cuando cambia el tamaño
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
+
+  // Manejar el scroll y posición del body cuando se expande en móviles
+  useEffect(() => {
+    if (isMobile) {
+      if (isExpanded) {
+        // Guardar la posición actual de scroll
+        const scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+      } else {
+        // Restaurar el scroll cuando se colapsa
+        const scrollY = document.body.style.top;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+    
+    return () => {
+      // Asegurar que limpiamos estos estilos si el componente se desmonta
+      if (isMobile && isExpanded) {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+      }
+    };
+  }, [isExpanded, isMobile]);
 
   // Función debounced para obtener sugerencias de autocompletado
   const fetchSuggestions = useCallback(async (query) => {
@@ -83,6 +128,9 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
       category: selectedCategory
     });
     setShowSuggestions(false);
+    if (isMobile) {
+      setIsExpanded(false);
+    }
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -115,7 +163,150 @@ const SearchBar = ({ onSearch, categories, initialFilters = {} }) => {
     handleClear();
     setIsExpanded(false);
   };
+  
+  // Función para cerrar modal en móvil
+  const handleCloseExpanded = () => {
+    setIsExpanded(false);
+  };
 
+  // Renderizado condicional para móviles o desktop
+  if (isMobile && isExpanded) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 overflow-y-auto pt-4 pb-6 px-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-[#730f06]">Buscar</h2>
+          <button 
+            onClick={handleCloseExpanded}
+            className="p-2 text-[#730f06] hover:bg-[#F9F7F4] rounded-full"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+          {/* Campo de búsqueda */}
+          <div className="relative" ref={searchRef}>
+            <div className="flex items-center h-12 border border-[#b08562] rounded-lg">
+              <Search size={20} className="text-[#730f06] absolute left-3" />
+              <input
+                type="text"
+                placeholder="¿Qué estás buscando?"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="w-full h-full pl-10 pr-4 py-2 rounded-lg bg-transparent focus:outline-none"
+                autoFocus
+              />
+              {keyword && (
+                <button
+                  type="button"
+                  onClick={() => setKeyword('')}
+                  className="absolute right-3 text-gray-400 hover:text-[#730f06]"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            {/* Sugerencias desde la API */}
+            {showSuggestions && (
+              <div
+                ref={suggestionsRef}
+                className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 py-2"
+              >
+                {isLoading ? (
+                  <div className="px-4 py-2 text-gray-500">Cargando sugerencias...</div>
+                ) : suggestions.length > 0 ? (
+                  suggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 hover:bg-[#F9F7F4] cursor-pointer flex items-center"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      <span>{suggestion}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-4 py-2 text-gray-500">No se encontraron sugerencias</div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Selector de categoría */}
+          <div className="relative" ref={categoryDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              className="flex items-center justify-between h-12 w-full px-4 rounded-lg border border-gray-300 focus:outline-none hover:border-[#b08562] transition-colors"
+            >
+              <span className="truncate">
+                {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : 'Categoría'}
+              </span>
+              <ChevronDown size={16} className="ml-2" />
+            </button>
+
+            {showCategoryDropdown && (
+              <div className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-60 overflow-auto">
+                <div
+                  className="px-4 py-2 hover:bg-[#F9F7F4] cursor-pointer"
+                  onClick={() => handleCategorySelect(null)}
+                >
+                  Todas las categorías
+                </div>
+                {categories.map((category) => (
+                  <div
+                    key={category.id}
+                    className="px-4 py-2 hover:bg-[#F9F7F4] cursor-pointer"
+                    onClick={() => handleCategorySelect(category.id)}
+                  >
+                    {category.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Selector de fechas */}
+          <div className="w-full">
+            <DateRangePicker
+              key={datePickerKey}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleDateChange}
+              placeholder="Selecciona fechas"
+              popperClassName="z-50"
+              customInput={
+                <input
+                  className="w-full h-12 px-4 rounded-lg border border-gray-300 focus:outline-none hover:border-[#b08562] transition-colors"
+                />
+              }
+            />
+          </div>
+
+          {/* Botones de acción */}
+          <div className="flex items-center space-x-2 pt-2">
+            <button
+              type="button"
+              onClick={handleClear}
+              className="flex items-center justify-center h-12 px-4 py-0 text-[#730f06] bg-white border border-[#730f06] rounded-full hover:bg-[#F9F7F4] transition-colors flex-1"
+            >
+              <X size={16} className="mr-1" />
+              <span>Limpiar</span>
+            </button>
+            <button
+              type="submit"
+              className="flex items-center justify-center h-12 px-4 py-0 bg-gradient-to-r from-[#730f06] to-[#3e0b05] text-white rounded-full hover:opacity-90 transition-opacity flex-1"
+            >
+              <Search size={16} className="mr-2" />
+              <span>Buscar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  // Renderizado normal (desktop o móvil colapsado)
   return (
     <div className="w-full max-w-6xl mx-auto">
       <div
