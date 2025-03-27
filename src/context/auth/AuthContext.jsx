@@ -112,6 +112,11 @@ export const AuthProvider = ({ children }) => {
         if (error.response?.status === 401) {
           handleLogout();
         }
+        if (error.response?.status === 403) {
+          errorToast("Acceso denegado. Verifica tus permisos.");
+          console.error("Error 403:", error.response?.data);
+          console.log(error.response?.data);
+        }
         return Promise.reject(error);
       }
     );
@@ -132,6 +137,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await axios.post(`${API_URL}/users/login`, credentials);
+
       const { token, user: userData = {} } = response.data.response;
 
       // Decode token to get additional information
@@ -160,6 +166,7 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error("Login error:", error);
+      console.log("Error response:", error.response);
 
       const errorMessage =
         error.response?.data?.message || "Error al iniciar sesión";
@@ -168,7 +175,6 @@ export const AuthProvider = ({ children }) => {
         type: LOGIN_FAIL,
         payload: errorMessage,
       });
-
       return { success: false, error: errorMessage };
     }
   };

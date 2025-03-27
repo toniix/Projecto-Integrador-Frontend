@@ -64,18 +64,18 @@ const RegisterForm = () => {
       setIsResending(true);
       try {
         // API endpoint
-        const response = await axios.post(
-          `https://clavecompas-production.up.railway.app/clavecompas/users/resend-confirmation?email=${encodeURIComponent(registeredEmail)}`,
-          {},
-          { headers: { "Content-Type": "application/json" } }
-        );
-      
-        // Local development endpoint
         // const response = await axios.post(
-        //   `http://localhost:8080/clavecompas/users/resend-confirmation?email=${encodeURIComponent(registeredEmail)}`,
+        //   `https://clavecompas-production.up.railway.app/clavecompas/users/resend-confirmation?email=${encodeURIComponent(registeredEmail)}`,
         //   {},
         //   { headers: { "Content-Type": "application/json" } }
         // );
+      
+        // Local development endpoint
+        const response = await axios.post(
+          `http://localhost:8080/clavecompas/users/resend-confirmation?email=${encodeURIComponent(registeredEmail)}`,
+          {},
+          { headers: { "Content-Type": "application/json" } }
+        );
 
         successToast("Correo de confirmación reenviado exitosamente");
       } catch (error) {

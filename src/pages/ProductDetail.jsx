@@ -10,12 +10,19 @@ import { CircleArrowLeft } from "lucide-react";
 import ShareInstrument from "../components/share/ShareInstrument";
 import { Share, Calendar } from "lucide-react";
 import { productPolicies } from "../utils/instrumentPolicies";
+import StarRating from "../components/review/StarRating";
+import ReviewsList from "../components/review/ReviewList";
+import ReviewForm from "../components/review/ReviewForm";
+import { useAuth } from "../context/auth/AuthContext";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
+  const { isAuthenticated } = useAuth();
 
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -235,6 +242,7 @@ const ProductDetail = () => {
           `https://clavecompas-production.up.railway.app/clavecompas/products/${id}`
         );
         const apiProduct = response.data.response;
+        console.log("apiProduct", apiProduct);
         setProduct({
           ...apiProduct,
           features: apiProduct.features || getFallbackFeatures(apiProduct),
@@ -250,7 +258,6 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -265,6 +272,21 @@ const ProductDetail = () => {
   }
 
   if (!product) return <div>Loading...</div>;
+
+  // Función para obtener las estadísticas de las reseñas
+  const fetchReviewStats = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/clavecompas/reviews/stats/${id}`);
+      setReviewStats(response.data.response);
+    } catch (err) {
+      console.error('Error fetching review stats:', err);
+    }
+  };
+
+  // Función para volver a cargar las estadísticas de las reseñas una vez que se haya enviado una nueva reseña
+  const handleReviewSubmitted = () => {
+    fetchReviewStats();
+  };
 
   const productImages = product.imageUrls;
   const previewImages = productImages.slice(1, 5);
@@ -385,9 +407,53 @@ const ProductDetail = () => {
         </div>
       </div>
 
+      {/* Resumen de calificaciones */}
+      <div className="flex items-center mb-4">
+        <StarRating rating={reviewStats.averageRating} size="md" />
+        <span className="ml-2 text-gray-600">
+          ({reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'reseña' : 'reseñas'})
+        </span>
+      </div>
+
       <ProductFeatures features={product.features} />
       <ProductPolicies policies={product.policies} />
-      <AvailabilityCalendar productId={id} productStock={product.stock} />
+      <AvailabilityCalendar productId={id} productStock={product.stock} productPrice={product.price} />
+
+      {/* Rating distribution */}
+      {reviewStats.ratingDistribution && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-3">Distribución de calificaciones</h3>
+          <div className="space-y-2">
+            {[5, 4, 3, 2, 1].map(star => {
+              const count = reviewStats.ratingDistribution[star] || 0;
+              const percentage = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
+              return (
+                <div key={star} className="flex items-center">
+                  <div className="w-12 text-sm text-gray-600">{star} estrellas</div>
+                    <div className="w-full mx-2 h-4 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-yellow-400 rounded-full" 
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                  <div className="w-12 text-sm text-gray-600 text-right">{count}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+ 
+      {/* Review form */}
+      {isAuthenticated && (
+        <ReviewForm 
+          productId={id} 
+          onReviewSubmitted={handleReviewSubmitted} 
+        />
+      )}
+        
+      {/* Reviews list */}
+      <ReviewsList productId={id} />
 
       {/* Modal de galería */}
       {isGalleryOpen && (
