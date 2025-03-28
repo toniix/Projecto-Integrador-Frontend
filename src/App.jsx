@@ -12,10 +12,11 @@ import "./styles/Button.css";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import PrivateRoute from "./context/auth/privateRoute"; // Ensure this path is correct
+import PrivateRoute from "./context/auth/privateRoute"; 
 import NotFound from "./pages/NotFound"; // Nueva página NotFound
 import "react-datepicker/dist/react-datepicker.css"; // Para implementar la selección de rango de fechas requerida en la HU #22
 import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
+import { ReservationHistoryPage } from "./pages/reservations/ReservationHistoryPage"; // Nueva página ResrvationHistoryPage
 
 export const App = () => {
   return (
@@ -23,10 +24,12 @@ export const App = () => {
       <Router>
         <Header /> {/* El Header se muestra en todas las rutas */}
         <Routes>
-          <Route path="/" element={<Home />} />{" "}
+          <Route path="/" element={<Home />} />
           {/* Ruta principal para la Home */}
+
           <Route path="/product/:id" element={<ProductDetail />} />
           {/* <Route path="/register" element={<RegisterForm />} /> */}
+
           <Route
             path="/admin"
             element={
@@ -36,6 +39,7 @@ export const App = () => {
             }
           />{" "}
           {/* Nueva ruta de Admin */}
+
           <Route
             path="/profile"
             element={
@@ -45,6 +49,7 @@ export const App = () => {
             }
           />{" "}
           {/* Nueva ruta de Profile Favoritos*/}
+
           <Route
             path="/favorites"
             element={
@@ -54,8 +59,19 @@ export const App = () => {
             }
           />{" "}
           {/* Nueva ruta de Profile */}
-          <Route path="*" element={<NotFound />} />{" "}
+
+          <Route
+            path="/user/reservations"
+            element={
+              <PrivateRoute roles={["USER", "ADMIN"]}>
+                <ReservationHistoryPage />
+              </PrivateRoute>
+            }
+          /> {/* Ruta de Historial de Reservas */}
+          
+          <Route path="*" element={<NotFound />} />
           {/* Ruta para manejar páginas no encontradas */}
+          
         </Routes>
         <FooterWrapper />{" "}
         {/* Reemplazar el <Footer /> existente por <FooterWrapper /> */}

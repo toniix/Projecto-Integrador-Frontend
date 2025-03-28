@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-import { LogOut, Settings, ChevronDown, Heart } from "lucide-react";
+import { LogOut, Settings, ChevronDown, Heart, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function UserMenu({ user, onLogout }) {
@@ -94,6 +94,20 @@ function UserMenu({ user, onLogout }) {
                 className="mr-3 text-[#c78418] group-hover:text-[#e6b465] transition-colors"
               />
               Mi perfil
+            </Link>
+
+            {/* Nueva opción de Historial de Reservas */}
+            <Link
+              to="/user/reservations"
+              className="flex items-center px-3 py-2.5 rounded-lg text-sm text-[#e6b465] 
+                hover:bg-[#3d2130] transition-colors group"
+              onClick={() => setIsOpen(false)}
+            >
+              <ClipboardList
+                size={16}
+                className="mr-3 text-[#c78418] group-hover:text-[#e6b465] transition-colors"
+              />
+              Historial de reservas
             </Link>
 
             {user?.roles?.includes("ADMIN") && (
