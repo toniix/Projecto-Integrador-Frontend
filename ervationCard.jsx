@@ -1,0 +1,109 @@
+[33m31ae7e6[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/acceder-histrial[m[33m, [m[1;31morigin/dev[m[33m, [m[1;32mdev[m[33m)[m HEAD@{0}: checkout: moving from dev to feature/acceder-histrial
+[33m31ae7e6[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/acceder-histrial[m[33m, [m[1;31morigin/dev[m[33m, [m[1;32mdev[m[33m)[m HEAD@{1}: pull origin dev: Fast-forward
+[33m8288943[m HEAD@{2}: checkout: moving from fix/admin-panel to dev
+[33m8288943[m HEAD@{3}: checkout: moving from dev to fix/admin-panel
+[33m8288943[m HEAD@{4}: checkout: moving from fix/admin-panel to dev
+[33m8288943[m HEAD@{5}: checkout: moving from dev to fix/admin-panel
+[33m8288943[m HEAD@{6}: pull origin dev: Fast-forward
+[33m7fccdf8[m HEAD@{7}: checkout: moving from feature/favoritos-realtime-styles to dev
+[33mf345d5d[m[33m ([m[1;31morigin/feature/favoritos-realtime-styles[m[33m)[m HEAD@{8}: commit: fix: Sincroniza favoritos al iniciar/cerrar sesión sin refrescar
+[33mf624024[m HEAD@{9}: commit: fix: Actualizar favoritos en tiempo real HU25
+[33mecb3ceb[m[33m ([m[1;31morigin/feature/marcar-listar-favoritos-v2[m[33m, [m[1;31morigin/feature/marcar-listar-favoritos[m[33m)[m HEAD@{10}: checkout: moving from feature/marcar-listar-favoritos-v2 to feature/favoritos-realtime-styles
+[33mecb3ceb[m[33m ([m[1;31morigin/feature/marcar-listar-favoritos-v2[m[33m, [m[1;31morigin/feature/marcar-listar-favoritos[m[33m)[m HEAD@{11}: checkout: moving from dev to feature/marcar-listar-favoritos-v2
+[33m7fccdf8[m HEAD@{12}: checkout: moving from feature/marcar-listar-favoritos-v2 to dev
+[33mecb3ceb[m[33m ([m[1;31morigin/feature/marcar-listar-favoritos-v2[m[33m, [m[1;31morigin/feature/marcar-listar-favoritos[m[33m)[m HEAD@{13}: checkout: moving from dev to feature/marcar-listar-favoritos-v2
+[33m7fccdf8[m HEAD@{14}: checkout: moving from feature/marcar-listar-favoritos-v2 to dev
+[33mecb3ceb[m[33m ([m[1;31morigin/feature/marcar-listar-favoritos-v2[m[33m, [m[1;31morigin/feature/marcar-listar-favoritos[m[33m)[m HEAD@{15}: checkout: moving from feature/marcar-listar-favoritos to feature/marcar-listar-favoritos-v2
+[33mecb3ceb[m[33m ([m[1;31morigin/feature/marcar-listar-favoritos-v2[m[33m, [m[1;31morigin/feature/marcar-listar-favoritos[m[33m)[m HEAD@{16}: commit: Feat: implementación HU 24-25 (marcar-listar favoritos)
+[33mdc472ca[m HEAD@{17}: commit: fix: se soliciona llamada del precio en lista de favoritos
+[33m7c6bf19[m HEAD@{18}: commit: feat: implementación HU 24-25
+[33m688acf2[m HEAD@{19}: merge dev: Merge made by the 'ort' strategy.
+[33mb6f085b[m HEAD@{20}: checkout: moving from dev to feature/marcar-listar-favoritos
+[33m7fccdf8[m HEAD@{21}: pull origin dev: Fast-forward
+[33mb250a3c[m HEAD@{22}: reset: moving to HEAD~1
+[33mb6f085b[m HEAD@{23}: checkout: moving from feature/marcar-listar-favoritos to dev
+[33mb6f085b[m HEAD@{24}: checkout: moving from dev to feature/marcar-listar-favoritos
+[33mb6f085b[m HEAD@{25}: commit: prueba
+[33mb250a3c[m HEAD@{26}: pull origin dev: Fast-forward
+[33m17b20f9[m[33m ([m[1;31morigin/feature/hu-22-realizar-busqueda[m[33m)[m HEAD@{27}: checkout: moving from feature/hu-22-realizar-busqueda to dev
+[33m17b20f9[m[33m ([m[1;31morigin/feature/hu-22-realizar-busqueda[m[33m)[m HEAD@{28}: checkout: moving from dev to feature/hu-22-realizar-busqueda
+[33m17b20f9[m[33m ([m[1;31morigin/feature/hu-22-realizar-busqueda[m[33m)[m HEAD@{29}: merge feature/hu-22-realizar-busqueda: Fast-forward
+[33m20ddb5f[m HEAD@{30}: checkout: moving from feature/hu-22-realizar-busqueda to dev
+[33m17b20f9[m[33m ([m[1;31morigin/feature/hu-22-realizar-busqueda[m[33m)[m HEAD@{31}: commit (merge): fix: solucionar conflictos de merge en Header, Home y dependencias
+[33m9b03ffc[m HEAD@{32}: checkout: moving from dev to feature/hu-22-realizar-busqueda
+[33m20ddb5f[m HEAD@{33}: pull origin dev: Fast-forward
+[33mf77eef9[m HEAD@{34}: checkout: moving from feature/hu-22-realizar-busqueda to dev
+[33m9b03ffc[m HEAD@{35}: commit: fix: corregir limpieza del DateRangePicker sincronizando estado y forzando re-render
+[33m0a836bc[m HEAD@{36}: commit: fix: Mantener el diseño de la página principal: Al mostrar los resultados.
+[33m79dee3b[m HEAD@{37}: commit: feat: Implementa búsqueda, autocompletado y filtros por categoría
+[33m1b8444d[m HEAD@{38}: commit: feat: feat(frontend): implementar selección de rango de fechas en la búsqueda (HU 22)
+[33m145b72c[m HEAD@{39}: checkout: moving from dev to feature/hu-22-realizar-busqueda
+[33mf77eef9[m HEAD@{40}: checkout: moving from feature/hu-22-realizar-busqueda to dev
+[33m145b72c[m HEAD@{41}: commit: feat: primer diseño de HU 22 - propuesta inicial del buscador
+[33mf77eef9[m HEAD@{42}: checkout: moving from dev to feature/hu-22-realizar-busqueda
+[33mf77eef9[m HEAD@{43}: checkout: moving from feature/hu-22-realizar-busqueda to dev
+[33mf77eef9[m HEAD@{44}: merge dev: Fast-forward
+[33m23603eb[m HEAD@{45}: checkout: moving from dev to feature/hu-22-realizar-busqueda
+[33mf77eef9[m HEAD@{46}: pull origin dev: Fast-forward
+[33m23603eb[m HEAD@{47}: checkout: moving from feature/hu-22-realizar-busqueda to dev
+[33m23603eb[m HEAD@{48}: checkout: moving from dev to feature/hu-22-realizar-busqueda
+[33m23603eb[m HEAD@{49}: checkout: moving from main to dev
+[33mdb5835e[m[33m ([m[1;32mmain[m[33m)[m HEAD@{50}: checkout: moving from dev to main
+[33mb659906[m HEAD@{51}: commit (merge): Merge branch 'dev' of github.com:toniix/Projecto-Integrador-Frontend into dev
+[33md1ee29b[m HEAD@{52}: commit: integarcion HU 13 y 16
+[33m9c9819f[m HEAD@{53}: merge image-integration: Merge made by the 'ort' strategy.
+[33me75add6[m HEAD@{54}: commit: correcion importacion de img
+[33m637480d[m HEAD@{55}: pull origin dev: Fast-forward
+[33m58b8b20[m HEAD@{56}: checkout: moving from image-integration to dev
+[33m30d8cbc[m HEAD@{57}: commit: fix: solucion proplema de carga de imagenes
+[33m58b8b20[m HEAD@{58}: checkout: moving from dev to image-integration
+[33m58b8b20[m HEAD@{59}: checkout: moving from image-integration to dev
+[33m58b8b20[m HEAD@{60}: checkout: moving from dev to image-integration
+[33m58b8b20[m HEAD@{61}: pull origin dev: Fast-forward
+[33mbc5e2a6[m HEAD@{62}: checkout: moving from cat-gab to dev
+[33mebe6953[m HEAD@{63}: pull origin cat: Merge made by the 'ort' strategy.
+[33mbc5e2a6[m HEAD@{64}: checkout: moving from dev to cat-gab
+[33mbc5e2a6[m HEAD@{65}: checkout: moving from richard-integracion-h13 to dev
+[33m22059d7[m[33m ([m[1;31morigin/richard-integracion-h13[m[33m)[m HEAD@{66}: pull origin richard-integracion-h13: Fast-forward
+[33mbc5e2a6[m HEAD@{67}: checkout: moving from dev to richard-integracion-h13
+[33mbc5e2a6[m HEAD@{68}: checkout: moving from fix-user-register to dev
+[33mee932b4[m[33m ([m[1;31morigin/fix-user-register[m[33m)[m HEAD@{69}: commit: fix: solución problema registro
+[33mbc5e2a6[m HEAD@{70}: checkout: moving from gab to fix-user-register
+[33mbc5e2a6[m HEAD@{71}: checkout: moving from dev to gab
+[33mbc5e2a6[m HEAD@{72}: pull origin dev: Fast-forward
+[33m46995fd[m HEAD@{73}: checkout: moving from anthony to dev
+[33mb944148[m[33m ([m[1;31morigin/Anthony[m[33m)[m HEAD@{74}: checkout: moving from dev to anthony
+[33m46995fd[m HEAD@{75}: pull origin dev: Fast-forward
+[33m3fb4103[m HEAD@{76}: checkout: moving from anthony to dev
+[33mb944148[m[33m ([m[1;31morigin/Anthony[m[33m)[m HEAD@{77}: pull origin Anthony: Fast-forward
+[33m8c6369c[m[33m ([m[1;31morigin/claudia[m[33m)[m HEAD@{78}: checkout: moving from claudia to anthony
+[33m8c6369c[m[33m ([m[1;31morigin/claudia[m[33m)[m HEAD@{79}: commit (merge): merge btn eliminar y estilos de panel de administracion
+[33m3200d83[m HEAD@{80}: pull origin dev: Fast-forward
+[33m96bf697[m HEAD@{81}: checkout: moving from test_paginacion to claudia
+[33md9d88b1[m HEAD@{82}: commit: estilos del home y panel de administracion
+[33m96bf697[m HEAD@{83}: checkout: moving from claudia to test_paginacion
+[33m96bf697[m HEAD@{84}: checkout: moving from test_paginacion to claudia
+[33m96bf697[m HEAD@{85}: reset: moving to HEAD
+[33m96bf697[m HEAD@{86}: checkout: moving from claudia to test_paginacion
+[33m96bf697[m HEAD@{87}: commit: feat: modificación formulario agregar productos
+[33mfa29901[m HEAD@{88}: pull origin dev: Fast-forward
+[33m54691a6[m HEAD@{89}: checkout: moving from claudia to claudia
+[33m54691a6[m HEAD@{90}: commit: feat: error and success message
+[33m0ec4ae7[m HEAD@{91}: pull origin dev: Merge made by the 'ort' strategy.
+[33m2433110[m HEAD@{92}: commit: feat: Listar productos en el panel de administración
+[33mc4f6992[m HEAD@{93}: commit: feat:Desarrollo del panel de control (HU-9)
+[33mc722534[m HEAD@{94}: commit: feat: Se redefine el uso de la paleta de colres y mejoran algunos estilos, se soluciona la inconsistencia de las imagenes en la base de datos
+[33mf645b76[m HEAD@{95}: commit (merge): Merge de todas las ramas y se resuelven conflictos
+[33m553314f[m HEAD@{96}: checkout: moving from claudia_respaldo to claudia
+[33m553314f[m HEAD@{97}: checkout: moving from claudia to claudia_respaldo
+[33m553314f[m HEAD@{98}: commit: feat: Componente mensajes de error y exito
+[33m4fd7ff9[m HEAD@{99}: commit: feat:Funcionalidad listar categorias y guardar un instrumento en la BBDD
+[33m4dfba03[m HEAD@{100}: commit: feat: Se estructura formulario y se aplican estilos
+[33me0a6ba4[m HEAD@{101}: merge clau_test: Fast-forward
+[33m3fb4103[m HEAD@{102}: checkout: moving from clau_test to claudia
+[33me0a6ba4[m HEAD@{103}: commit: feat: Instrument registration form
+[33m3fb4103[m HEAD@{104}: checkout: moving from claudia to clau_test
+[33m3fb4103[m HEAD@{105}: checkout: moving from dev to claudia
+[33m3fb4103[m HEAD@{106}: commit: feat: Folder structure
+[33mdb5835e[m[33m ([m[1;32mmain[m[33m)[m HEAD@{107}: checkout: moving from main to dev
+[33mdb5835e[m[33m ([m[1;32mmain[m[33m)[m HEAD@{108}: clone: from github.com:toniix/Projecto-Integrador-Frontend.git
