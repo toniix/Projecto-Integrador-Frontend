@@ -12,7 +12,9 @@ const ReviewForm = ({ productId, onReviewSubmitted, hasCompletedReservation }) =
   const [success, setSuccess] = useState(false);
   const [existingReview, setExistingReview] = useState(null);
   const { user, token } = useAuth();
-  const REV_URL = 'http://localhost:8080/clavecompas/reviews';
+
+  const API_URL = import.meta.env.VITE_API_URL;
+  const REV_URL = API_URL + '/reviews';
 
   useEffect(() => {
     // Solo verificar si existe una reseña previa, no verificar elegibilidad

@@ -20,7 +20,7 @@ const ReviewManagement = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:8080/clavecompas/admin/reviews?page=${page}&size=${pageSize}`,
+        `${API_BASE_URL}/admin/reviews?page=${page}&size=${pageSize}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

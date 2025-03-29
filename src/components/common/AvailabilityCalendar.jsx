@@ -19,7 +19,7 @@ moment.locale('es', {
 });
 
 const API_URL = import.meta.env.VITE_API_URL;
-const RESERVATION_URL = "http://localhost:8080/clavecompas/reservations";
+const RESERVATION_URL = API_URL + "/reservations";
 
 const localizer = momentLocalizer(moment);
 

@@ -12,6 +12,9 @@ const ReviewsList = ({ productId }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const pageSize = 5;
   const cardsToShow = 5;
+
+  const API_URL = import.meta.env.VITE_API_URL;
+  const REV_URL = API_URL + '/reviews';
   
   const scrollContainerRef = useRef(null);
 
@@ -23,7 +26,7 @@ const ReviewsList = ({ productId }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:8080/clavecompas/reviews/product/${productId}`
+        `${REV_URL}/product/${productId}`
       );
       
       const { content, last } = response.data.response;

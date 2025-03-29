@@ -9,6 +9,9 @@ const UserReviews = () => {
   const [error, setError] = useState(null);
   const { user, token } = useAuth();
   
+  const API_URL = import.meta.env.VITE_API_URL;
+  const REV_URL = API_URL + '/reviews';
+
   useEffect(() => {
     const fetchUserReviews = async () => {
       if (!user || !token) return;
@@ -16,7 +19,7 @@ const UserReviews = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:8080/clavecompas/reviews/user/${user.id}`,
+          `${REV_URL}/user/${user.id}`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
