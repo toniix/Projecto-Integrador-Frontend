@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReviewCard from './ReviewCard';
 import axios from 'axios';
+import { errorToast } from '../../utils/toastNotifications';
 
 const ReviewsList = ({ productId }) => {
   const [reviews, setReviews] = useState([]);
@@ -8,7 +9,11 @@ const ReviewsList = ({ productId }) => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const pageSize = 5;
+  const cardsToShow = 5;
+  
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     fetchReviews();
@@ -18,7 +23,7 @@ const ReviewsList = ({ productId }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:8080/clavecompas/reviews/product/${productId}?page=${page}&size=${pageSize}&sortBy=reviewDate&sortDir=desc`
+        `http://localhost:8080/clavecompas/reviews/product/${productId}`
       );
       
       const { content, last } = response.data.response;
@@ -33,9 +38,9 @@ const ReviewsList = ({ productId }) => {
       setLoading(false);
     } catch (err) {
       setError('Error al cargar las reseñas');
+      errorToast('No se pudieron cargar las reseñas');
       setLoading(false);
       console.error('Error fetching reviews:', err);
-      console.log(err);
     }
   };
 
@@ -45,9 +50,26 @@ const ReviewsList = ({ productId }) => {
     }
   };
 
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < reviews.length - cardsToShow) {
+      setCurrentIndex(currentIndex + 1);
+    } else if (hasMore && !loading) {
+      loadMore();
+    }
+  };
+
   if (error) {
     return <div className="text-red-500 text-center my-4">{error}</div>;
   }
+
+  const visibleReviews = reviews.slice(currentIndex, currentIndex + cardsToShow);
+  const canGoNext = currentIndex < reviews.length - cardsToShow || hasMore;
 
   return (
     <div className="mt-6">
@@ -56,23 +78,46 @@ const ReviewsList = ({ productId }) => {
       {reviews.length === 0 && !loading ? (
         <p className="text-gray-500 italic">Este producto aún no tiene reseñas.</p>
       ) : (
-        <>
-          <div className="space-y-4">
-            {reviews.map(review => (
-              <ReviewCard key={review.idReview} review={review} />
-            ))}
-          </div>
-          
-          {hasMore && (
-            <button
-              onClick={loadMore}
-              disabled={loading}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+        <div className="relative">
+          {currentIndex > 0 && (
+            <button 
+              onClick={handlePrev}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-[#3B0012] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-[#5a0a1f]"
+              aria-label="Ver reseñas anteriores"
             >
-              {loading ? 'Cargando...' : 'Cargar más reseñas'}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
           )}
-        </>
+          
+          <div 
+            ref={scrollContainerRef}
+            className="flex overflow-hidden py-4 px-10"
+          >
+            {visibleReviews.map(review => (
+              <ReviewCard key={review.idReview} review={review} />
+            ))}
+            
+            {loading && visibleReviews.length < cardsToShow && (
+              <div className="flex items-center justify-center w-64 mx-2">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#3B0012]"></div>
+              </div>
+            )}
+          </div>
+          
+          {canGoNext && (
+            <button 
+              onClick={handleNext}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-[#3B0012] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-[#5a0a1f]"
+              aria-label="Ver más reseñas"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

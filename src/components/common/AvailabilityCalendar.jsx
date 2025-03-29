@@ -5,7 +5,9 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import "./AvailabilityCalendar.css";
 import axios from 'axios';
 import { errorToast, successToast } from '../../utils/toastNotifications';
-import LoginModal from '../login/LoginModal';
+import LoginModal from '../user/login/LoginModal';
+import { useAuth, isTokenValid, getToken } from '../../context/auth/AuthContext';
+import { id } from 'date-fns/locale';
 
 // Configurar localización en español
 moment.locale('es', {
@@ -56,7 +58,7 @@ const CustomToolbar = (toolbar) => {
   );
 };
 
-function AvailabilityCalendar({ productId, productStock, productPrice, onDateRangeSelect, userId }) {
+function AvailabilityCalendar({ productId, productStock, productPrice, onDateRangeSelect }) {
   const [reservations, setReservations] = useState([]);
   const [availabilityMap, setAvailabilityMap] = useState({});
   const [loading, setLoading] = useState(true);
@@ -65,6 +67,11 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
+
+  // Verificar si el usuario está autenticado
+  const { getUserId } = useAuth();
+  const isUserAuthenticated = isTokenValid();
+  const userId = getUserId();
   
   // Estados para las fechas de los calendarios
   const [currentDate, setCurrentDate] = useState(() => {
@@ -123,62 +130,80 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
     setNextMonthDate(newNextMonthDate);
   };
 
-  // Función para crear una reserva
-  const createReservation = async () => {
-    if (!startDate || !endDate || !productId || !userId) {
-      errorToast('Faltan datos necesarios para realizar la reserva');
-      return;
-    }
+// Función para crear una reserva
+const createReservation = async () => {
+  if (!startDate || !endDate || !productId) {
+    errorToast('Faltan datos necesarios para realizar la reserva');
+    return;
+  }
 
-    try {
-      setIsReserving(true);
+  if (!isUserAuthenticated) {
+    openLoginModal();
+    return;
+  }
+
+  try {
+    setIsReserving(true);
+    
+    // Formatear las fechas como YYYY-MM-DD
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+    
+    // Obtener el token de autenticación
+    const token = getToken();
+    console.log('Token:', token);
+    
+    // Realizar la petición POST al backend con el formato requerido
+    const response = await axios.post(`${RESERVATION_URL}`, {
+      idProduct: parseInt(productId),
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
+      quantity: parseInt(quantityToReserve),
+      status: 'PENDING',
+      idUser: userId,
+      productId: parseInt(productId),
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true
+    });
+    
+    // Verificar la respuesta
+    if (response.data && response.status === 200) {
+      successToast('¡Reserva realizada con éxito!');
       
-      // Crear el objeto de reserva según el formato esperado por el backend
-      const reservationDTO = {
-        startDate: moment(startDate).format('YYYY-MM-DD'),
-        endDate: moment(endDate).format('YYYY-MM-DD'),
-        quantity: quantityToReserve,
-        productId: productId,
-        userId: userId
-      };
-      
-      // Realizar la petición POST al backend
-      const response = await axios.post(RESERVATION_URL, reservationDTO);
-      
-      // Verificar la respuesta
-      if (response.data && response.data.statusCode === 200) {
-        successToast('¡Reserva realizada con éxito!');
-        
-        // Notificar al componente padre
-        if (onDateRangeSelect) {
-          onDateRangeSelect({
-            startDate: startDate,
-            endDate: endDate,
-            quantity: quantityToReserve,
-            subtotal: calculateSubtotal(),
-            reservationId: response.data.response?.id || null
-          });
-        }
-        
-        // Actualizar el calendario y reiniciar la selección
-        fetchReservations();
-        resetSelection();
-      } else {
-        throw new Error('La respuesta del servidor no tiene el formato esperado');
+      // Notificar al componente padre
+      if (onDateRangeSelect) {
+        onDateRangeSelect({
+          startDate: startDate,
+          endDate: endDate,
+          quantity: quantityToReserve,
+          subtotal: calculateSubtotal(),
+          reservationId: response.data.id || null
+        });
       }
-    } catch (error) {
-      console.error("Error al crear la reserva:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
-      errorToast(`Error al crear la reserva: ${errorMessage}`);
-    } finally {
-      setIsReserving(false);
+      
+      // Actualizar el calendario y reiniciar la selección
+      fetchReservations();
+      resetSelection();
+    } else {
+      throw new Error('La respuesta del servidor no tiene el formato esperado');
     }
-  };
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
+    errorToast(`Error al crear la reserva: ${errorMessage}`);
+  } finally {
+    setIsReserving(false);
+  }
+};
 
   const fetchReservations = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/reservations/product/${productId}`);
+      const response = await axios.get(`${RESERVATION_URL}/product/${productId}`);
       
       // Verificar la estructura de la respuesta y proporcionar valores por defecto
       const responseData = response.data || {};
@@ -449,9 +474,9 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
 
   // Verificar si hay alguna selección activa
   const hasSelection = startDate !== null;
-  
-  // Verificar si el usuario está autenticado (si tenemos userId)
-  const isUserAuthenticated = !!userId;
+
+  // Añadir un log para depuración
+  console.log("Estado de autenticación:", { isUserAuthenticated, userId });
 
   return (
     <div className="my-3 md:my-5">
@@ -584,13 +609,14 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
           disabled={!hasSelection}
           className={`px-4 py-2 rounded-md ${
             hasSelection 
-              ? 'bg-red-500 hover:bg-red-600 text-white' 
+
+              ? 'bg-[#3D2130] text-[#ffffff] hover:bg-[#604152]' 
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
           Reiniciar selección
-        </button>
-      </div>
+
+        </button>      </div>
       
       {/* Resumen de la selección */}
       {startDate && endDate && (
@@ -609,7 +635,7 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
                 <p className="text-amber-700 mb-2">Debe iniciar sesión para realizar una reserva</p>
                 <button 
                   onClick={openLoginModal}
-                  className="px-6 py-2 bg-[#b08562] hover:bg-[#8c6a4e] text-white font-medium rounded-md transition-colors duration-300 shadow-md inline-block"
+                  className="px-6 py-2 bg-[#7a0715]/90 text-[#ffffff] rounded-xl hover:bg-[#604152] shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5"
                 >
                   Iniciar Sesión
                 </button>
@@ -621,8 +647,8 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
                 className={`px-6 py-2 ${
                   isReserving 
                     ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-[#b08562] hover:bg-[#8c6a4e]'
-                } text-white font-medium rounded-md transition-colors duration-300 shadow-md flex items-center`}
+                    : 'bg-[#7a0715]/90 hover:bg-[#604152]'
+                } text-[#ffffff] rounded-xl shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 flex items-center`}
               >
                 {isReserving ? (
                   <>
@@ -635,8 +661,7 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
                 ) : (
                   'Reservar'
                 )}
-              </button>
-            )}
+              </button>            )}
           </div>
         </div>
       )}

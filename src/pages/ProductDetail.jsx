@@ -13,8 +13,11 @@ import { productPolicies } from "../utils/instrumentPolicies";
 import StarRating from "../components/review/StarRating";
 import ReviewsList from "../components/review/ReviewList";
 import ReviewForm from "../components/review/ReviewForm";
-import { useAuth } from "../context/auth/AuthContext";
+import { useAuth, isTokenValid } from "../context/auth/AuthContext";
+import { errorToast } from "../utils/toastNotifications";
 const API_URL = import.meta.env.VITE_API_URL;
+const REV_URL = 'http://localhost:8080/clavecompas/reviews';
+const RESERVATION_URL = "http://localhost:8080/clavecompas/reservations";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -23,7 +26,8 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
-  const { isAuthenticated } = useAuth();
+  const isUserAuthenticated = isTokenValid();
+  const [hasCompletedReservation, setHasCompletedReservation] = useState(false);
 
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -236,6 +240,36 @@ const ProductDetail = () => {
     }
   };
 
+  // Función para verificar si el usuario tiene reservas completadas para este producto
+  const checkUserCompletedReservations = async () => {
+    if (!isUserAuthenticated) return;
+
+    try {
+      const response = await axios.get(`${RESERVATION_URL}/user/completed`, {
+        params: { productId: id },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const completedReservations = response.data.response;
+      setHasCompletedReservation(completedReservations && completedReservations.length > 0);
+    } catch (error) {
+      console.error("Error al verificar reservas completadas:", error);
+      errorToast("No se pudieron verificar tus reservas anteriores");
+    }
+  };
+
+  // Función para obtener las estadísticas de las reseñas
+  const fetchReviewStats = async () => {
+    try {
+      const response = await axios.get(`${REV_URL}/stats/${id}`);
+      setReviewStats(response.data.response);
+    } catch (err) {
+      console.error('Error fetching review stats:', err);
+    }
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -255,7 +289,13 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [id]);
+    fetchReviewStats();
+
+    // Verificar reservas completadas si el usuario está autenticado
+    if (isUserAuthenticated) {
+      checkUserCompletedReservations();
+    }
+  }, [id, isUserAuthenticated]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -271,16 +311,6 @@ const ProductDetail = () => {
   }
 
   if (!product) return <div>Loading...</div>;
-
-  // Función para obtener las estadísticas de las reseñas
-  const fetchReviewStats = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8080/clavecompas/reviews/stats/${id}`);
-      setReviewStats(response.data.response);
-    } catch (err) {
-      console.error('Error fetching review stats:', err);
-    }
-  };
 
   // Función para volver a cargar las estadísticas de las reseñas una vez que se haya enviado una nueva reseña
   const handleReviewSubmitted = () => {
@@ -312,7 +342,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 min-h-screen pt-28 relative">
+    <div className="max-w-6xl mx-auto p-6 min-h-screen pt-28 mt-4 relative">
       {/* Header Container */}
       <div className="w-full bg-white mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -322,12 +352,18 @@ const ProductDetail = () => {
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-[#ffffff0a] transition-colors text-[#730f06] hover:text-[#b08562]"
             >
-              <CircleArrowLeft size={28} className="sm:w-8 sm:h-8" />
+              <CircleArrowLeft size={28} className="sm:w-12 sm:h-12" />
             </button>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-[#2a0803] leading-tight">
-              {product.name}
-            </h1>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-[#2a0803] leading-tight">
+                {product.name}
+              </h1>
+              <div className="flex items-center mt-1">
+                <StarRating rating={reviewStats.averageRating} size="xs" />
+              </div>
+            </div>
           </div>
+
 
           {/* Botones de acción */}
           <div className="flex items-center gap-3">
@@ -400,57 +436,73 @@ const ProductDetail = () => {
 
         <div className="flex-col justify-items-end my-4 ml-6">
           <p className="text-5xl text-[#C78418] mt-2">${product.price}</p>
-          <p className="text-xs text-gray-600 whitespace-nowrap mt-2">
+          <p className="text-xs font-semibold text-gray-600 whitespace-nowrap mt-2">
+            Precio diario por una unidad
+          </p>
+          <p className="text-xs text-gray-600 whitespace-nowrap">
             Unidades disponibles: {product.stock}
           </p>
         </div>
       </div>
 
-      {/* Resumen de calificaciones */}
-      <div className="flex items-center mb-4">
+      <ProductFeatures features={product.features} />
+      <ProductPolicies policies={product.policies} />
+      <AvailabilityCalendar
+        productId={id}
+        productStock={product.stock}
+        productPrice={product.price}
+      />
+
+      {/* Review form section */}
+      {isUserAuthenticated && (
+        <div className="mb-8">
+          <ReviewForm
+            productId={id}
+            onReviewSubmitted={handleReviewSubmitted}
+            hasCompletedReservation={hasCompletedReservation}
+          />
+        </div>
+      )}
+
+{/* Rating distribution */}
+{reviewStats.ratingDistribution && (
+  <div className="mb-8 mt-8">
+    <div className="flex justify-between items-center mb-4">
+      <p className="text-2xl">Puntuación de Clientes</p>
+      <div className="flex items-center">
         <StarRating rating={reviewStats.averageRating} size="md" />
         <span className="ml-2 text-gray-600">
           ({reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? 'reseña' : 'reseñas'})
         </span>
       </div>
-
-      <ProductFeatures features={product.features} />
-      <ProductPolicies policies={product.policies} />
-      <AvailabilityCalendar productId={id} productStock={product.stock} productPrice={product.price} />
-
-      {/* Rating distribution */}
-      {reviewStats.ratingDistribution && (
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-3">Distribución de calificaciones</h3>
-          <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map(star => {
-              const count = reviewStats.ratingDistribution[star] || 0;
-              const percentage = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
-              return (
-                <div key={star} className="flex items-center">
-                  <div className="w-12 text-sm text-gray-600">{star} estrellas</div>
-                    <div className="w-full mx-2 h-4 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-yellow-400 rounded-full" 
-                        style={{ width: `${percentage}%` }}
-                      ></div>
-                    </div>
-                  <div className="w-12 text-sm text-gray-600 text-right">{count}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
- 
-      {/* Review form */}
-      {isAuthenticated && (
-        <ReviewForm 
-          productId={id} 
-          onReviewSubmitted={handleReviewSubmitted} 
-        />
-      )}
+    </div>
+    <div className="space-y-2">
+      {[5, 4, 3, 2, 1].map(star => {
+        const count = reviewStats.ratingDistribution[star] || 0;
+        const percentage = reviewStats.totalReviews > 0 ? (count / reviewStats.totalReviews) * 100 : 0;
         
+        // Crear la representación visual de estrellas
+        const stars = '★'.repeat(star) + '☆'.repeat(5 - star);
+        
+        return (
+          <div key={star} className="flex items-center">
+            <div className="w-20 text-sm text-[#C78418] font-bold">
+              {stars}
+            </div>
+            <div className="w-full mx-2 h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#C78418] rounded-full"
+                style={{ width: `${percentage}%` }}
+              ></div>
+            </div>
+            <div className="w-12 text-sm text-gray-600 text-right">{count}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
       {/* Reviews list */}
       <ReviewsList productId={id} />
 

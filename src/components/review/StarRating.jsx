@@ -26,7 +26,7 @@ const StarRating = ({ rating, totalStars = 5, size = 'md', interactive = false, 
       stars.push(
         <FaStar 
           key={`star-${i}`} 
-          className={`text-yellow-400 ${sizeClass} ${interactive ? 'cursor-pointer' : ''}`} 
+          className={`text-[#C78418] ${sizeClass} ${interactive ? 'cursor-pointer' : ''}`} 
           onClick={() => handleClick(i)}
         />
       );
@@ -37,7 +37,7 @@ const StarRating = ({ rating, totalStars = 5, size = 'md', interactive = false, 
       stars.push(
         <FaStarHalfAlt 
           key="half-star" 
-          className={`text-yellow-400 ${sizeClass}`} 
+          className={`text-[#C78418] ${sizeClass}`} 
         />
       );
     }
@@ -51,7 +51,7 @@ const StarRating = ({ rating, totalStars = 5, size = 'md', interactive = false, 
       stars.push(
         <FaRegStar 
           key={`empty-star-${i}`} 
-          className={`text-yellow-400 ${sizeClass} ${interactive ? 'cursor-pointer' : ''}`} 
+          className={`text-[#C78418] ${sizeClass} ${interactive ? 'cursor-pointer' : ''}`} 
           onClick={() => handleClick(fullStars + i)}
         />
       );

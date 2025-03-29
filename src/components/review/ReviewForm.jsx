@@ -1,61 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 import axios from 'axios';
-// import { useAuth } from "../context/auth/AuthContext";
 import { useAuth } from '../../context/auth/AuthContext';
+import { successToast, errorToast } from '../../utils/toastNotifications';
 
-const ReviewForm = ({ productId, onReviewSubmitted }) => {
+const ReviewForm = ({ productId, onReviewSubmitted, hasCompletedReservation }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [canReview, setCanReview] = useState(false);
   const [existingReview, setExistingReview] = useState(null);
   const { user, token } = useAuth();
+  const REV_URL = 'http://localhost:8080/clavecompas/reviews';
 
   useEffect(() => {
-    // Check if user can review this product (has completed a reservation)
-    const checkReviewEligibility = async () => {
-      if (!user || !token) return;
+    // Solo verificar si existe una reseña previa, no verificar elegibilidad
+    const checkExistingReview = async () => {
       
       try {
-        // First check if user already has a review for this product
+        console.log(`Checking for existing review: User ${user.id}, Product ${productId}`);
+        
+        // Check if user already has a review for this product
         const reviewResponse = await axios.get(
-          `http://localhost:8080/clavecompas/reviews/user/${user.id}/product/${productId}`,
+          `${REV_URL}/user/${user.id}/product/${productId}`,
           {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           }
         );
         
         if (reviewResponse.data.response) {
+          console.log('Existing review found:', reviewResponse.data.response);
           setExistingReview(reviewResponse.data.response);
           setRating(reviewResponse.data.response.rating);
           setComment(reviewResponse.data.response.comment || '');
-          setCanReview(true);
-          return;
+        } else {
+          console.log('No existing review found');
+          setExistingReview(null);
         }
-        
-        // If no existing review, check if user has completed reservations for this product
-        // This endpoint would need to be implemented in your backend
-        const response = await axios.get(
-          `http://localhost:8080/clavecompas/reservations/user/completed?productId=${productId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-        
-        setCanReview(response.data.response && response.data.response.length > 0);
       } catch (err) {
         // If 404, it means no review exists yet, which is fine
-        if (err.response && err.response.status !== 404) {
-          console.error('Error checking review eligibility:', err);
+        if (err.response && err.response.status === 404) {
+          console.log('No review exists (404 response)');
+          setExistingReview(null);
+        } else {
+          console.error('Error checking existing review:', err);
+          errorToast('Error al verificar si ya tienes una reseña');
         }
       }
     };
     
-    checkReviewEligibility();
-  }, [productId, user, token]);
+    checkExistingReview();
+  }, [productId, onReviewSubmitted]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,25 +72,33 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
         reviewDate: new Date().toISOString()
       };
       
+      // Log para depuración
+      console.log('Submitting review:', { 
+        isUpdate: !!existingReview, 
+        reviewData 
+      });
+      
       // If we have an existing review, update it
       if (existingReview) {
         reviewData.idReview = existingReview.idReview;
         await axios.put(
-          `${API_BASE_URL}/reviews`,
+          `${REV_URL}`,
           reviewData,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
         );
+        successToast('Reseña actualizada con éxito');
       } else {
         // Otherwise create a new review
         await axios.post(
-          `${API_BASE_URL}/reviews`,
+          `${REV_URL}`,
           reviewData,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
         );
+        successToast('Reseña enviada con éxito');
       }
       
       setSuccess(true);
@@ -111,7 +115,9 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
         setComment('');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al enviar la reseña');
+      const errorMessage = err.response?.data?.message || 'Error al enviar la reseña';
+      setError(errorMessage);
+      errorToast(errorMessage);
       console.error('Error submitting review:', err);
     } finally {
       setLoading(false);
@@ -126,19 +132,25 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
     );
   }
 
-  if (!canReview) {
+  if (!hasCompletedReservation) {
     return (
       <div className="bg-gray-50 p-4 rounded-lg text-center">
-        <p className="text-gray-600">Solo los usuarios que han completado una reserva pueden dejar una reseña</p>
+        <p className="text-gray-600">Para dejar una reseña, primero debes haber completado una reserva de este instrumento.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h3 className="text-xl font-semibold mb-4">
+    <div className="bg-white rounded-lg mb-6">
+      <p className="text-2xl mb-4">
         {existingReview ? 'Actualizar tu reseña' : 'Deja tu reseña'}
-      </h3>
+      </p>
+      
+      <p className="text-gray-600 mb-4">
+        {existingReview 
+          ? 'Puedes modificar tu reseña anterior sobre este instrumento.' 
+          : 'Ya que has utilizado este instrumento, nos encantaría conocer tu experiencia.'}
+      </p>
       
       {success && (
         <div className="bg-green-100 text-green-700 p-3 rounded mb-4">
@@ -180,7 +192,7 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-blue-300"
+          className="px-4 py-2 bg-[#7a0715]/90 text-[#ffffff] rounded-xl hover:bg-[#604152] shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5"
         >
           {loading ? 'Enviando...' : existingReview ? 'Actualizar reseña' : 'Enviar reseña'}
         </button>

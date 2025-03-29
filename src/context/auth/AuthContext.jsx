@@ -17,7 +17,7 @@ import {
   AUTH_ERROR,
   UPDATE_USER,
 } from "./authActions";
-import { successToast } from "../../utils/toastNotifications";
+import { successToast, errorToast } from "../../utils/toastNotifications";
 import axios from "axios";
 
 /**
@@ -34,6 +34,35 @@ const initialState = {
   isAuthenticated: false,
   loading: true,
   error: null,
+};
+
+// Funciones de utilidad para manejar tokens y autenticación
+export const getToken = () => localStorage.getItem("token");
+
+export const isTokenValid = () => {
+  const token = getToken();
+  if (!token) return false;
+  
+  try {
+    const decodedToken = jwtDecode(token);
+    return decodedToken.exp * 1000 > Date.now();
+  } catch (error) {
+    console.error("Error validando token:", error);
+    return false;
+  }
+};
+
+export const getUserFromToken = () => {
+  const token = getToken();
+  if (!token) return null;
+  
+  try {
+    const userData = localStorage.getItem("userData");
+    return userData ? JSON.parse(userData) : null;
+  } catch (error) {
+    console.error("Error obteniendo datos del usuario:", error);
+    return null;
+  }
 };
 
 export const AuthProvider = ({ children }) => {
@@ -136,7 +165,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login user
-  // Inside your login function in AuthContext.jsx
   const login = async (credentials) => {
     dispatch({ type: AUTH_LOADING });
     console.log(credentials);
@@ -211,21 +239,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check session status (can be called periodically)
   const checkSessionStatus = useCallback(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        if (decodedToken.exp * 1000 <= Date.now()) {
-          handleLogout();
-          return false;
-        }
-        return true;
-      } catch (error) {
-        handleLogout();
-        return false;
-      }
-    }
-    return false;
+    return isTokenValid();
   }, []);
 
   // Logout user
@@ -241,10 +255,14 @@ export const AuthProvider = ({ children }) => {
     successToast("Sesión cerrada exitosamente");
   }, []);
 
-  console.log(state.user);
   // Check if user has a specific role
   const hasRole = (role) => {
     return state.user?.roles?.includes(role);
+  };
+
+  // Get current user ID
+  const getUserId = () => {
+    return state.user?.id || null;
   };
 
   // Context value
@@ -258,7 +276,8 @@ export const AuthProvider = ({ children }) => {
     updateUserData,
     checkSessionStatus,
     hasRole,
-    refreshFavorites, // Exportamos la función para usarla desde otros componentes
+    getUserId,
+    refreshFavorites,
   };
 
   return (
