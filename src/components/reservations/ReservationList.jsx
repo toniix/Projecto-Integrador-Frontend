@@ -6,7 +6,7 @@ const ReservationList = ({ reservations }) => {
     if (!reservations || reservations.length === 0) {
         return null;
     }
-
+    
     return (
         <div className="space-y-2">
             {reservations.map((reservation) => (
@@ -24,7 +24,8 @@ ReservationList.propTypes = {
         PropTypes.shape({
             id: PropTypes.number.isRequired,
             productName: PropTypes.string.isRequired,
-            productImage: PropTypes.string.isRequired,
+            productImage: PropTypes.string,
+            productImageURL: PropTypes.string,
             startDate: PropTypes.string.isRequired,
             endDate: PropTypes.string.isRequired,
             status: PropTypes.string.isRequired,
