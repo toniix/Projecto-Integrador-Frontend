@@ -1,17 +1,21 @@
 import PropTypes from "prop-types";
 import { X } from "lucide-react";
-import { useInstrumentForm } from "./useInstrumentForm";
+import { useInstrumentForm } from "../../../hooks/useInstrumentForm";
 import FormFields from "./FormFields";
 import ImageUploader from "./ImageUploader";
 import "../../../styles/Modal.css";
 
 /**
  * InstrumentForm component - Handles creation and editing of instruments
- * 
+ *
  * Single Responsibility: Manages the overall form UI structure and orchestrates
  * the form submission process
  */
-export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => {
+export const InstrumentForm = ({
+  isOpen,
+  onClose,
+  instrumentToEdit = null,
+}) => {
   const {
     formData,
     categories,
@@ -22,7 +26,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
     handleImageUpload,
     removeImage,
     resetForm,
-    handleClose
+    handleClose,
   } = useInstrumentForm({ isOpen, onClose, instrumentToEdit });
 
   if (!isOpen) return null;
@@ -33,7 +37,9 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-[#b08562] to-[#d9c6b0] p-4 rounded-t-xl flex justify-between items-center border-b border-[#d9c6b0] z-10">
           <h2 className="text-[#3e0b05] text-xl font-bold">
-            {isEditMode ? "Editar Categoría del Instrumento" : "Registrar Instrumento"}
+            {isEditMode
+              ? "Editar Categoría del Instrumento"
+              : "Registrar Instrumento"}
           </h2>
           <button
             onClick={handleClose}
@@ -49,7 +55,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
           onSubmit={handleSubmit}
         >
           <div className="bg-[#F9F7F4] p-5 rounded-xl">
-            <FormFields 
+            <FormFields
               formData={formData}
               categories={categories}
               isEditMode={isEditMode}
@@ -58,7 +64,7 @@ export const InstrumentForm = ({ isOpen, onClose, instrumentToEdit = null }) => 
           </div>
 
           <div className="bg-[#F9F7F4] p-5 rounded-xl">
-            <ImageUploader 
+            <ImageUploader
               isEditMode={isEditMode}
               imagePreviews={imagePreviews}
               removeImage={removeImage}

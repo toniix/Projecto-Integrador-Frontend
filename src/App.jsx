@@ -16,6 +16,7 @@ import PrivateRoute from "./context/auth/privateRoute"; // Ensure this path is c
 import NotFound from "./pages/NotFound"; // Nueva página NotFound
 import "react-datepicker/dist/react-datepicker.css"; // Para implementar la selección de rango de fechas requerida en la HU #22
 import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
+import ReservationDetails from "./components/reservation/ReservationDetails";
 
 export const App = () => {
   return (
@@ -26,7 +27,12 @@ export const App = () => {
           <Route path="/" element={<Home />} />{" "}
           {/* Ruta principal para la Home */}
           <Route path="/product/:id" element={<ProductDetail />} />
-          {/* <Route path="/register" element={<RegisterForm />} /> */}
+          {/* Ruta para el detalle del producto */}
+          <Route
+            path="/product/:id/reservation"
+            element={<ReservationDetails />}
+          />
+          {/* Ruta para la página de reserva del producto */}
           <Route
             path="/admin"
             element={

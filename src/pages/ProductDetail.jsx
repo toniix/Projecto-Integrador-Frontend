@@ -10,6 +10,8 @@ import { CircleArrowLeft } from "lucide-react";
 import ShareInstrument from "../components/share/ShareInstrument";
 import { Share, Calendar } from "lucide-react";
 import { productPolicies } from "../utils/instrumentPolicies";
+import ReservationDetails from "../components/reservation/ReservationDetails";
+import WhatsAppChatButton from "../components/common/WhatsAppChatButton";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ProductDetail = () => {
@@ -22,6 +24,7 @@ const ProductDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
   // Función para abrir el modal
   const openShareModal = () => {
@@ -321,6 +324,8 @@ const ProductDetail = () => {
             </button>
 
             <button
+              // onClick={() => navigate(`/product/${id}/reservation`)}
+              onClick={() => setIsReservationModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl
                 bg-gradient-to-r from-[#730f06] to-[#b08562] text-white text-sm sm:text-base font-medium
                 hover:from-[#8b1208] hover:to-[#c49573]
@@ -421,6 +426,21 @@ const ProductDetail = () => {
       {isModalOpen && (
         <ShareInstrument product={product} closeModal={closeShareModal} />
       )}
+
+      {/* Modal de reserva */}
+      {isReservationModalOpen && (
+        <ReservationDetails
+          // product={product}
+          isOpen={isReservationModalOpen}
+          onClose={() => setIsReservationModalOpen(false)}
+        />
+      )}
+
+      {/* WhatsApp Chat Button */}
+      <WhatsAppChatButton
+        phoneNumber="1234567890"
+        prefilledMessage="Hola, me gustaría obtener más información sobre la reserva de instrumentos."
+      />
     </div>
   );
 };

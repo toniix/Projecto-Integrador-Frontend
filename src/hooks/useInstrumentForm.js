@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { useInstrumentContext } from "../../../context";
-import instrumentService from "../../../services/instrumentService";
-import cloudinaryService from "../../../services/images/cloudinaryService";
-import { successToast, errorToast } from "../../../utils/toastNotifications";
+import { useInstrumentContext } from "../context";
+import instrumentService from "../services/instrumentService";
+import cloudinaryService from "../services/images/cloudinaryService";
+import { successToast, errorToast } from "../utils/toastNotifications";
 
 /**
  * Custom hook to manage instrument form state and logic
- * 
+ *
  * Follows Single Responsibility Principle: Handles only form state management
  * and form submission logic, separate from UI rendering
  */
@@ -29,7 +29,7 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
   });
 
   const [categories, setCategories] = useState([]);
-  
+
   // Image state
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -67,7 +67,10 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
     const fetchCategories = async () => {
       try {
         const data = await instrumentService.getCategories();
-        if (data?.response?.categories && Array.isArray(data.response.categories)) {
+        if (
+          data?.response?.categories &&
+          Array.isArray(data.response.categories)
+        ) {
           setCategories(data.response.categories);
         } else {
           console.error("La API no devolvió un array:", data);
@@ -136,7 +139,7 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
         idCategory: "",
         imageUrls: [],
       });
-      
+
       setImageFiles([]);
       setImagePreviews([]);
       setExistingImages([]);
@@ -185,14 +188,14 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
     if (isEditMode) return;
 
     const isExistingImage = index < existingImages.length;
-    
+
     if (isExistingImage) {
       const imageUrl = existingImages[index];
       setExistingImages((prev) => prev.filter((_, i) => i !== index));
       setImagePreviews((prev) => prev.filter((url) => url !== imageUrl));
     } else {
       const newIndex = index - existingImages.length;
-      
+
       if (imagePreviews[index] && imagePreviews[index].startsWith("blob:")) {
         URL.revokeObjectURL(imagePreviews[index]);
       }
@@ -220,15 +223,17 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
         // In edit mode, only send ID and category
         const categoryUpdateData = {
           id: formData.id,
-          idCategory: formData.idCategory
+          idCategory: formData.idCategory,
         };
-        
-        const updatedInstrument = await instrumentService.updateInstrument(categoryUpdateData);
-        
+
+        const updatedInstrument = await instrumentService.updateInstrument(
+          categoryUpdateData
+        );
+
         if (updateInstrument) {
           updateInstrument(updatedInstrument);
         }
-        
+
         successToast("Categoría del instrumento actualizada con éxito.");
       } else {
         // Verify images in creation mode
@@ -251,10 +256,10 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
         if (addInstrument) {
           addInstrument(newInstrument);
         }
-        
+
         successToast("Instrumento agregado con éxito.");
       }
-      
+
       handleClose();
     } catch (error) {
       console.error("Error completo:", error);
@@ -266,7 +271,12 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
       } else if (error.response?.status === 500) {
         errorToast("Error en el servidor. Inténtalo más tarde.");
       } else {
-        errorToast(error.message || `Error al ${isEditMode ? 'actualizar la categoría' : 'crear'} el instrumento.`);
+        errorToast(
+          error.message ||
+            `Error al ${
+              isEditMode ? "actualizar la categoría" : "crear"
+            } el instrumento.`
+        );
       }
     }
   };
@@ -281,6 +291,6 @@ export const useInstrumentForm = ({ isOpen, onClose, instrumentToEdit }) => {
     handleImageUpload,
     removeImage,
     resetForm,
-    handleClose
+    handleClose,
   };
 };

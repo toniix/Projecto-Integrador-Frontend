@@ -1,94 +1,92 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
-import { useCategoryForm } from "./useCategoryForm";
+import { useCategoryForm } from "../../hooks/useCategoryForm";
 import { X } from "lucide-react";
 import ImageUploader from "../instrument/instrumentform/ImageUploader";
-const CategoryForm = ({ isOpen, onClose, initialData  }) => {
-  
-   const {
-      formData,
-      imagePreviews,
-      isEditMode,
-      handleInputChange,
-      handleSubmit,
-      handleImageUpload,
-      removeImage,
-      resetForm,
-      handleClose
-    } = useCategoryForm({ isOpen, onClose, initialData });
-  
-    if (!isOpen) return null;
-    return (
-        <div className="fixed inset-0 bg-[#1e1e1e]/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl w-full max-w-3xl overflow-hidden shadow-xl">
-            {/* Encabezado */}
-            <div className="sticky top-0 bg-gradient-to-r from-[#b08562] to-[#d9c6b0] p-4 rounded-t-xl flex justify-between items-center border-b border-[#d9c6b0] z-10">
-              <h2 className="text-[#3e0b05] text-xl font-bold">
-                {isEditMode ? "Editar Categoría del Instrumento" : "Registrar Instrumento"}
-              </h2>
-              <button
-                onClick={handleClose}
-                className="flex items-center justify-center rounded-full bg-white/20 text-[#3e0b05] hover:bg-white/40 transition-all p-2"
-                aria-label="Cerrar"
-              >
-                <X size={18} />
-              </button>
-            </div>
-      
-            {/* Formulario */}
-            <form onSubmit={handleSubmit} className="space-y-4 p-4">
-              <FormField
-                label="Nombre"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                disabled={isEditMode}
-              />
-      
-              <FormField
-                label="Descripción"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                required
-                disabled={isEditMode}
-              />
-      
-              {/* Sección de imágenes */}
-              <div className="bg-[#F9F7F4] p-5 rounded-xl">
-                <ImageUploader 
-                  isEditMode={isEditMode}
-                  imagePreviews={imagePreviews}
-                  removeImage={removeImage}
-                  handleImageUpload={handleImageUpload}
-                  maxImages = {1}
-                  isSingle ={true}
-                  
-                />
-              </div>
-      
-              {/* Botones */}
-              <div className="flex justify-center md:justify-end space-x-4 pt-4 border-t border-[#d9c6b0] bg-white p-4 rounded-b-xl">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="px-4 py-2 border border-[#d9c6b0] text-[#3e0b05] rounded-lg hover:bg-[#F9F7F4] transition-all font-medium"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#3e0b05] text-white rounded-lg hover:bg-[#730f06] transition-all shadow-sm"
-                >
-                  {isEditMode ? "Actualizar Categoría" : "Registrar Categoría"}
-                </button>
-              </div>
-            </form>
-          </div>
+const CategoryForm = ({ isOpen, onClose, initialData }) => {
+  const {
+    formData,
+    imagePreviews,
+    isEditMode,
+    handleInputChange,
+    handleSubmit,
+    handleImageUpload,
+    removeImage,
+    resetForm,
+    handleClose,
+  } = useCategoryForm({ isOpen, onClose, initialData });
+
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-[#1e1e1e]/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl w-full max-w-3xl overflow-hidden shadow-xl">
+        {/* Encabezado */}
+        <div className="sticky top-0 bg-gradient-to-r from-[#b08562] to-[#d9c6b0] p-4 rounded-t-xl flex justify-between items-center border-b border-[#d9c6b0] z-10">
+          <h2 className="text-[#3e0b05] text-xl font-bold">
+            {isEditMode
+              ? "Editar Categoría del Instrumento"
+              : "Registrar Instrumento"}
+          </h2>
+          <button
+            onClick={handleClose}
+            className="flex items-center justify-center rounded-full bg-white/20 text-[#3e0b05] hover:bg-white/40 transition-all p-2"
+            aria-label="Cerrar"
+          >
+            <X size={18} />
+          </button>
         </div>
-      );
-      
+
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="space-y-4 p-4">
+          <FormField
+            label="Nombre"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+            disabled={isEditMode}
+          />
+
+          <FormField
+            label="Descripción"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            required
+            disabled={isEditMode}
+          />
+
+          {/* Sección de imágenes */}
+          <div className="bg-[#F9F7F4] p-5 rounded-xl">
+            <ImageUploader
+              isEditMode={isEditMode}
+              imagePreviews={imagePreviews}
+              removeImage={removeImage}
+              handleImageUpload={handleImageUpload}
+              maxImages={1}
+              isSingle={true}
+            />
+          </div>
+
+          {/* Botones */}
+          <div className="flex justify-center md:justify-end space-x-4 pt-4 border-t border-[#d9c6b0] bg-white p-4 rounded-b-xl">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2 border border-[#d9c6b0] text-[#3e0b05] rounded-lg hover:bg-[#F9F7F4] transition-all font-medium"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-[#3e0b05] text-white rounded-lg hover:bg-[#730f06] transition-all shadow-sm"
+            >
+              {isEditMode ? "Actualizar Categoría" : "Registrar Categoría"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 const FormField = ({ label, name, value, onChange, required, disabled }) => {
@@ -102,7 +100,9 @@ const FormField = ({ label, name, value, onChange, required, disabled }) => {
         onChange={onChange}
         required={required}
         disabled={disabled}
-        className={`w-full p-2 border rounded ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+        className={`w-full p-2 border rounded ${
+          disabled ? "bg-gray-100 cursor-not-allowed" : ""
+        }`}
       />
     </div>
   );
@@ -111,9 +111,7 @@ const FormField = ({ label, name, value, onChange, required, disabled }) => {
 CategoryForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   isEditMode: PropTypes.bool,
-  initialData: PropTypes.object
+  initialData: PropTypes.object,
 };
-
-
 
 export default CategoryForm;
