@@ -32,3 +32,13 @@
     }
   }
   
+  .calendar-day-cell {
+    position: relative;
+  }
+  .availability-number {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }

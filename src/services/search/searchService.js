@@ -32,7 +32,7 @@ const searchService = {
       params.append('page', searchParams.page || 0);
       params.append('size', searchParams.size || 8);
       
-      const response = await axios.get(`${API_BASE_URL}/search/products`, { params });
+      const response = await axios.get(`https://clavecompas-production.up.railway.app/clavecompas/search/products`, { params });
       return response.data.response;
     } catch (error) {
       console.error('Error al buscar productos:', error);
@@ -52,7 +52,7 @@ const searchService = {
       const params = new URLSearchParams();
       params.append('query', query);
       
-      const response = await axios.get(`${API_BASE_URL}/search/autocomplete`, { params });
+      const response = await axios.get(`https://clavecompas-production.up.railway.app/clavecompas/search/autocomplete`, { params });
       return response.data.response;
     } catch (error) {
       console.error('Error al obtener sugerencias:', error);
