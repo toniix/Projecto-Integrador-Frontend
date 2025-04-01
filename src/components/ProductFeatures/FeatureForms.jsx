@@ -5,10 +5,11 @@ import IconSelector from "./IconSelector";
 import { useState } from "react";
 const FeatureForm = ({ isOpen, onClose, initialData  }) => {
     
-    const [icono, setIcono] = useState("");
+    
    const {
       formData,
       isEditMode,
+      handleIconName,
       handleInputChange,
       handleSubmit,
       resetForm,
@@ -53,9 +54,9 @@ const FeatureForm = ({ isOpen, onClose, initialData  }) => {
                 disabled={isEditMode}
               />
       
-              {/* Sección de imágenes */}
-              <div className="bg-[#F9F7F4] p-5 rounded-xl">
-                <IconSelector onSelect={setIcono}/>
+              {/* Sección de iconos */}
+              <div className="bg-[#F9F7F4] p-1 rounded-xl">
+                <IconSelector onSelect={handleIconName}/>
               </div>
       
               {/* Botones */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import featureService from "../../services/featureService";
 import PaginationComponent from "../../components/common/PaginationComponent";
 import "../../styles/ListProduct.css";
@@ -7,7 +7,7 @@ import { successToast, errorToast } from "../../utils/toastNotifications";
 import ConfirmationModal from "../../components/instrument/ConfirmationModal";
 import Button from "../../components/common/Button";
 import FeatureForm from "../../components/ProductFeatures/FeatureForms";
-
+import * as lucideIcons from "lucide-react";
 
 export const ListFeatures = () => {
     const [features, setAllfeatures] = useState([]);
@@ -22,7 +22,7 @@ export const ListFeatures = () => {
     const [featureId, setFeatureId] = useState(null);
     const [featureName, setFeatureName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    // Obtener categorias paginados
+    // Obtener caracteristicas paginados
     const fetchfeatures = async (uiPage) => {
         setIsLoading(true);
         try {
@@ -43,8 +43,8 @@ export const ListFeatures = () => {
                 }
             }
         } catch (error) {
-            console.error("Error al cargar categorias:", error);
-            errorToast("No se pudieron cargar las categorias");
+            console.error("Error al cargar caracteristicas:", error);
+            errorToast("No se pudieron cargar las caracteristicas");
             setAllfeatures([]);
         } finally {
             setIsLoading(false);
@@ -89,7 +89,7 @@ export const ListFeatures = () => {
             .deleteFeature(id, token)
             .then(() => {
                 fetchfeatures(currentPage);
-                successToast("Categoria eliminada correctamente");
+                successToast("Caracteristicas eliminada correctamente");
             })
             .catch((error) => {
                 console.error("Error al eliminar la categoria:", error);
@@ -101,15 +101,15 @@ export const ListFeatures = () => {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="p-6 bg-gradient-to-r from-[#d9c6b0] to-[#f1eae7]">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <h2 className="text-2xl font-bold text-[#3e0b05] mb-4">Categorias</h2>
-                    <p className="text-[#1e1e1e] mb-4">Todos las Categorias</p>
+                    <h2 className="text-2xl font-bold text-[#3e0b05] mb-4">Caracteristicas</h2>
+                    <p className="text-[#1e1e1e] mb-4">Todos las Caracteristicas</p>
                     <Button
                         variant="primary"
                         onClick={() => setIsCreateModalOpen(true)}
                     >
                         <div className="flex items-center gap-2">
                             <Plus size={16} />
-                            <span>Nueva Categoria</span>
+                            <span>Nueva Caracteristica</span>
                         </div>
                     </Button>
                 </div>
@@ -118,7 +118,7 @@ export const ListFeatures = () => {
                         <thead className="bg-[#3e0b05] text-white">
                             <tr>
                                 <th className="p-3">ID</th>
-                                <th className="p-4 font-medium">Imagen</th>
+                                <th className="p-4 font-medium">Icono</th>
                                 <th className="p-3">Nombre</th>
                                 <th className="p-3">Descripcion</th>
                                 <th className="p-3 text-center">Acciones</th>
@@ -141,17 +141,13 @@ export const ListFeatures = () => {
                                         <tr key={feature.idFeature} className="hover:bg-[#f1eae7] transition-colors">
                                             <td className="p-3 text-[#1e1e1e]">{feature.idFeature}</td>
                                             <td className="p-4">
-                                                {feature.imageUrl ? (
-                                                    <div className="h-16 w-16 rounded-xl overflow-hidden bg-[#d9c6b0] shadow-sm">
-                                                        <img 
-                                                            src={feature.imageUrl} 
-                                                            alt={feature.name}
-                                                            className="h-full w-full object-cover object-center"
-                                                        />
-                                                    </div>
+                                                {feature.iconUrl ? (
+                                                    <div className="h-12 w-12 flex items-center justify-center rounded-lg overflow-hidden bg-[#000000] shadow-md">
+                                                    {React.createElement(lucideIcons[feature.iconUrl], { size: 20 , color: "#fff"})}
+                                                  </div>
                                                 ) : (
-                                                    <div className="h-16 w-16 rounded-xl bg-[#d9c6b0] flex items-center justify-center text-[#3e0b05]">
-                                                        <Package size={24} />
+                                                    <div className="h-12 w-12 flex items-center justify-center rounded-lg overflow-hidden bg-[#101010] shadow-md">
+                                                        <Package size={20} />
                                                     </div>
                                                 )}
                                             </td>

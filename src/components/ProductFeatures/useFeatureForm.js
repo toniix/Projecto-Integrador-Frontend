@@ -18,50 +18,32 @@ export const useFeatureForm = ({ isOpen, onClose, initialData }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    iconName: "",
+    iconUrl: "",
   });
 
   
   
   // Image state
-  const [imageFiles, setImageFiles] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [existingImages, setExistingImages] = useState([]);
+ 
+  const [icon, setIcon] = useState("");
 
   // Form reset - Using useCallback to memoize the function
   const resetForm = useCallback(() => {
     // Clean up any object URLs to prevent memory leaks
-    imagePreviews.forEach((url) => {
-      if (url.startsWith("blob:")) {
-        URL.revokeObjectURL(url);
-      }
-    });
+   
 
     setFormData({
       name: "",
       description: "",
-      imageUrl: "",
+      iconUrl: "",
     });
 
-    setImageFiles([]);
-    setImagePreviews([]);
-    setExistingImages([]);
-  }, [imagePreviews]); // Only depend on imagePreviews
+    setIcon("");
+  }, []); // Only depend on imagePreviews
 
 
  
-  // Handle modal state changes
-  useEffect(() => {
-    // When modal closes, we'll clean up object URLs
-    if (!isOpen) {
-      // Cleanup function for blob URLs
-      imagePreviews.forEach((url) => {
-        if (url.startsWith("blob:")) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    }
-  }, [isOpen, imagePreviews]);
+ 
 
   // This is a separate effect just for resetting the form when opening in non-edit mode
   // IMPORTANT: Removed the call to resetForm inside the effect body to prevent infinite loop
@@ -71,12 +53,10 @@ export const useFeatureForm = ({ isOpen, onClose, initialData }) => {
       setFormData({
         name: "",
         description: "",
-        imageUrl: "",
+        iconUrl: "",
       });
+      setIcon("");
       
-      setImageFiles([]);
-      setImagePreviews([]);
-      setExistingImages([]);
     }
   }, [isOpen, isEditMode]);
 
@@ -87,19 +67,13 @@ export const useFeatureForm = ({ isOpen, onClose, initialData }) => {
    
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : name === "idFeature"
-          ? Number(value)
-          : name === "available"
-          ? value === "true"
-          : value,
+      [name]: value,
     }));
   };
 
-  
-
+  const handleIconName = (iconName) =>{
+    setIcon(iconName)
+  }
 
   const handleClose = () => {
     onClose();
@@ -114,8 +88,8 @@ export const useFeatureForm = ({ isOpen, onClose, initialData }) => {
 
       
         // Verify images in creation mode
-        if (imageFiles.length === 0) {
-          errorToast("Debes agregar al menos una imagen.");
+        if (icon === "") {
+          errorToast("Debes seleccionar un icono.");
           return;
         }
         const token = localStorage.getItem("token");
@@ -124,12 +98,12 @@ export const useFeatureForm = ({ isOpen, onClose, initialData }) => {
         // Create instrument with image URLs
         const newFeature = await featureService.createFeature({
           ...formData,
-          imageUrl:imageUrl[0],
+          iconUrl:icon,
         },token);
 
         
         
-        successToast("Categoria agregado con éxito.");
+        successToast("Caracteristica agregada con éxito.");
       
       
       handleClose();
@@ -151,6 +125,7 @@ export const useFeatureForm = ({ isOpen, onClose, initialData }) => {
   return {
     formData,
     isEditMode,
+    handleIconName,
     handleInputChange,
     handleSubmit,
     resetForm,
