@@ -1,8 +1,30 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import StarRating from "../review/StarRating";
+import axios from "axios";
 import PropTypes from "prop-types";
 import Button from "../common/Button";
 import FavoriteButton from "../common/FavoriteButton";
 
 const Card = ({ product, onViewDetail }) => {
+
+  const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReviewStats = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/clavecompas/reviews/stats/${product.idProduct}`);
+        setReviewStats(response.data.response);
+      } catch (error) {
+        console.error("Error fetching review stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviewStats();
+    }, [product.idProduct]);
+
   return (
     <div
       className="relative cursor-pointer bg-white shadow-2xl rounded-3xl flex flex-col h-full"
@@ -31,6 +53,16 @@ const Card = ({ product, onViewDetail }) => {
           }}>
             Ver
           </Button>
+        </div>
+        <div className="flex items-center mb-2">
+          {!loading && (
+            <>
+              <StarRating rating={reviewStats.averageRating} size="sm" />
+              <span className="text-sm text-gray-500 ml-1">
+                ({reviewStats.totalReviews})
+              </span>
+            </>
+          )}
         </div>
       </div>
     </div>
