@@ -12,6 +12,8 @@ import { Share, Calendar } from "lucide-react";
 import { productPolicies } from "../utils/instrumentPolicies";
 import ReservationDetails from "../components/reservation/ReservationDetails";
 import WhatsAppChatButton from "../components/common/WhatsAppChatButton";
+import { useAuth } from "../context";
+import AuthRequiredModal from "../components/modals/AuthRequiredModal";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ProductDetail = () => {
@@ -25,6 +27,8 @@ const ProductDetail = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user } = useAuth();
 
   // Función para abrir el modal
   const openShareModal = () => {
@@ -35,6 +39,14 @@ const ProductDetail = () => {
   const closeShareModal = () => {
     setIsModalOpen(false);
     setSelectedNetwork(null);
+  };
+
+  const handleReservationClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    setIsReservationModalOpen(true);
   };
 
   // Función para obtener características según el nombre del producto (esto luego deberíamos cambiarlo por información de la API)
@@ -252,6 +264,8 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  console.log(product);
+
   // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -324,8 +338,7 @@ const ProductDetail = () => {
             </button>
 
             <button
-              // onClick={() => navigate(`/product/${id}/reservation`)}
-              onClick={() => setIsReservationModalOpen(true)}
+              onClick={handleReservationClick}
               className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl
                 bg-gradient-to-r from-[#730f06] to-[#b08562] text-white text-sm sm:text-base font-medium
                 hover:from-[#8b1208] hover:to-[#c49573]
@@ -430,11 +443,17 @@ const ProductDetail = () => {
       {/* Modal de reserva */}
       {isReservationModalOpen && (
         <ReservationDetails
-          // product={product}
+          instrument={product}
           isOpen={isReservationModalOpen}
           onClose={() => setIsReservationModalOpen(false)}
         />
       )}
+
+      {/* Auth Required Modal */}
+      <AuthRequiredModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
 
       {/* WhatsApp Chat Button */}
       <WhatsAppChatButton

@@ -7,6 +7,8 @@ function UserMenu({ user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
+  console.log(user);
+
   // Handle clicking outside to close the menu
   useEffect(() => {
     function handleClickOutside(event) {
