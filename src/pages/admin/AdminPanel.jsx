@@ -3,6 +3,7 @@ import { InstrumentForm } from "../../components/instrument/instrumentform/index
 import { ListProduct } from "./ListProduct";
 import { ListUsers } from "./ListUsers";
 import { ListCategories } from "./ListCategories";
+import { ListFeatures} from "./ListFeatures"
 import Button from "../../components/common/Button";
 import {
   Home,

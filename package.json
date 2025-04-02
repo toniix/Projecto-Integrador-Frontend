@@ -13,6 +13,7 @@
     "@cloudinary/url-gen": "^1.21.0",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@radix-ui/react-dialog": "^1.1.6",
     "@tailwindcss/vite": "^4.0.8",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
