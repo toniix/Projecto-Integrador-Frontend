@@ -13,7 +13,7 @@ import { productPolicies } from "../utils/instrumentPolicies";
 import ReservationDetails from "../components/reservation/ReservationDetails";
 import WhatsAppChatButton from "../components/common/WhatsAppChatButton";
 import { useAuth } from "../context";
-import AuthRequiredModal from "../components/modals/AuthRequiredModal";
+import AuthRequiredModal from "../components/reservation/AuthRequiredModal";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ProductDetail = () => {

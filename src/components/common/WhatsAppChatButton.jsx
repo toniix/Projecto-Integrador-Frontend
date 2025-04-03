@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
+import whatsappLogo from "../../../public/img/wts-logo.png";
 
 export default function WhatsAppChatButton({
   phoneNumber,
@@ -73,7 +74,7 @@ export default function WhatsAppChatButton({
               onClick={handleWhatsAppClick}
               className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md transition-colors flex items-center justify-center"
             >
-              <MessageSquare size={18} className="mr-2" />
+              <img src={whatsappLogo} alt="WhatsApp" className="w-5 h-5 mr-2" />
               Iniciar chat
             </button>
           </div>
@@ -81,10 +82,10 @@ export default function WhatsAppChatButton({
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center"
+          className="bg-white hover:bg-gray-100 text-green-500 p-4 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center"
           aria-label="Chat por WhatsApp"
         >
-          <MessageSquare size={24} />
+          <img src={whatsappLogo} alt="WhatsApp" className="w-6 h-6" />
         </button>
       </div>
     </>

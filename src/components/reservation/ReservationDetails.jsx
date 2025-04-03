@@ -52,6 +52,17 @@ const ReservationDetails = ({ isOpen, onClose, instrument }) => {
 
   if (!isOpen) return null;
 
+  const handleReservationSubmit = () => {
+    // Handle reservation submission logic here
+    console.log("Reservation submitted:", {
+      instrumentId: instrument.id,
+      userId: user.id,
+      dateFrom: date.from,
+      dateTo: date.to,
+    });
+    onClose();
+  };
+
   return (
     <>
       <div className="fixed inset-0 bg-[#3d2130] bg-opacity-70 z-50 flex items-center justify-center p-4">

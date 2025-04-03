@@ -1,15 +1,41 @@
-import { X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import LoginModal from "../user/login/LoginModal";
+import RegisterModal from "../user/register/RegisterModal";
 
-export default function AuthRequiredModal({ isOpen, onClose }) {
-  const navigate = useNavigate();
+const AuthRequiredModal = ({ isOpen, onClose }) => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
-  if (!isOpen) return null;
-
-  const handleLogin = () => {
+  const openLoginModal = () => {
+    setIsLoginModalOpen(true);
+    setIsRegisterModalOpen(false);
     onClose();
-    navigate("/login");
   };
+
+  const openRegisterModal = () => {
+    setIsLoginModalOpen(false);
+    setIsRegisterModalOpen(true);
+  };
+
+  const closeLoginModal = () => setIsLoginModalOpen(false);
+  const closeRegisterModal = () => setIsRegisterModalOpen(false);
+
+  if (!isOpen) {
+    return (
+      <>
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={closeLoginModal}
+          openRegisterModal={openRegisterModal}
+        />
+        <RegisterModal
+          isOpen={isRegisterModalOpen}
+          onClose={closeRegisterModal}
+          openLoginModal={openLoginModal}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
@@ -29,7 +55,7 @@ export default function AuthRequiredModal({ isOpen, onClose }) {
               Cancelar
             </button>
             <button
-              onClick={handleLogin}
+              onClick={openLoginModal}
               className="px-6 py-2 bg-gradient-to-r from-[#7a0715] to-[#3b0012] text-white rounded-lg hover:shadow-lg hover:shadow-[#7a0715]/20 transform hover:-translate-y-0.5 transition-all duration-200"
             >
               Iniciar sesión
@@ -39,4 +65,6 @@ export default function AuthRequiredModal({ isOpen, onClose }) {
       </div>
     </div>
   );
-}
+};
+
+export default AuthRequiredModal;
