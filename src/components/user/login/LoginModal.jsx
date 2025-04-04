@@ -100,7 +100,6 @@ const LoginModal = ({ isOpen, onClose, openRegisterModal }) => {
       });
 
       if (result.success) {
-        console.log("usuario auth",result)
         if(result.roles.find(rol=>rol=="ADMIN")){
           navigate("/admin")
         }
