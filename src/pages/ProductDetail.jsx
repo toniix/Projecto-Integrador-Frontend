@@ -16,8 +16,8 @@ import ReviewForm from "../components/review/ReviewForm";
 import { useAuth, isTokenValid } from "../context/auth/AuthContext";
 import { errorToast } from "../utils/toastNotifications";
 const API_URL = import.meta.env.VITE_API_URL;
-const REV_URL = 'http://localhost:8080/clavecompas/reviews';
-const RESERVATION_URL = "http://localhost:8080/clavecompas/reservations";
+const REV_URL = `${API_URL}/reviews`;
+const RESERVATION_URL = `${API_URL}/reservations`;
 
 const ProductDetail = () => {
   const { id } = useParams();

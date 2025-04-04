@@ -10,11 +10,11 @@ const Card = ({ product, onViewDetail }) => {
 
   const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
   const [loading, setLoading] = useState(true);
-
+  const API_URL = import.meta.env.VITE_API_URL;
   useEffect(() => {
     const fetchReviewStats = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/clavecompas/reviews/stats/${product.idProduct}`);
+        const response = await axios.get(`${API_URL}/reviews/stats/${product.idProduct}`);
         setReviewStats(response.data.response);
       } catch (error) {
         console.error("Error fetching review stats:", error);

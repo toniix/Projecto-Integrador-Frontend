@@ -641,12 +641,12 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
 
           {/* Contenido alineado a la izquierda */}
           <div className="flex flex-col space-y-4 text-[#7a0715] text-sm md:text-base">
-            {console.log("nombre de usuario",user)}
             
-            <p className="flex items-center gap-2">
+            {isUserAuthenticated?(<p className="flex items-center gap-2">
               <SquareUser className="w-5 h-5 text-[#7a0715]" />
               <span className="font-medium">Nombres:</span> {` ${user.firstName} ${user.lastName}`}
-            </p>
+            </p>):(<></>)}
+            
             <p className="flex items-center gap-2">
               <CalendarDays className="w-5 h-5 text-[#7a0715]" />
               <span className="font-medium">Fecha de inicio:</span> {moment(startDate).format('DD/MM/YYYY')}
