@@ -287,7 +287,7 @@ const ProductDetail = () => {
         setLoading(false);
       }
     };
-    console.log("veamos que muestra",selectDate.current)
+    
     fetchProduct();
     fetchReviewStats();
 
