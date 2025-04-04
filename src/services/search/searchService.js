@@ -30,7 +30,7 @@ const searchService = {
       params.append('sortBy', searchParams.sortBy || 'name');
       params.append('sortDirection', searchParams.sortDirection || 'asc');
       params.append('page', searchParams.page || 0);
-      params.append('size', searchParams.size || 8);
+      params.append('size', searchParams.size || 10);
       
       const response = await axios.get(`${API_BASE_URL}/search/products`, { params });
       return response.data.response;
