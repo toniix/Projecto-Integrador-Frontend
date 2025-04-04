@@ -12,6 +12,16 @@ const ReservationDetails = ({ isOpen, onClose, instrument }) => {
   const [showMoreFeatures, setShowMoreFeatures] = useState(false);
   const { user } = useAuth();
 
+  const [quantity, setQuantity] = useState(1);
+
+  // Manejador para la cantidad
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (value > 0 && value <= instrument.stock) {
+      setQuantity(value);
+    }
+  };
+
   // Calculate total days and price
   const calculateDays = () => {
     if (!date.from || !date.to) return 0;

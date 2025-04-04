@@ -457,7 +457,7 @@ const ProductDetail = () => {
 
       {/* WhatsApp Chat Button */}
       <WhatsAppChatButton
-        phoneNumber="1234567890"
+        phoneNumber="51927984226"
         prefilledMessage="Hola, me gustaría obtener más información sobre la reserva de instrumentos."
       />
     </div>
