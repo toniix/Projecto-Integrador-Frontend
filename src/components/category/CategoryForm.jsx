@@ -24,7 +24,7 @@ const CategoryForm = ({ isOpen, onClose, initialData  }) => {
             {/* Encabezado */}
             <div className="sticky top-0 bg-gradient-to-r from-[#b08562] to-[#d9c6b0] p-4 rounded-t-xl flex justify-between items-center border-b border-[#d9c6b0] z-10">
               <h2 className="text-[#3e0b05] text-xl font-bold">
-                {isEditMode ? "Editar Categoría del Instrumento" : "Registrar Instrumento"}
+                {isEditMode ? "Editar Categoría " : "Registrar Categoría"}
               </h2>
               <button
                 onClick={handleClose}

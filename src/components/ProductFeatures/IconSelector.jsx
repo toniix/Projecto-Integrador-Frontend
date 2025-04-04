@@ -55,7 +55,7 @@ const IconSelector = ({onSelect}) => {
 
       {/* Modal */}
       {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
           <div className="bg-white rounded-lg shadow-lg p-5 w-96 max-h-[70vh] overflow-y-auto">
             {/* Encabezado */}
             <div className="flex justify-between items-center mb-3">

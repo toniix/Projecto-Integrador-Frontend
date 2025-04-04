@@ -23,7 +23,7 @@ const FeatureForm = ({ isOpen, onClose, initialData  }) => {
             {/* Encabezado */}
             <div className="sticky top-0 bg-gradient-to-r from-[#b08562] to-[#d9c6b0] p-4 rounded-t-xl flex justify-between items-center border-b border-[#d9c6b0] z-10">
               <h2 className="text-[#3e0b05] text-xl font-bold">
-                {isEditMode ? "Editar Categoría del Instrumento" : "Registrar Instrumento"}
+                {isEditMode ? "Editar Caracteríastica del Instrumento" : "Registrar Caracteríastica"}
               </h2>
               <button
                 onClick={handleClose}
@@ -72,7 +72,7 @@ const FeatureForm = ({ isOpen, onClose, initialData  }) => {
                   type="submit"
                   className="px-4 py-2 bg-[#3e0b05] text-white rounded-lg hover:bg-[#730f06] transition-all shadow-sm"
                 >
-                  {isEditMode ? "Actualizar Categoría" : "Registrar Categoría"}
+                  {isEditMode ? "Actualizar Característica" : "Registrar Característica"}
                 </button>
               </div>
             </form>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, X } from "lucide-react";
 import { useAuth } from "../../../context";
 import { errorToast, successToast } from "../../../utils/toastNotifications";
+import { useNavigate } from "react-router-dom";
 
 const LoginModal = ({ isOpen, onClose, openRegisterModal }) => {
   // Estados
@@ -16,7 +17,7 @@ const LoginModal = ({ isOpen, onClose, openRegisterModal }) => {
   const [error, setError] = useState("");
 
   const { login } = useAuth();
-
+  const navigate = useNavigate();
   // Función para resetear el formulario
   const resetForm = () => {
     setFormData({
@@ -99,6 +100,10 @@ const LoginModal = ({ isOpen, onClose, openRegisterModal }) => {
       });
 
       if (result.success) {
+        console.log("usuario auth",result)
+        if(result.roles.find(rol=>rol=="ADMIN")){
+          navigate("/admin")
+        }
         successToast("¡Bienvenido!");
         setFormData({ email: "", password: "" });
         setError(""); // Limpiar error general
