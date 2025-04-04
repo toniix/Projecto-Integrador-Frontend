@@ -42,10 +42,8 @@ function Home() {
   const [filters, setFilters] = useState(initialFilters);
   const [pagination, setPagination] = useState({
     page: parseInt(queryParams.get("page") || "0"),
-    size: 8,
+    size: 10,
     totalPages: 0,
-
-    
     totalElements: 0,
   });
 
@@ -63,6 +61,16 @@ function Home() {
     { id: 4, name: "Teclas", img: "/img/teclas.jpg" },
     { id: 5, name: "Electrónicas", img: "/img/electronica.jpg" },
   ];
+
+  // Función para mezclar un array de forma aleatoria (algoritmo Fisher-Yates)
+  const shuffleArray = (array) => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
 
   // Cargar categorías desde la API
   const fetchCategories = useCallback(async () => {
@@ -158,8 +166,16 @@ function Home() {
         };
 
         const data = await searchService.searchProducts(searchParams);
-
-        setProducts(data.content || []);
+        
+        // Si no hay filtros activos, aleatorizar los productos en cada carga
+        if (!hasActiveFilters) {
+          console.log("Aleatorizando productos en cada refresco");
+          setProducts(shuffleArray(data.content || []));
+        } else {
+          // Si hay filtros activos, mostrar los productos en el orden recibido
+          setProducts(data.content || []);
+        }
+        
         setPagination((prev) => ({
           ...prev,
           totalPages: data.totalPages || 0,
@@ -174,7 +190,7 @@ function Home() {
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.page, pagination.size]);
+  }, [filters, pagination.page, pagination.size, hasActiveFilters]);
 
   // Cargar categorías al montar el componente
   useEffect(() => {
