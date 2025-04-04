@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ProductDetail.css";
@@ -16,8 +16,8 @@ import ReviewForm from "../components/review/ReviewForm";
 import { useAuth, isTokenValid } from "../context/auth/AuthContext";
 import { errorToast } from "../utils/toastNotifications";
 const API_URL = import.meta.env.VITE_API_URL;
-const REV_URL = 'http://localhost:8080/clavecompas/reviews';
-const RESERVATION_URL = "http://localhost:8080/clavecompas/reservations";
+const REV_URL = `${API_URL}/reviews`;
+const RESERVATION_URL = `${API_URL}/reservations`;
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -33,7 +33,7 @@ const ProductDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const selectDate = useRef(null);
   // Función para abrir el modal
   const openShareModal = () => {
     setIsModalOpen(true);
@@ -287,7 +287,7 @@ const ProductDetail = () => {
         setLoading(false);
       }
     };
-
+    
     fetchProduct();
     fetchReviewStats();
 
@@ -299,6 +299,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
   }, []);
 
   if (loading) {
@@ -341,6 +342,13 @@ const ProductDetail = () => {
     });
   };
 
+
+  
+
+  const handleScroll = () => {
+    selectDate.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 min-h-screen pt-28 mt-4 relative">
       {/* Header Container */}
@@ -379,6 +387,7 @@ const ProductDetail = () => {
             </button>
 
             <button
+              onClick={handleScroll}
               className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-xl
                 bg-gradient-to-r from-[#730f06] to-[#b08562] text-white text-sm sm:text-base font-medium
                 hover:from-[#8b1208] hover:to-[#c49573]
@@ -447,12 +456,14 @@ const ProductDetail = () => {
 
       <ProductFeatures features={product.features} />
       <ProductPolicies policies={product.policies} />
+      <div ref={selectDate} >
       <AvailabilityCalendar
+        
         productId={id}
         productStock={product.stock}
         productPrice={product.price}
       />
-
+      </div>
       {/* Review form section */}
       {isUserAuthenticated && (
         <div className="mb-8">

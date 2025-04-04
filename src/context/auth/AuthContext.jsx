@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post(`${API_URL}/users/login`, credentials);
 
-      const { token, user: userData = {} } = response.data.response;
+      const { token, user: userData = {},roles } = response.data.response;
 
       // Decode token to get additional information
       const decodedToken = jwtDecode(token);
@@ -207,7 +207,7 @@ export const AuthProvider = ({ children }) => {
       // Después de iniciar sesión exitosamente, refrescar favoritos
       refreshFavorites();
 
-      return { success: true };
+      return { success: true ,roles:roles};
     } catch (error) {
       console.error("Login error:", error);
       console.log("Error response:", error.response);

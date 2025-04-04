@@ -8,7 +8,8 @@ import { errorToast, successToast } from '../../utils/toastNotifications';
 import LoginModal from '../user/login/LoginModal';
 import { useAuth, isTokenValid, getToken } from '../../context/auth/AuthContext';
 import { id } from 'date-fns/locale';
-
+import { CalendarDays, Clock, Layers, ShoppingBag, DollarSign, SquareUser } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 // Configurar localización en español
 moment.locale('es', {
   months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
@@ -44,7 +45,7 @@ const CustomToolbar = (toolbar) => {
     const date = moment(toolbar.date);
     return (
       <span className="text-lg md:text-xl lg:text-2xl font-regular">
-        {date.format('MMMM YYYY')} 
+        {date.format('MMMM YYYY')}
       </span>
     );
   };
@@ -67,12 +68,12 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
-
+  const navigate = useNavigate();
   // Verificar si el usuario está autenticado
-  const { getUserId } = useAuth();
+  const { getUserId ,user} = useAuth();
   const isUserAuthenticated = isTokenValid();
   const userId = getUserId();
-  
+
   // Estados para las fechas de los calendarios
   const [currentDate, setCurrentDate] = useState(() => {
     // Asegurarse de que comience en el mes actual
@@ -80,7 +81,7 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
     today.setDate(1); // Primer día del mes
     return today;
   });
-  
+
   const [nextMonthDate, setNextMonthDate] = useState(() => {
     // Mes siguiente al actual
     const nextMonth = new Date();
@@ -88,7 +89,7 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     return nextMonth;
   });
-  
+
   // Estados para la selección de fechas
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -98,8 +99,8 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
   // Verificar si estamos en el mes actual (para deshabilitar el botón "Anterior")
   const isCurrentMonthTheSystemCurrentMonth = () => {
     const today = new Date();
-    return currentDate.getFullYear() === today.getFullYear() && 
-           currentDate.getMonth() === today.getMonth();
+    return currentDate.getFullYear() === today.getFullYear() &&
+      currentDate.getMonth() === today.getMonth();
   };
 
   // Función para navegar ambos calendarios a la vez
@@ -107,16 +108,16 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
     const newCurrentDate = new Date(currentDate);
     const newNextMonthDate = new Date(nextMonthDate);
     const today = new Date();
-    
+
     if (direction === 'PREV') {
       // Verificar si retroceder nos llevaría a un mes anterior al actual
       newCurrentDate.setMonth(newCurrentDate.getMonth() - 1);
       newNextMonthDate.setMonth(newNextMonthDate.getMonth() - 1);
-      
+
       // Comprobar si el nuevo mes actual es anterior al mes actual del sistema
-      if (newCurrentDate.getFullYear() < today.getFullYear() || 
-          (newCurrentDate.getFullYear() === today.getFullYear() && 
-           newCurrentDate.getMonth() < today.getMonth())) {
+      if (newCurrentDate.getFullYear() < today.getFullYear() ||
+        (newCurrentDate.getFullYear() === today.getFullYear() &&
+          newCurrentDate.getMonth() < today.getMonth())) {
         // No permitir retroceder más allá del mes actual
         errorToast('No se pueden visualizar meses anteriores al actual');
         return;
@@ -125,93 +126,98 @@ function AvailabilityCalendar({ productId, productStock, productPrice, onDateRan
       newCurrentDate.setMonth(newCurrentDate.getMonth() + 1);
       newNextMonthDate.setMonth(newNextMonthDate.getMonth() + 1);
     }
-    
+
     setCurrentDate(newCurrentDate);
     setNextMonthDate(newNextMonthDate);
   };
 
-// Función para crear una reserva
-const createReservation = async () => {
-  if (!startDate || !endDate || !productId) {
-    errorToast('Faltan datos necesarios para realizar la reserva');
-    return;
-  }
-
-  if (!isUserAuthenticated) {
-    openLoginModal();
-    return;
-  }
-
-  try {
-    setIsReserving(true);
-    
-    // Formatear las fechas como YYYY-MM-DD
-    const formattedStartDate = startDate.toISOString().split('T')[0];
-    const formattedEndDate = endDate.toISOString().split('T')[0];
-    
-    // Obtener el token de autenticación
-    const token = getToken();
-    console.log('Token:', token);
-    
-    // Realizar la petición POST al backend con el formato requerido
-    const response = await axios.post(`${RESERVATION_URL}`, {
-      idProduct: parseInt(productId),
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-      quantity: parseInt(quantityToReserve),
-      status: 'PENDING',
-      idUser: userId,
-      productId: parseInt(productId),
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true
-    });
-    
-    // Verificar la respuesta
-    if (response.data && response.status === 200) {
-      successToast('¡Reserva realizada con éxito!');
-      
-      // Notificar al componente padre
-      if (onDateRangeSelect) {
-        onDateRangeSelect({
-          startDate: startDate,
-          endDate: endDate,
-          quantity: quantityToReserve,
-          subtotal: calculateSubtotal(),
-          reservationId: response.data.id || null
-        });
-      }
-      
-      // Actualizar el calendario y reiniciar la selección
-      fetchReservations();
-      resetSelection();
-    } else {
-      throw new Error('La respuesta del servidor no tiene el formato esperado');
+  // Función para crear una reserva
+  const createReservation = async () => {
+    if (!startDate || !endDate || !productId) {
+      errorToast('Faltan datos necesarios para realizar la reserva');
+      return;
     }
-  } catch (error) {
-    console.error("Error al crear la reserva:", error);
-    const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
-    errorToast(`Error al crear la reserva: ${errorMessage}`);
-  } finally {
-    setIsReserving(false);
-  }
-};
+
+    if (!isUserAuthenticated) {
+      openLoginModal();
+      return;
+    }
+
+    try {
+      setIsReserving(true);
+
+      // Formatear las fechas como YYYY-MM-DD
+      const formattedStartDate = startDate.toISOString().split('T')[0];
+      const formattedEndDate = endDate.toISOString().split('T')[0];
+
+      // Obtener el token de autenticación
+      const token = getToken();
+      console.log('Token de reserva:', token);
+
+      // Realizar la petición POST al backend con el formato requerido
+      const response = await axios.post(`${RESERVATION_URL}`, {
+
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+        quantity: parseInt(quantityToReserve),
+        status: 'PENDING',
+        idUser: userId,
+        idProduct: parseInt(productId),
+        totalPrice: calculateSubtotal(),
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('respuesta de la reserva:', response);
+      // Verificar la respuesta
+      if (response.data && response.status === 200) {
+        // Después de realizar la reserva
+        navigate("/user/confirmreservation", { state: { status: true, reservaInfo: response.data } });
+
+        successToast('¡Reserva realizada con éxito!');
+
+        // Notificar al componente padre
+        if (onDateRangeSelect) {
+          onDateRangeSelect({
+            startDate: startDate,
+            endDate: endDate,
+            quantity: quantityToReserve,
+            subtotal: calculateSubtotal(),
+            reservationId: response.data.id || null
+          });
+        }
+
+        // Actualizar el calendario y reiniciar la selección
+        fetchReservations();
+        resetSelection();
+      } else {
+        throw new Error('La respuesta del servidor no tiene el formato esperado');
+      }
+    } catch (error) {
+      console.error("Error al crear la reserva:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
+      navigate("/user/confirmreservation", { state: { success: false, errorMessage: response.message } });
+      errorToast(`Error al crear la reserva: ${errorMessage}`);
+    } finally {
+      setIsReserving(false);
+    }
+  };
 
   const fetchReservations = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${RESERVATION_URL}/product/${productId}`);
-      
+
       // Verificar la estructura de la respuesta y proporcionar valores por defecto
       const responseData = response.data || {};
       const reservationsData = responseData.response || [];
-      
+
       // Asegurarse de que reservationsData sea un array
       const reservationsArray = Array.isArray(reservationsData) ? reservationsData : [];
-      
+
       const events = reservationsArray.map(reservation => ({
         title: `Disponible: ${productStock - reservation.quantity} unidad(es)`,
         start: moment(reservation.startDate).startOf('day').toDate(),
@@ -219,27 +225,27 @@ const createReservation = async () => {
         allDay: true,
         resource: reservation
       }));
-      
+
       setReservations(events);
-      
+
       // Mapa de disponibilidad por día
       const availMap = {};
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 6); // Mostrar disponibilidad para 6 meses
-      
+
       // Inicializar todos los días con disponibilidad completa
       for (let d = new Date(today); d <= endDate; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
         availMap[dateStr] = productStock;
       }
-      
+
       // Restar las reservas existentes
       reservationsArray.forEach(reservation => {
         const start = moment(reservation.startDate).startOf('day').toDate();
         const end = moment(reservation.endDate).endOf('day').toDate();
-        
+
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toISOString().split('T')[0];
           if (availMap[dateStr] !== undefined) {
@@ -247,7 +253,7 @@ const createReservation = async () => {
           }
         }
       });
-      
+
       setAvailabilityMap(availMap);
       setLoading(false);
     } catch (error) {
@@ -256,22 +262,22 @@ const createReservation = async () => {
       errorToast(`Error al cargar las reservas: ${errorMessage}`);
       setError(errorMessage);
       setLoading(false);
-      
+
       // Inicializar con valores por defecto en caso de error
       setReservations([]);
-      
+
       // Crear un mapa de disponibilidad por defecto
       const availMap = {};
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 6);
-      
+
       for (let d = new Date(today); d <= endDate; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
         availMap[dateStr] = productStock;
       }
-      
+
       setAvailabilityMap(availMap);
     }
   };
@@ -283,18 +289,18 @@ const createReservation = async () => {
       // Si no hay productId o productStock, inicializar con valores por defecto
       setLoading(false);
       setReservations([]);
-      
+
       const availMap = {};
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 6);
-      
+
       for (let d = new Date(today); d <= endDate; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0];
         availMap[dateStr] = productStock || 0;
       }
-      
+
       setAvailabilityMap(availMap);
     }
   }, [productId, productStock]);
@@ -303,12 +309,12 @@ const createReservation = async () => {
   const isDateSelectable = (date) => {
     const dateStr = date.toISOString().split('T')[0];
     const availability = availabilityMap[dateStr];
-    
+
     // No seleccionable si es fecha pasada
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (date < today) return false;
-    
+
     // No seleccionable si no hay suficiente disponibilidad
     return availability >= quantityToReserve;
   };
@@ -317,12 +323,12 @@ const createReservation = async () => {
   const handleDateSelect = (date) => {
     // Convertir a fecha de inicio de día para evitar problemas con horas
     const selectedDate = moment(date).startOf('day').toDate();
-    
+
     if (!isDateSelectable(selectedDate)) {
       errorToast('Esta fecha no está disponible para la cantidad seleccionada');
       return;
     }
-    
+
     if (selectionMode === 'start') {
       setStartDate(selectedDate);
       setEndDate(null);
@@ -334,7 +340,7 @@ const createReservation = async () => {
         errorToast('La fecha de finalización debe ser posterior a la fecha de inicio');
         return;
       }
-      
+
       // Verificar que todas las fechas en el rango tengan disponibilidad suficiente
       let hasAvailability = true;
       for (let d = new Date(startDate); d <= selectedDate; d.setDate(d.getDate() + 1)) {
@@ -344,15 +350,15 @@ const createReservation = async () => {
           break;
         }
       }
-      
+
       if (!hasAvailability) {
         errorToast('No hay disponibilidad suficiente para todas las fechas en el rango seleccionado');
         return;
       }
-      
+
       setEndDate(selectedDate);
       setSelectionMode('start');
-      
+
       successToast('Rango de fechas seleccionado correctamente');
     }
   };
@@ -370,10 +376,10 @@ const createReservation = async () => {
     today.setHours(0, 0, 0, 0);
     const dateStr = date.toISOString().split('T')[0];
     const availability = availabilityMap[dateStr];
-    
+
     // Estilo base
     let style = {};
-    
+
     // Fechas pasadas
     if (date < today) {
       style = {
@@ -419,7 +425,7 @@ const createReservation = async () => {
         };
       }
     }
-    
+
     return { style };
   };
 
@@ -452,10 +458,10 @@ const createReservation = async () => {
   // Calcular el subtotal basado en el precio, cantidad y duración
   const calculateSubtotal = () => {
     if (!startDate || !endDate || !productPrice) return 0;
-    
+
     // Calcular la duración en días (incluyendo el día de inicio y fin)
     const durationInDays = moment(endDate).diff(moment(startDate), 'days') + 1;
-    
+
     // Calcular el subtotal
     return productPrice * quantityToReserve * durationInDays;
   };
@@ -480,175 +486,210 @@ const createReservation = async () => {
 
   return (
     <div className="my-3 md:my-5">
-      <p className="text-xl md:text-2xl mb-2 md:mb-3">Disponibilidad del Producto</p>
-      
-      {/* Leyenda del calendario */}
-      <div className="flex justify-center flex-wrap gap-2 md:gap-4 my-2 md:my-4 text-sm md:text-base">
-        <div className="flex items-center">
-          <span className="w-4 h-4 md:w-5 md:h-5 inline-block mr-1 md:mr-1.5" style={{ backgroundColor: 'rgba(220, 53, 69, 0.5)' }}></span>
-          <span>No disponible</span>
+      {/* Contenedor principal estilizado */}
+      <div className="bg-white rounded-2xl p-6 md:p-8 max-w-7xl mx-auto">
+
+        {/* Título */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <svg className="w-7 h-7 text-[#7a0715]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="text-2xl font-bold text-[#3D2130]">Disponibilidad del Producto</p>
         </div>
-        <div className="flex items-center">
-          <span className="w-4 h-4 md:w-5 md:h-5 inline-block mr-1 md:mr-1.5" style={{ backgroundColor: 'rgba(255, 193, 7, 0.5)' }}></span>
-          <span>Poca disponibilidad</span>
+
+        {/* Leyenda */}
+        <div className="flex justify-center flex-wrap gap-3 md:gap-4 mb-8 text-sm md:text-base">
+          <div className="flex items-center gap-2 px-3 py-1 bg-red-100 border border-red-300 rounded-md shadow-sm">
+            <span className="w-4 h-4 rounded-sm bg-red-500"></span>
+            <span className="text-red-800 font-medium">No disponible</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md shadow-sm">
+            <span className="w-4 h-4 rounded-sm bg-yellow-400"></span>
+            <span className="text-yellow-800 font-medium">Poca disponibilidad</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-green-100 border border-green-300 rounded-md shadow-sm">
+            <span className="w-4 h-4 rounded-sm bg-green-400"></span>
+            <span className="text-green-800 font-medium">Buena disponibilidad</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-100 border border-emerald-300 rounded-md shadow-sm">
+            <span className="w-4 h-4 rounded-sm bg-emerald-500"></span>
+            <span className="text-emerald-800 font-medium">Disponibilidad completa</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 border border-blue-300 rounded-md shadow-sm">
+            <span className="w-4 h-4 rounded-sm bg-blue-600"></span>
+            <span className="text-blue-800 font-medium">Seleccionado</span>
+          </div>
         </div>
-        <div className="flex items-center">
-          <span className="w-4 h-4 md:w-5 md:h-5 inline-block mr-1 md:mr-1.5" style={{ backgroundColor: 'rgba(40, 167, 69, 0.5)' }}></span>
-          <span>Buena disponibilidad</span>
+
+        {/* Cantidad a reservar */}
+        <div className="flex ">
+          <div className="w-full md:w-1/3 p-4  ">
+            <label htmlFor="quantityToReserve" className="block text-lg font-semibold text-[#3D2130] mb-2">
+              Cantidad a reservar
+            </label>
+            <div className="flex items-center justify-between">
+              <input
+                type="number"
+                id="quantityToReserve"
+                min="1"
+                max={productStock}
+                value={quantityToReserve}
+                onChange={handleQuantityChange}
+                className="w-3/4 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+              />
+              <span className="text-sm text-gray-500 font-medium">
+                (Máx: {productStock})
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center">
-          <span className="w-4 h-4 md:w-5 md:h-5 inline-block mr-1 md:mr-1.5" style={{ backgroundColor: 'rgba(25, 135, 84, 0.5)' }}></span>
-          <span>Disponibilidad completa</span>
-        </div>
-        <div className="flex items-center">
-          <span className="w-4 h-4 md:w-5 md:h-5 inline-block mr-1 md:mr-1.5" style={{ backgroundColor: '#3273dc' }}></span>
-          <span>Seleccionado</span>
-        </div>
-      </div>
-      
-      {/* Botones de navegación para ambos calendarios */}
-      <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={() => navigateCalendars('PREV')}
-          disabled={isCurrentMonthTheSystemCurrentMonth()}
-          className={`px-4 py-2 rounded-md ${
-            isCurrentMonthTheSystemCurrentMonth() 
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+
+
+
+        {/* Botones de navegación */}
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={() => navigateCalendars('PREV')}
+            disabled={isCurrentMonthTheSystemCurrentMonth()}
+            className={`px-5 py-2 rounded-lg transition-all font-semibold ${isCurrentMonthTheSystemCurrentMonth()
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-          }`}
-        >
-          &lt; Anterior
-        </button>
-        <button 
-          onClick={() => navigateCalendars('NEXT')}
-          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
-        >
-          Siguiente &gt;
-        </button>
-      </div>
-      
-      {/* Contenedor de los dos calendarios */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Calendario izquierdo */}
-        <div className="min-h-[300px] h-[50vh] md:h-[60vh] lg:h-[500px]">
-          <Calendar
-            localizer={localizer}
-            events={reservations}
-            startAccessor="start"
-            endAccessor="end"
-            className="h-[calc(100%-40px)] text-xs sm:text-sm md:text-base"
-            dayPropGetter={dayPropGetter}
-            eventPropGetter={eventStyleGetter}
-            views={['month']}
-            defaultView="month"
-            tooltipAccessor={(event) => event.title}
-            messages={messages}
-            date={currentDate}
-            onNavigate={(date) => {
-              setCurrentDate(date);
-            }}
-            components={{
-              toolbar: CustomToolbar
-            }}
-            selectable
-            onSelectSlot={(slotInfo) => handleDateSelect(slotInfo.start)}
-          />
-        </div>
-        
-        {/* Calendario derecho */}
-        <div className="min-h-[300px] h-[50vh] md:h-[60vh] lg:h-[500px]">
-          <Calendar
-            localizer={localizer}
-            events={reservations}
-            startAccessor="start"
-            endAccessor="end"
-            className="h-[calc(100%-40px)] text-xs sm:text-sm md:text-base"
-            dayPropGetter={dayPropGetter}
-            eventPropGetter={eventStyleGetter}
-            views={['month']}
-            defaultView="month"
-            tooltipAccessor={(event) => event.title}
-            messages={messages}
-            date={nextMonthDate}
-            onNavigate={(date) => {
-              setNextMonthDate(date);
-            }}
-            components={{
-              toolbar: CustomToolbar
-            }}
-            selectable
-            onSelectSlot={(slotInfo) => handleDateSelect(slotInfo.start)}
-          />
-        </div>
-      </div>
-      
-      {/* Controles del calendario */}
-      <div className="flex justify-between items-center mt-4">
-        {/* Selector de cantidad a reservar */}
-        <div className="flex items-center">
-          <label htmlFor="quantityToReserve" className="text-sm font-medium text-gray-700 mr-2">
-            Cantidad a reservar:
-          </label>
-          <input
-            type="number"
-            id="quantityToReserve"
-            min="1"
-            max={productStock}
-            value={quantityToReserve}
-            onChange={handleQuantityChange}
-            className="w-16 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
-          <span className="ml-2 text-sm text-gray-500">
-            (Máx: {productStock})
-          </span>
-        </div>
-        
-        {/* Botón de reinicio de la selección */}
-        <button 
-          onClick={resetSelection}
-          disabled={!hasSelection}
-          className={`px-4 py-2 rounded-md ${
-            hasSelection 
+              }`}
+          >
+            &lt; Mes anterior
+          </button>
 
-              ? 'bg-[#3D2130] text-[#ffffff] hover:bg-[#604152]' 
+          <p className="text-lg font-medium text-[#3D2130] text-center">Seleccionar Fechas Disponibles</p>
+
+          <button
+            onClick={() => navigateCalendars('NEXT')}
+            className="px-5 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-semibold transition-all"
+          >
+            Mes siguiente &gt;
+          </button>
+        </div>
+
+        {/* Contenedor de calendarios */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-gray-50 rounded-xl border border-gray-200 p-4 md:p-6">
+          {/* Calendario izquierdo */}
+          <div className="h-[40vh] md:h-[50vh] lg:h-[400px] border-r border-gray-300 pr-2 md:pr-4">
+            <Calendar
+              localizer={localizer}
+              events={reservations}
+              startAccessor="start"
+              endAccessor="end"
+              className="h-full text-sm"
+              dayPropGetter={dayPropGetter}
+              eventPropGetter={eventStyleGetter}
+              views={['month']}
+              defaultView="month"
+              tooltipAccessor={(event) => event.title}
+              messages={messages}
+              date={currentDate}
+              onNavigate={(date) => setCurrentDate(date)}
+              components={{ toolbar: CustomToolbar }}
+              selectable
+              onSelectSlot={(slotInfo) => handleDateSelect(slotInfo.start)}
+            />
+          </div>
+
+          {/* Calendario derecho */}
+          <div className="h-[40vh] md:h-[50vh] lg:h-[400px] pl-2 md:pl-4">
+            <Calendar
+              localizer={localizer}
+              events={reservations}
+              startAccessor="start"
+              endAccessor="end"
+              className="h-full text-sm"
+              dayPropGetter={dayPropGetter}
+              eventPropGetter={eventStyleGetter}
+              views={['month']}
+              defaultView="month"
+              tooltipAccessor={(event) => event.title}
+              messages={messages}
+              date={nextMonthDate}
+              onNavigate={(date) => setNextMonthDate(date)}
+              components={{ toolbar: CustomToolbar }}
+              selectable
+              onSelectSlot={(slotInfo) => handleDateSelect(slotInfo.start)}
+            />
+          </div>
+        </div>
+
+        {/* Controles inferiores */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+
+          {/* Botón de reinicio */}
+          {/* <button
+            onClick={resetSelection}
+            disabled={!hasSelection}
+            className={`px-5 py-2 rounded-lg font-semibold transition-all ${hasSelection
+              ? 'bg-[#3D2130] text-white hover:bg-[#604152]'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          Reiniciar selección
+              }`}
+          >
+            Reiniciar selección
+          </button> */}
 
-        </button>      </div>
-      
+        </div>
+      </div>
+
       {/* Resumen de la selección */}
       {startDate && endDate && (
-        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <h3 className="text-lg font-medium mb-2">Resumen de su reserva</h3>
-          <p><strong>Fecha de inicio:</strong> {moment(startDate).format('DD/MM/YYYY')}</p>
-          <p><strong>Fecha de finalización:</strong> {moment(endDate).format('DD/MM/YYYY')}</p>
-          <p><strong>Duración:</strong> {moment(endDate).diff(moment(startDate), 'days') + 1} días</p>
-          <p><strong>Cantidad:</strong> {quantityToReserve} unidad(es)</p>
-          <p><strong>Subtotal:</strong> {formatPrice(calculateSubtotal())}</p>
-          
-          {/* Botón de Reservar */}
-          <div className="mt-4 flex justify-end">
+        <div className="w-full bg-[#f8e6e6] border-l-4 border-[#a52a2a] mt-10 p-6 md:p-10 rounded-none">
+          <h3 className="text-2xl font-semibold text-[#7a0715] mb-6">Resumen de tu reserva</h3>
+
+          {/* Contenido alineado a la izquierda */}
+          <div className="flex flex-col space-y-4 text-[#7a0715] text-sm md:text-base">
+            
+            {isUserAuthenticated?(<p className="flex items-center gap-2">
+              <SquareUser className="w-5 h-5 text-[#7a0715]" />
+              <span className="font-medium">Nombres:</span> {` ${user.firstName} ${user.lastName}`}
+            </p>):(<></>)}
+            
+            <p className="flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-[#7a0715]" />
+              <span className="font-medium">Fecha de inicio:</span> {moment(startDate).format('DD/MM/YYYY')}
+            </p>
+            <p className="flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-[#7a0715]" />
+              <span className="font-medium">Fecha de finalización:</span> {moment(endDate).format('DD/MM/YYYY')}
+            </p>
+            <p className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#7a0715]" />
+              <span className="font-medium">Duración:</span> {moment(endDate).diff(moment(startDate), 'days') + 1} días
+            </p>
+            <p className="flex items-center gap-2">
+              <Layers className="w-5 h-5 text-[#7a0715]" />
+              <span className="font-medium">Cantidad:</span> {quantityToReserve} unidad(es)
+            </p>
+            <p className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-[#7a0715]" />
+              <span className="font-medium">Subtotal:</span> {formatPrice(calculateSubtotal())}
+            </p>
+          </div>
+
+          {/* Botón centrado */}
+          <div className="mt-8 flex justify-center">
             {!isUserAuthenticated ? (
-              <div className="text-center w-full">
-                <p className="text-amber-700 mb-2">Debe iniciar sesión para realizar una reserva</p>
-                <button 
+              <div className="text-center">
+                <p className="text-[#a52a2a] mb-2 text-base">Debes iniciar sesión para reservar</p>
+                <button
                   onClick={openLoginModal}
-                  className="px-6 py-2 bg-[#7a0715]/90 text-[#ffffff] rounded-xl hover:bg-[#604152] shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5"
+                  className="px-6 py-2 bg-[#7a0715] text-white rounded-xl hover:bg-[#5b0512] transition-all duration-300 flex items-center gap-2 mx-auto"
                 >
+                  <ShoppingBag className="w-5 h-5" />
                   Iniciar Sesión
                 </button>
               </div>
             ) : (
-              <button 
+              <button
                 onClick={createReservation}
                 disabled={isReserving}
-                className={`px-6 py-2 ${
-                  isReserving 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-[#7a0715]/90 hover:bg-[#604152]'
-                } text-[#ffffff] rounded-xl shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 flex items-center`}
+                className={`px-6 py-2 text-white rounded-xl transition-all duration-300 flex items-center gap-2 mx-auto ${isReserving
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#7a0715] hover:bg-[#5b0512]'
+                  }`}
               >
                 {isReserving ? (
                   <>
@@ -659,11 +700,20 @@ const createReservation = async () => {
                     Procesando...
                   </>
                 ) : (
-                  'Reservar'
+                  <>
+                    <ShoppingBag className="w-5 h-5" />
+                    Reservar
+                  </>
                 )}
-              </button>            )}
+              </button>
+            )}
           </div>
         </div>
+
+
+
+
+
       )}
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </div>

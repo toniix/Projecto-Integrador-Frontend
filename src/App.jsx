@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound"; // Nueva página NotFound
 import "react-datepicker/dist/react-datepicker.css"; // Para implementar la selección de rango de fechas requerida en la HU #22
 import FavoritesPage from "./pages/FavoritesPage"; // Nueva página FavoritesPage
 import { ReservationHistoryPage } from "./pages/reservations/ReservationHistoryPage"; // Nueva página ResrvationHistoryPage
+import ReservaConfirmacion from "./components/reservations/ReservaConfirmacion";
 
 export const App = () => {
   return (
@@ -68,7 +69,14 @@ export const App = () => {
               </PrivateRoute>
             }
           /> {/* Ruta de Historial de Reservas */}
-          
+          <Route
+            path="/user/confirmreservation"
+            element={
+              <PrivateRoute roles={["USER", "ADMIN"]}>
+                <ReservaConfirmacion />
+              </PrivateRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
           {/* Ruta para manejar páginas no encontradas */}
           

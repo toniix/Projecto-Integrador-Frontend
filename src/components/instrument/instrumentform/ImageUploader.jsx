@@ -21,13 +21,11 @@ const ImageUploader = ({
         {isSingle ? "Imagen" : `Imágenes (máximo ${maxImages})`}
       </label>
       <div className="space-y-4">
-        <div className={`grid ${isSingle ? "grid-cols-1 place-items-center" : `grid-cols-${gridCols}`} gap-4`}>
+        <div className={`grid ${isSingle ? "grid-cols-1 place-items-center" : `grid-cols-3`} gap-4`}>
           {imagePreviews.map((preview, index) => (
             <div
               key={index}
-              className={`relative group aspect-square ${
-                isSingle ? "w-24 h-24" : "w-full"
-              }`}
+              className={`relative group aspect-square w-24 h-24`} // Tamaño fijo para todas las imágenes
             >
               <img
                 src={preview}
@@ -47,9 +45,7 @@ const ImageUploader = ({
           ))}
           {!isEditMode && imagePreviews.length < maxImages && (
             <label
-              className={`aspect-square flex items-center justify-center border-2 border-[#757575] border-dashed rounded-lg cursor-pointer hover:bg-gray-50 ${
-                isSingle ? "w-24 h-24" : ""
-              }`}
+              className={`aspect-square flex items-center justify-center border-2 border-[#757575] border-dashed rounded-lg cursor-pointer hover:bg-gray-50 w-24 h-24`} // Tamaño fijo para "Añadir"
             >
               <div className="flex flex-col items-center justify-center">
                 <Plus className="text-[#b08562] mb-1" size={24} />
@@ -67,6 +63,9 @@ const ImageUploader = ({
         </div>
       </div>
     </div>
+
+
+
   );
 };
 

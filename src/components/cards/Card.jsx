@@ -9,6 +9,7 @@ import FavoriteButton from "../common/FavoriteButton";
 const Card = ({ product, onViewDetail }) => {
   const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
   const [loading, setLoading] = useState(true);
+
   
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -32,6 +33,7 @@ const Card = ({ product, onViewDetail }) => {
     // Fallback a imagen basada en ID
     return `/img/products/${product.idProduct}.jpg`;
   };
+
 
   useEffect(() => {
     const fetchReviewStats = async () => {
