@@ -7,14 +7,36 @@ import Button from "../common/Button";
 import FavoriteButton from "../common/FavoriteButton";
 
 const Card = ({ product, onViewDetail }) => {
-
   const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
   const [loading, setLoading] = useState(true);
+  
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  // Función para obtener la URL de la imagen, considerando todas las posibles propiedades
+  const getProductImageUrl = () => {
+    // Para depuración - muestra todas las propiedades del objeto producto
+    // console.log("Producto completo:", product);
+
+    // Verificar todas las posibles propiedades donde podría estar la URL de la imagen
+    if (product.mainImageUrl) return product.mainImageUrl;
+    if (product.image) return product.image;
+    if (product.productImage) return product.productImage;
+    if (product.imageUrl) return product.imageUrl;
+    if (product.imageUrls && product.imageUrls.length > 0) return product.imageUrls[0];
+    if (product.images && product.images.length > 0) {
+      if (typeof product.images[0] === 'string') return product.images[0];
+      if (product.images[0].url) return product.images[0].url;
+      if (product.images[0].imageUrl) return product.images[0].imageUrl;
+    }
+    
+    // Fallback a imagen basada en ID
+    return `/img/products/${product.idProduct}.jpg`;
+  };
 
   useEffect(() => {
     const fetchReviewStats = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/clavecompas/reviews/stats/${product.idProduct}`);
+        const response = await axios.get(`${API_URL}/reviews/stats/${product.idProduct}`);
         setReviewStats(response.data.response);
       } catch (error) {
         console.error("Error fetching review stats:", error);
@@ -23,7 +45,7 @@ const Card = ({ product, onViewDetail }) => {
       }
     };
     fetchReviewStats();
-    }, [product.idProduct]);
+  }, [product.idProduct, API_URL]);
 
   return (
     <div
@@ -33,14 +55,19 @@ const Card = ({ product, onViewDetail }) => {
       {/* Botón de favorito */}
       <FavoriteButton productId={product.idProduct} />
       
-      <img
-        src={`/provisorio/${product.idProduct}.jpg`} 
-        alt={product.name}
-        className="w-full h-60 object-cover rounded-t-2xl"
-        onError={(e) => {
-          e.target.src = "/img/placeholder.jpg";
-        }}
-      />
+      {/* DIV contenedor de la imagen */}
+      <div className="w-full h-60 rounded-t-2xl overflow-hidden bg-gray-100">
+        <img
+          src={getProductImageUrl()}
+          alt={product.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // console.error("Error cargando imagen:", e.target.src);
+            e.target.src = "/img/placeholder.jpg";
+          }}
+        />
+      </div>
+      
       <div className="p-6 flex flex-col flex-1">
         <h3 className="text-2xl text-[#1E1E1E] mb-2">{product.name}</h3>
         {/* Este div empuja el contenido que sigue hacia abajo */}
@@ -74,6 +101,19 @@ Card.propTypes = {
     idProduct: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
+    // Propiedades opcionales para las imágenes
+    mainImageUrl: PropTypes.string,
+    image: PropTypes.string,
+    productImage: PropTypes.string,
+    imageUrl: PropTypes.string,
+    imageUrls: PropTypes.arrayOf(PropTypes.string),
+    images: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.string),
+      PropTypes.arrayOf(PropTypes.shape({
+        url: PropTypes.string,
+        imageUrl: PropTypes.string
+      }))
+    ])
   }).isRequired,
   onViewDetail: PropTypes.func.isRequired,
 };

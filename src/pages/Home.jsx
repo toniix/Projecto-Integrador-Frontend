@@ -44,6 +44,8 @@ function Home() {
     page: parseInt(queryParams.get("page") || "0"),
     size: 8,
     totalPages: 0,
+
+    
     totalElements: 0,
   });
 
@@ -55,8 +57,8 @@ function Home() {
 
   // Categorías predefinidas para fallback
   const defaultCategories = [
-    { id: 1, name: "Cuerdas", img: "/img/cuerdas.jpg" },
-    { id: 2, name: "Percusión", img: "/img/percusion.jpg" },
+    { id: 2, name: "Cuerdas", img: "/img/cuerdas.jpg" },
+    { id: 1, name: "Percusión", img: "/img/percusion.jpg" },
     { id: 3, name: "Viento", img: "/img/viento.jpg" },
     { id: 4, name: "Teclas", img: "/img/teclas.jpg" },
     { id: 5, name: "Electrónicas", img: "/img/electronica.jpg" },
